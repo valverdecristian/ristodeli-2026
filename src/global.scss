@@ -35,3 +35,66 @@
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
 @import '@ionic/angular/css/palettes/dark.system.css';
+
+/* 
+ * ============================================================
+ * RISTODELI GLOBAL VARIABLES & PALETTE
+ * ============================================================
+ */
+:root {
+  /* Core brand palette */
+  --risto-retro-green: #31603D;
+  --risto-vanilla-cream: #F8EECB;
+  --risto-fire-red: #D23D2D;
+  --risto-saffron: #F5C065;
+  --risto-russet: #6E433D;
+
+  /* Global App overrides (Fondo verde, texto vainilla) */
+  --ion-background-color: var(--risto-retro-green) !important;
+  --ion-text-color: var(--risto-vanilla-cream) !important;
+
+  /* Mapping to ionic standard colors */
+  --ion-color-primary: var(--risto-retro-green);
+  --ion-color-secondary: var(--risto-vanilla-cream);
+  --ion-color-tertiary: var(--risto-saffron);
+  --ion-color-warning: var(--risto-saffron);
+  --ion-color-danger: var(--risto-fire-red);
+  --ion-color-dark: var(--risto-russet);
+  
+  /* Component-specific assignments */
+  --ion-card-background: var(--risto-russet); /* Las tarjetas por defecto seran color russet */
+  --ion-item-background: var(--risto-retro-green);
+}
+
+/* Contenedores tipo tarjeta a futuro */
+.risto-card {
+  background-color: var(--risto-russet);
+  color: var(--risto-vanilla-cream);
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+  margin: 16px 0;
+}
+
+/* Contenedores destacados (ej. promociones, avisos) */
+.risto-card-highlight {
+  background-color: var(--risto-saffron);
+  color: var(--risto-russet);
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+  margin: 16px 0;
+}
+
+/* Modificadores de color de texto */
+.text-cream { color: var(--risto-vanilla-cream); }
+.text-saffron { color: var(--risto-saffron); }
+.text-red { color: var(--risto-fire-red); }
+.text-green { color: var(--risto-retro-green); }
+.text-russet { color: var(--risto-russet); }
+
+/* Fondos útiles */
+.bg-russet { background-color: var(--risto-russet) !important; }
+.bg-cream { background-color: var(--risto-vanilla-cream) !important; }
+.bg-green { background-color: var(--risto-retro-green) !important; }
+
