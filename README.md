@@ -1,28 +1,51 @@
 # RISTODELI - Trabajo Final Integrador 2026
 
+<br>
+
+<p align="center">
+  <img src="assets/icon.png" alt="Logo de la App" width="200">
+</p>
+
 Este proyecto consiste en el desarrollo de una aplicación móvil para la gestión integral de un restaurante, enfocada en la experiencia del usuario (clientes y empleados).
 
----
+<br>
 
 ## 🛠️ Entorno y Reglas de Desarrollo
 
-Ionic versión `7.2.1`.
-Node.js versión `24.14.1`.
-Angular versión `21.2.5`.
+Ionic versión `7.2.1`. <br>
+Node.js versión `24.14.1`. <br>
+Angular versión `21.2.5`. <br>
 
----
+<br>
 
-## 👥 Integrantes y Responsabilidades
+## 👥 Integrantes
 
-De acuerdo a los requerimientos de la cátedra, se detallan las tareas asignadas y el seguimiento de cada integrante:
+* **Valverde, Cristian Jorge**: rama `dev-alfa`
+* **Chavez, Alejo**: rama `dev-beta`
+* **Pozo, Mariano**: rama `dev-gamma`
 
-| Apellidos y Nombres | Módulos (Objetivos) | Fecha Inicio | Fecha Fin | Branch |
-| :--- | :--- | :--- | :--- | :--- |
-| **Valverde, Cristian Jorge (Alfa)** | Liderazgo de proyecto y creación del ícono de la aplicación. | 01/04/2026 | 07/04/2026 | `dev-alfa` |
-| **Chavez, Alejo (Beta)** | Desarrollo de la vista de Login. | 01/04/2026 | 07/04/2026 | `dev-beta` |
-| **Pozo, Mariano (Gamma)** | Splash Screen animada/estática con logo, nombres y división del grupo. | 01/04/2026 | 07/04/2026 | `dev-gamma` |
+<br>
 
----
+## 🚀 Tareas Asignadas
+
+De acuerdo a los requerimientos de la cátedra, se detallan las tareas asignadas a cada integrante:
+
+| Apellidos y Nombres | Módulos (Objetivos) | Fecha Inicio | Fecha Fin |
+| :--- | :--- | :--- | :--- |
+| **Valverde, Cristian Jorge** | Creación del ícono de la aplicación. | 01/04/2026 | 01/04/2026 |
+| **Chavez, Alejo** | Desarrollo de la vista de Login. | 01/04/2026 | 03/04/2026 |
+| **Pozo, Mariano** | Splash Screen animada/estática. | 01/04/2026 | pendiente |
+| **Valverde, Cristian Jorge** | Configuración de Supabase (Auth, DB y Buckets) | 05/04/2026 | 05/04/2026 |
+| **Valverde, Cristian Jorge** | Integración de Cámara | 05/04/2026 | 05/04/2026 |
+| **Valverde, Cristian Jorge** | Servicio de Autenticación Reactivo | 05/04/2026 | 05/04/2026 |
+
+<br>
+
+## 🎨 Diseño y Prototipado (UI/UX)
+
+[Ver Prototipo Interactivo en Canva](https://canva.link/2kf3z7wq2apab4s)
+
+<br>
 
 ## 📂 Arquitectura del proyecto
 
@@ -31,6 +54,7 @@ src/
 └── app/
     ├── core/                 <-- (Lo que se carga una vez: Servicios globales)
     │   ├── services/
+    │   ├── models/
     │   └── guards/
     │
     ├── shared/               <-- (Componentes reutilizables en toda la app)
@@ -39,6 +63,7 @@ src/
     │
     ├── features/             <-- (Módulos lógicos del negocio / Entregas)
 assets/
+docs/
 environments/
 theme/
 ```
@@ -47,7 +72,7 @@ theme/
 **shared/**: Componentes que se usan en más de una pantalla.
 **features/**: Aquí va la lógica de cada punto funcional.
 
----
+<br>
 
 ## 🌿 Estrategia de Ramas (Gitflow)
 
