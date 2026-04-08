@@ -10,7 +10,7 @@ import { DetalleRegistro, UsuarioPerfil } from '../models/usuario.model';
 export class AuthService {
   private supabase: SupabaseClient;
   private router = inject(Router);
-  
+
   // Usamos signals para manejar el estado del usuario actual de manera reactiva en Angular >= 16
   public currentUser = signal<User | null>(null);
   public currentSession = signal<Session | null>(null);
@@ -49,7 +49,7 @@ export class AuthService {
       email,
       password: clave,
     });
-    
+
     if (error) throw error;
     return data;
   }
@@ -111,4 +111,69 @@ export class AuthService {
 
     return error ? null : data;
   }
+
+  /**
+   * Obtiene el correo de un usuario basado en su perfil (usado para autocompletar login rápido)
+   */
+  async obtenerEmailPorPerfil(perfil: string) {
+    const { data, error } = await this.supabase
+      .from('usuarios')
+      .select('email')
+      .eq('perfil', perfil)
+      .limit(1)
+      .single();
+
+    if (error) {
+      console.warn(`Error al buscar email para perfil '${perfil}':`, error.message);
+      return null;
+    }
+
+    return data?.email;
+  }
+  /**
+   * Redirige al usuario a la pantalla correspondiente según su perfil
+   */
+  async redirigirSegunPerfil() {
+    const perfilUsuario = await this.obtenerPerfilUsuarioActual();
+
+    if (!perfilUsuario) {
+      throw new Error('No se encontró el perfil del usuario.');
+    }
+
+    switch (perfilUsuario.perfil) {
+      case 'admin':
+        this.router.navigate(['/admin']);
+        break;
+
+      case 'cliente':
+        this.router.navigate(['/cliente']);
+        break;
+
+      case 'mozo':
+        this.router.navigate(['/mozo']);
+        break;
+
+      case 'supervisor':
+        this.router.navigate(['/supervisor']);
+        break;
+
+      case 'metre':
+        this.router.navigate(['/metre']);
+        break;
+
+      case 'cantinero':
+        this.router.navigate(['/cantinero']);
+        break;
+
+      case 'cocinero':
+        this.router.navigate(['/cocinero']);
+        break;
+
+      default:
+        this.router.navigate(['/login']);
+        throw new Error('Perfil no válido.');
+    }
+  }
 }
+
+

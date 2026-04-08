@@ -1,0 +1,37 @@
+<ion-content [fullscreen]="true">
+
+  <div class="login-container">
+
+    <div class="logo-section">
+      <img src="assets/icon/favicon.ico" alt="Logo" class="logo" />
+    </div>
+
+    <!-- Acceso Rápido -->
+
+
+    <div class="form-section">
+      <form (ngSubmit)="login()">
+
+        <ion-item class="input-item" [ngClass]="{'has-error': !isEmailValid}">
+          <ion-input type="email" placeholder="Correo Electrónico" [(ngModel)]="email" name="email" required
+            (ngModelChange)="checkEmailVal()" (ionBlur)="onEmailBlur()">
+          </ion-input>
+        </ion-item>
+
+        <ion-item class="input-item" [ngClass]="{'has-error': !isPasswordValid}">
+          <ion-input type="password" placeholder="Contraseña" [(ngModel)]="password" name="password" required
+            (ngModelChange)="checkPasswordVal()" (ionBlur)="onPasswordBlur()">
+          </ion-input>
+        </ion-item>
+
+        <ion-button expand="block" type="submit" class="login-button">
+          Iniciar sesión
+        </ion-button>
+
+      </form>
+      <app-botones-acceso-rapido (credentialsSelected)="onCredentialsSelected($event)"></app-botones-acceso-rapido>
+    </div>
+
+  </div>
+
+</ion-content>
