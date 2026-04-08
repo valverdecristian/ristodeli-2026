@@ -1,0 +1,20 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar color="warning">
+    <ion-title class="header-admin-title">Administración</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="logout()">
+        <ion-icon slot="icon-only" name="log-out-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="dashboard-content">
+  <div class="welcome-section">
+    <h2>Panel de Control</h2>
+    <p>Seleccione una opción para gestionar los recursos del restaurante.</p>
+  </div>
+
+  <app-management-actions (actionClicked)="handleAction($event)"></app-management-actions>
+
+</ion-content>

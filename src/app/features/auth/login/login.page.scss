@@ -40,6 +40,13 @@ form {
   --inner-border-width: 0px;
   border-radius: 16px;
   overflow: hidden;
+  transition: --background 0.3s ease;
+}
+
+.input-item.has-error {
+  /* Fondo rojo pálido para alertar por dentro y borde rojo fuerte */
+  --background: #ffcccc;
+  border: 2px solid var(--risto-fire-red);
 }
 
 ion-input {

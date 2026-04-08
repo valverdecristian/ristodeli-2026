@@ -1,0 +1,47 @@
+.quick-access-container {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  /* Reduje el gap para que entren sin problema */
+  width: 100%;
+  margin: 10px 0;
+  padding: 60px 0;
+  /* Al quitar el padding lateral restrictivo, el div dejará que entren los 3 botones en fila */
+}
+
+.profile-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+
+  /* Al poner flex basis en 30% aprox aseguro que entren 3 sin pelear por el padding de la pantalla */
+  flex: 0 0 30%;
+
+  transition: transform 0.2s ease;
+
+  &:active {
+    transform: scale(0.9);
+  }
+}
+
+.circular-button {
+  --border-radius: 50%;
+  --padding-start: 0;
+  --padding-end: 0;
+  --box-shadow: none;
+  /* Quitamos la sombra nativa de ionic por las dudas */
+  width: 80px;
+  height: 80px;
+  margin: 0;
+  /* Borré la propiedad 'box-shadow' que te estaba generando ese cuadrado pedorro */
+
+  ion-icon {
+    font-size: 50px;
+    /* Ajusté un toque el tamaño para que encaje perfecto en el 80x80 */
+  }
+}

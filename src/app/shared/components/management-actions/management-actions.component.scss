@@ -1,0 +1,88 @@
+.actions-grid {
+  /* Usamos "grid" en lugar de "flex" porque queremos estructurar recuadros parejos */
+  display: grid;
+  
+  /* Esto hace que las columnas se acomoden solas dependiendo del ancho de la pantalla.
+     Nunca van a medir menos de 130px, y si hay más espacio se estiran (1fr) */
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 20px;
+  padding: 10px;
+}
+
+.action-card {
+  /* Necesitamos relative porque después vamos a posicionar un degradado absoluto encima */
+  position: relative;
+  overflow: hidden; /* Que nada se salga de los bordes redondeados */
+  
+  /* Toma el color que seteamos dinámicamente en el HTML con [style.--bg-color]="act.color" */
+  background: var(--bg-color);
+  border-radius: 20px; /* Bordes bien redondeados modernos */
+  
+  /* Flexbox acá adentro para alinear el icono y el texto verticalmente en el centro */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  
+  /* Sombra inicial suave para darle profundidad (efecto carta) */
+  box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+  
+  /* Le decimos que anime el 'transform' y el 'box-shadow' en 0.3 segundos cuando ocurra algo */
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s ease;
+  color: #fff;
+  cursor: pointer;
+  
+  /* "padding" es el aire interno de la tarjeta, empujando el contenido al centro */
+  padding: 18px 12px;
+
+  /* Esto es la micro-animación: cuando hacés CLICK (active), la carta se hunde */
+  &:active {
+    /* Baja 2px y se achica al 96% de su tamaño */
+    transform: translateY(2px) scale(0.96);
+    /* La sombra se hace más chica porque "tocó el piso" */
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  }
+
+  /* Pseudo-elemento: Esto hace el efecto "Glassmorphism" (destello de luz diagonal) */
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    /* Degradado lineal que va de un blanco súper suave al transparente absoluto */
+    background: linear-gradient(135deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 100%);
+    pointer-events: none; /* Que este degradado no moleste a los clicks, es puro diseño */
+  }
+
+  .icon-container {
+    /* Un círculo semi-transparente donde va a vivir dentro el icono de ionic */
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    /* Esta sombra interna ("inset") hace que el círculo de fondo se hunda como un cráter */
+    box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.3);
+    margin-bottom: 12px;
+    width: 55px; /* Reducido un poquito (antes 65px) */
+    height: 55px;
+
+    ion-icon {
+      /* Le subimos el nivel de fuente en lugar de width/height porque los iconos son fuentes */
+      font-size: 28px; /* Reducido un poquito (antes 34px) */
+      color: #fff;
+    }
+  }
+
+  .action-title {
+    /* Estilizamos el texto copiando el peso moderno de la web (700 es negrita) */
+    font-weight: 700;
+    font-size: 0.95rem;
+    text-align: center;
+    line-height: 1.2;
+    /* 'letter-spacing' aleja un poquitito las letras haciéndolas más legibles (muy iOS/premium) */
+    letter-spacing: 0.5px;
+    /* Una sombrita al texto ayuda a contrastar si la carta tiene un fondo muy claro */
+    text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+  }
+}
