@@ -6,6 +6,7 @@ import { Router } from '@angular/router';
 import { BotonesAccesoRapidoComponent } from '../../../shared/components/botones-acceso-rapido/botones-acceso-rapido.component';
 import { AuthService } from '../../../core/services/auth.service';
 import { ToastService } from '../../../core/services/toast.service';
+import { SpinnerService } from '../../../core/services/spinner.service';
 
 @Component({
   selector: 'app-login',
@@ -23,7 +24,8 @@ export class LoginPage implements OnInit {
 
   constructor(
     private authService: AuthService,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private spinnerService: SpinnerService
   ) { }
 
   ngOnInit() {
@@ -76,10 +78,14 @@ export class LoginPage implements OnInit {
     }
 
     try {
+      await this.spinnerService.mostrar('Iniciando sesión...');
       await this.authService.ingresar(this.email, this.password);
+      
+      await this.spinnerService.ocultar();
       this.toastService.mostrarExito('¡Sesión iniciada con éxito!');
       await this.authService.redirigirSegunPerfil();
     } catch (e: any) {
+      await this.spinnerService.ocultar();
       console.error('Credenciales inválidas o error de red:', e);
       this.toastService.mostrarError('Credenciales inválidas. Intente nuevamente.');
     }

@@ -129,3 +129,55 @@ ion-toast.custom-toast-warning {
   --border-radius: 8px;
   --box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
 }
+
+/* 
+ * ============================================================
+ * SPINNER / LOADER CUSTOM CSS
+ * Animamos el logo para que gire dentro de la pantalla de carga.
+ * ============================================================
+ */
+
+/* Animación rotatoria infinita */
+@keyframes risto-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Modificamos la caja interna del loading de Ionic */
+ion-loading.custom-spinner-logo {
+  --background: var(--risto-retro-green);
+  --spinner-color: transparent; 
+  --backdrop-opacity: 0.7; 
+  
+  .loading-wrapper {
+    border-radius: 16px;
+    padding: 24px 32px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    
+    /* Inyectamos la imagen mediante pseudo-elemento ::before */
+    &::before {
+      content: '';
+      display: block;
+      width: 64px;
+      height: 64px;
+      margin-bottom: 12px;
+      background: url('/assets/icon/favicon.ico') no-repeat center center;
+      background-size: contain;
+      border-radius: 50%;
+      animation: risto-spin 2s linear infinite;
+    }
+  }
+
+  /* Modificamos el texto por defecto de Ionic */
+  .loading-content {
+    font-weight: 600;
+    color: var(--risto-vanilla-cream);
+    font-size: 1.1rem;
+    letter-spacing: 0.5px;
+    text-align: center;
+  }
+}
