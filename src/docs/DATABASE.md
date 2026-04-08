@@ -16,6 +16,6 @@ create table public.usuarios (
 
 Detalles de campos:
 
-- perfil: valores: dueño, supervisor, metre, mozo, cocinero, cantinero, cliente_reg, cliente_anon.
+- perfil: valores: admin, supervisor, metre, mozo, cocinero, cantinero, cliente_reg, cliente_anon.
 
 - foto_url: url del bucket de supabase

@@ -33,11 +33,11 @@ De acuerdo a los requerimientos de la cátedra, se detallan las tareas asignadas
 | Apellidos y Nombres | Módulos (Objetivos) | Fecha Inicio | Fecha Fin |
 | :--- | :--- | :--- | :--- |
 | **Valverde, Cristian Jorge** | Creación del ícono de la aplicación. | 01/04/2026 | 01/04/2026 |
-| **Chavez, Alejo** | Desarrollo de la vista de Login. | 01/04/2026 | 03/04/2026 |
+| **Chavez, Alejo** | Desarrollo de la interfaz de Login. | 01/04/2026 | 03/04/2026 |
 | **Pozo, Mariano** | Splash Screen animada/estática. | 01/04/2026 | pendiente |
-| **Valverde, Cristian Jorge** | Configuración de Supabase (Auth, DB y Buckets) | 05/04/2026 | 05/04/2026 |
-| **Valverde, Cristian Jorge** | Integración de Cámara | 05/04/2026 | 05/04/2026 |
-| **Valverde, Cristian Jorge** | Servicio de Autenticación Reactivo | 05/04/2026 | 05/04/2026 |
+| **Valverde, Cristian Jorge** | Configuración de Supabase (Auth, DB y Storage) | 05/04/2026 | 05/04/2026 |
+| **Valverde, Cristian Jorge** | Servicio de Cámara | 05/04/2026 | 05/04/2026 |
+|  | Toast Service y Sppiner |  |  |
 
 <br>
 
