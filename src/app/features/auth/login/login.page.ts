@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonButton, IonContent, IonHeader, IonInput, IonItem, IonTitle, IonToolbar, ToastController } from '@ionic/angular/standalone';
+import { IonButton, IonContent, IonInput, IonItem } from '@ionic/angular/standalone';
 import { Router } from '@angular/router';
 import { BotonesAccesoRapidoComponent } from '../../../shared/components/botones-acceso-rapido/botones-acceso-rapido.component';
 import { AuthService } from '../../../core/services/auth.service';
+import { ToastService } from '../../../core/services/toast.service';
 
 @Component({
   selector: 'app-login',
@@ -17,28 +18,15 @@ export class LoginPage implements OnInit {
 
   email: string = '';
   password: string = '';
-  
   isEmailValid: boolean = true;
   isPasswordValid: boolean = true;
 
   constructor(
-    private router: Router, 
     private authService: AuthService,
-    private toastCtrl: ToastController
+    private toastService: ToastService
   ) { }
 
   ngOnInit() {
-  }
-
-  async presentToast(message: string) {
-    const toast = await this.toastCtrl.create({
-      message,
-      duration: 2500,
-      color: 'danger',
-      position: 'top',
-      icon: 'alert-circle-outline'
-    });
-    toast.present();
   }
 
   checkEmailVal() {
@@ -60,14 +48,14 @@ export class LoginPage implements OnInit {
   onEmailBlur() {
     this.checkEmailVal();
     if (!this.isEmailValid && this.email.length > 0) {
-      this.presentToast('Por favor ingrese un formato de email válido.');
+      this.toastService.mostrarAdvertencia('Por favor ingrese un formato de email válido.');
     }
   }
 
   onPasswordBlur() {
     this.checkPasswordVal();
     if (!this.isPasswordValid && this.password.length > 0) {
-      this.presentToast('La contraseña debe contener al menos 6 caracteres.');
+      this.toastService.mostrarAdvertencia('La contraseña debe contener al menos 6 caracteres.');
     }
   }
 
@@ -83,16 +71,17 @@ export class LoginPage implements OnInit {
     this.checkPasswordVal();
     
     if (!this.isEmailValid || !this.isPasswordValid || !this.email || !this.password) {
-      this.presentToast('Por favor, revise que los datos ingresados sean correctos.');
+      this.toastService.mostrarError('Por favor, revise que los datos ingresados sean correctos.');
       return;
     }
 
     try {
       await this.authService.ingresar(this.email, this.password);
+      this.toastService.mostrarExito('¡Sesión iniciada con éxito!');
       await this.authService.redirigirSegunPerfil();
     } catch (e: any) {
       console.error('Credenciales inválidas o error de red:', e);
-      this.presentToast('Credenciales inválidas. Intente nuevamente.');
+      this.toastService.mostrarError('Credenciales inválidas. Intente nuevamente.');
     }
   }
 }

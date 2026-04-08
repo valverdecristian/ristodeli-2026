@@ -98,3 +98,34 @@
 .bg-cream { background-color: var(--risto-vanilla-cream) !important; }
 .bg-green { background-color: var(--risto-retro-green) !important; }
 
+/* 
+ * ============================================================
+ * TOAST CUSTOM CSS / NOTIFICACIONES
+ * Puedes modificar los colores de fondo (--background) o del texto (--color) 
+ * cuando definas por completo tus paletas de colores.
+ * ============================================================
+ */
+
+/* Toast de Éxito */
+ion-toast.custom-toast-success {
+  --background: var(--risto-retro-green);
+  --color: var(--risto-vanilla-cream);
+  --border-radius: 8px;
+  --box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+}
+
+/* Toast de Error */
+ion-toast.custom-toast-error {
+  --background: var(--risto-fire-red);
+  --color: var(--risto-vanilla-cream);
+  --border-radius: 8px;
+  --box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+}
+
+/* Toast de Advertencia/Información */
+ion-toast.custom-toast-warning {
+  --background: var(--risto-saffron);
+  --color: var(--risto-russet);
+  --border-radius: 8px;
+  --box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+}

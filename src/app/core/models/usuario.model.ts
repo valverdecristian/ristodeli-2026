@@ -1,5 +1,5 @@
 export type PerfilUsuario = 
-  | 'dueño' 
+  | 'admin' 
   | 'supervisor' 
   | 'metre' 
   | 'mozo' 
