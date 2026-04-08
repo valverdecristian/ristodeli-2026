@@ -20,9 +20,9 @@ Angular versión `21.2.5`. <br>
 
 ## 👥 Integrantes
 
-* **Valverde, Cristian Jorge**: rama `dev-alfa`
-* **Chavez, Alejo**: rama `dev-beta`
-* **Pozo, Mariano**: rama `dev-gamma`
+* **Valverde, Cristian Jorge** (Alfa): rama `dev-alfa`
+* **Chavez, Alejo** (Beta): rama `dev-beta`
+* **Pozo, Mariano** (Gamma): rama `dev-gamma`
 
 <br>
 
@@ -33,11 +33,15 @@ De acuerdo a los requerimientos de la cátedra, se detallan las tareas asignadas
 | Apellidos y Nombres | Módulos (Objetivos) | Fecha Inicio | Fecha Fin |
 | :--- | :--- | :--- | :--- |
 | **Valverde, Cristian Jorge** | Creación del ícono de la aplicación. | 01/04/2026 | 01/04/2026 |
+| **Chavez, Alejo** | Splash Screen animada/estática. | 07/04/2026 | pendiente |
 | **Chavez, Alejo** | Desarrollo de la interfaz de Login. | 01/04/2026 | 03/04/2026 |
-| **Pozo, Mariano** | Splash Screen animada/estática. | 01/04/2026 | pendiente |
 | **Valverde, Cristian Jorge** | Configuración de Supabase (Auth, DB y Storage) | 05/04/2026 | 05/04/2026 |
 | **Valverde, Cristian Jorge** | Servicio de Cámara | 05/04/2026 | 05/04/2026 |
-|  | Toast Service y Sppiner |  |  |
+| **Chavez, Alejo** | Vista del Menú del Administrador. | 07/04/2026 | pendiente |
+| **Valverde, Cristian Jorge** | Toast Service y Sppiner | 08/04/2026 | pendiente |
+| **Valverde, Cristian Jorge** | Formulario de Cliente y Empleado. | 07/04/2026 | pendiente |
+| **Chavez, Alejo** | Vista Crear Nuevo Empleado. | 07/04/2026 | pendiente |
+|  | Sonidos y Vibraciones. | pendiente | pendiente |
 
 <br>
 
