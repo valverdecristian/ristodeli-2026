@@ -48,6 +48,8 @@
   --risto-fire-red: #D23D2D;
   --risto-saffron: #F5C065;
   --risto-russet: #6E433D;
+  --risto-orange: #f6a700;
+  --risto-purple: #D0BFFF;
 
   /* Global App overrides (Fondo verde, texto vainilla) */
   --ion-background-color: var(--risto-retro-green) !important;
@@ -98,3 +100,102 @@
 .bg-cream { background-color: var(--risto-vanilla-cream) !important; }
 .bg-green { background-color: var(--risto-retro-green) !important; }
 
+/* 
+ * ============================================================
+ * TOAST CUSTOM CSS / NOTIFICACIONES
+ * Puedes modificar los colores de fondo (--background) o del texto (--color) 
+ * cuando definas por completo tus paletas de colores.
+ * ============================================================
+ */
+
+/* Toast de Éxito */
+ion-toast.custom-toast-success {
+  --background: var(--risto-retro-green);
+  --color: var(--risto-vanilla-cream);
+  --border-radius: 8px;
+  --box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+}
+
+/* Toast de Error */
+ion-toast.custom-toast-error {
+  --background: var(--risto-fire-red);
+  --color: var(--risto-vanilla-cream);
+  --border-radius: 8px;
+  --box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+}
+
+/* Toast de Advertencia/Información */
+ion-toast.custom-toast-warning {
+  --background: var(--risto-saffron);
+  --color: var(--risto-russet);
+  --border-radius: 8px;
+  --box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+}
+
+/* 
+ * ============================================================
+ * SPINNER / LOADER CUSTOM CSS
+ * Animamos el logo para que gire dentro de la pantalla de carga.
+ * ============================================================
+ */
+
+/* Animación rotatoria infinita */
+@keyframes risto-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Modificamos la caja interna del loading de Ionic */
+ion-loading.custom-spinner-logo {
+  --background: var(--risto-retro-green);
+  --spinner-color: transparent; 
+  --backdrop-opacity: 0.7; 
+  
+  .loading-wrapper {
+    border-radius: 16px;
+    padding: 24px 32px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    
+    /* Inyectamos la imagen mediante pseudo-elemento ::before */
+    &::before {
+      content: '';
+      display: block;
+      width: 64px;
+      height: 64px;
+      margin-bottom: 12px;
+      background: url('/assets/icon/favicon.ico') no-repeat center center;
+      background-size: contain;
+      border-radius: 50%;
+      animation: risto-spin 2s linear infinite;
+    }
+  }
+
+  /* Modificamos el texto por defecto de Ionic */
+  .loading-content {
+    font-weight: 600;
+    color: var(--risto-vanilla-cream);
+    font-size: 1.1rem;
+    letter-spacing: 0.5px;
+    text-align: center;
+  }
+}
+/* Popover override class for custom Select elements */
+.orange-popover {
+  --ion-background-color: var(--risto-orange) !important;
+  --ion-text-color: var(--risto-russet) !important;
+  --max-width: 90vw !important; /* Ensuring popover doesn't look cut off horizontally */
+  
+  ion-item {
+    --background: var(--risto-orange) !important;
+    --color: var(--risto-russet) !important;
+    text-shadow: none !important;
+  }
+}
+
+.text-vanilla {
+  color: var(--risto-vanilla-cream) !important;
+}
