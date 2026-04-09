@@ -48,6 +48,8 @@
   --risto-fire-red: #D23D2D;
   --risto-saffron: #F5C065;
   --risto-russet: #6E433D;
+  --risto-orange: #f6a700;
+  --risto-purple: #D0BFFF;
 
   /* Global App overrides (Fondo verde, texto vainilla) */
   --ion-background-color: var(--risto-retro-green) !important;
@@ -180,4 +182,20 @@ ion-loading.custom-spinner-logo {
     letter-spacing: 0.5px;
     text-align: center;
   }
+}
+/* Popover override class for custom Select elements */
+.orange-popover {
+  --ion-background-color: var(--risto-orange) !important;
+  --ion-text-color: var(--risto-russet) !important;
+  --max-width: 90vw !important; /* Ensuring popover doesn't look cut off horizontally */
+  
+  ion-item {
+    --background: var(--risto-orange) !important;
+    --color: var(--risto-russet) !important;
+    text-shadow: none !important;
+  }
+}
+
+.text-vanilla {
+  color: var(--risto-vanilla-cream) !important;
 }

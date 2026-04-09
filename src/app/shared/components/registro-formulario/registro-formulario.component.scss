@@ -1,0 +1,131 @@
+.risto-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px; /* Distancia entre grupos de elementos principal */
+  width: 100%;
+  
+  .field-wrapper {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 8px; /* Espacio real visual entre campos para que respiren */
+
+    .input-item {
+      --background: var(--risto-orange); /* Color Naranja puro solicitado */
+      --color: var(--risto-russet); /* Que la fuente sea oscura para lectura */
+      --placeholder-color: var(--risto-russet);
+      --placeholder-opacity: 0.7;
+      --border-radius: 8px;
+      --padding-top: 14px;
+      --padding-bottom: 14px;
+      margin-bottom: 2px;
+      font-size: 1.05rem; /* Letras microscópicamente mas grandes para acompañar */
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .error-container {
+      min-height: 20px; /* Reservamos este espacio para que no salte todo */
+      display: flex;
+      align-items: flex-start;
+      
+      .error-msg {
+        font-size: 0.8rem;
+        padding-left: 8px;
+        &.text-center { text-align: center; margin-top: 4px; }
+      }
+    }
+  }
+
+  .foto-section {
+    align-self: center; /* Intento de flex, resuelto con margin 0 auto abajo */
+    margin: 0 auto 20px auto; /* Centrado estricto y separación debajo */
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background-color: var(--risto-orange); /* Actualizado segun ordenes */
+    color: var(--risto-vanilla-cream);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+    position: relative;
+
+    .foto-placeholder {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 10px;
+
+      ion-icon {
+        font-size: 40px;
+      }
+      p {
+        font-size: 0.55rem;
+        margin: 4px 0 0;
+      }
+    }
+
+    .foto-preview {
+      width: 100%;
+      height: 100%;
+      position: relative;
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .foto-badge {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        text-align: center;
+        background: rgba(0,0,0,0.6);
+        font-size: 0.6rem;
+        padding: 4px 0;
+      }
+    }
+  }
+
+  .stepper-controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 8px;
+    gap: 8px;
+
+    .stepper-indicator {
+      font-size: 0.85rem;
+      color: var(--risto-vanilla-cream);
+      font-weight: bold;
+      opacity: 0.8;
+      margin-bottom: 4px;
+    }
+
+    .stepper-buttons {
+      display: flex;
+      width: 100%;
+      gap: 12px;
+
+      .stepper-button-back {
+        flex: 1;
+        --color: var(--risto-vanilla-cream);
+      }
+      .stepper-button-next {
+        flex: 2;
+        --background: var(--risto-purple); /* Color purpura claro solicitado */
+        --color: var(--risto-russet); /* Letras más nítidas encima del púrpura */
+      }
+    }
+  }
+
+  .error-container {
+    min-height: 20px;
+    .error-msg {
+      font-size: 0.8rem;
+    }
+  }
+}
