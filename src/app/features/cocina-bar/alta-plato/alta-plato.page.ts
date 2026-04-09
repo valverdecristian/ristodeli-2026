@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { 
   IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonBackButton, 
   IonItem, IonInput, IonTextarea, IonButton, IonGrid, IonRow, IonCol, IonCard, 
-  IonList, IonFooter // 
+  IonList, IonFooter 
 } from '@ionic/angular/standalone';
 import { FotoService } from '../../../core/services/foto.service';
 import { ProductoService } from '../../../core/services/producto.service';
@@ -22,7 +22,7 @@ import { Router } from '@angular/router';
   imports: [
     IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonBackButton,
     IonItem, IonInput, IonTextarea, IonButton, IonGrid, IonRow, IonCol, IonCard,
-    IonList, IonFooter, // <-- ¡Acá también!
+    IonList, IonFooter,
     CommonModule, FormsModule
   ]
 })
@@ -33,6 +33,7 @@ export class AltaPlatoPage {
   private spinnerService = inject(SpinnerService);
   private router = inject(Router);
 
+  // Inicialización del objeto plato siguiendo la interfaz Producto
   plato: Producto = {
     nombre: '',
     descripcion: '',
@@ -41,11 +42,14 @@ export class AltaPlatoPage {
     fotos: [], 
     tipo: 'plato'
   };
+
   fotosPreview: string[] = [];
 
   constructor() {}
 
-  /** Abre la camara usando el servicio **/
+  /**
+   * Abre la cámara mediante FotoService para capturar evidencias del plato.
+   */
   async tomarFoto() {
     if (this.fotosPreview.length >= 3) {
       this.toastService.mostrarAdvertencia('Ya tomaste las 3 fotos requeridas.');
@@ -60,16 +64,19 @@ export class AltaPlatoPage {
   }
 
   /**
-   * Elimina una foto de la lista antes de guardar
+   * Remueve una foto de los arreglos locales antes de confirmar el guardado.
    */
   eliminarFoto(index: number) {
     this.fotosPreview.splice(index, 1);
     this.plato.fotos.splice(index, 1);
   }
 
+  /**
+   * Procesa el guardado del plato.
+   * Realiza validaciones de longitud, valores positivos y cantidad de imágenes.
+   */
   async guardarPlato() {
     
-    // Validaciones 
     if (!this.plato.nombre || this.plato.nombre.length < 3) {
       await Haptics.impact({ style: ImpactStyle.Heavy });
       this.toastService.mostrarError('El nombre debe tener al menos 3 letras.');
@@ -103,7 +110,6 @@ export class AltaPlatoPage {
     try {
       await this.spinnerService.mostrar('Guardando plato...');
 
-      // Verifica si ya existe un plato con ese nombre
       const existe = await this.productoService.verificarSiExiste(this.plato.nombre, 'plato');
       if (existe) {
         await this.spinnerService.ocultar();
@@ -112,14 +118,12 @@ export class AltaPlatoPage {
         return;
       }
 
-      // Guardar en Base de Datos
       await this.productoService.crearProducto(this.plato);
       
       await this.spinnerService.ocultar();
       this.toastService.mostrarExito('¡Plato agregado correctamente!');
       
-      // Limpiar formulario y volver atrás
-      this.router.navigate(['/home']); // CAMBIAR LA REDIRECCION HACIA EL DASHBOARD CORRESPONDIENTE
+      this.router.navigate(['/home']); 
 
     } catch (error) {
       await this.spinnerService.ocultar();

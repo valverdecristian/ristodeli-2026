@@ -1,0 +1,11 @@
+/* Estilos para el registro de cliente */
+.welcome-banner {
+  text-align: center;
+  margin-bottom: 24px;
+  font-size: 1.1rem;
+  font-weight: 500;
+  
+  &.text-cream {
+    color: var(--risto-vanilla-cream, #F4EBD0);
+  }
+}

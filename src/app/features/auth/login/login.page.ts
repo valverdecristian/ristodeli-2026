@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonButton, IonContent, IonInput, IonItem } from '@ionic/angular/standalone';
-import { Router} from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { BotonesAccesoRapidoComponent } from '../../../shared/components/botones-acceso-rapido/botones-acceso-rapido.component';
 import { AuthService } from '../../../core/services/auth.service';
 import { ToastService } from '../../../core/services/toast.service';
@@ -14,7 +14,7 @@ import { Haptics, ImpactStyle } from '@capacitor/haptics';
   templateUrl: './login.page.html',
   styleUrls: ['./login.page.scss'],
   standalone: true,
-  imports: [IonContent, CommonModule, FormsModule, IonButton, IonInput, IonItem, BotonesAccesoRapidoComponent]
+  imports: [IonContent, CommonModule, FormsModule, IonButton, IonInput, IonItem, BotonesAccesoRapidoComponent, RouterModule]
 })
 export class LoginPage implements OnInit {
 

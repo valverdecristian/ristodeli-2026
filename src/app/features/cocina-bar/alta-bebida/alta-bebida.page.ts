@@ -27,12 +27,14 @@ import { Router } from '@angular/router';
   ]
 })
 export class AltaBebidaPage {
+  // Inyeccion de dependencias mediante inject 
   private fotoService = inject(FotoService);
   private productoService = inject(ProductoService);
   private toastService = inject(ToastService);
   private spinnerService = inject(SpinnerService);
   private router = inject(Router);
 
+  // Modelo de datos inicial para la bebida
   bebida: Producto = {
     nombre: '',
     descripcion: '',
@@ -46,6 +48,10 @@ export class AltaBebidaPage {
 
   constructor() {}
 
+  /**
+   * Captura una foto utilizando la cámara del dispositivo.
+   * Limita la carga a un máximo de 3 fotografías.
+   */
   async tomarFoto() {
     if (this.fotosPreview.length >= 3) {
       this.toastService.mostrarAdvertencia('Ya tomaste las 3 fotos requeridas.');
@@ -59,12 +65,20 @@ export class AltaBebidaPage {
     }
   }
 
+  /**
+   * Elimina una foto seleccionada de la lista de previsualización.
+   */
   eliminarFoto(index: number) {
     this.fotosPreview.splice(index, 1);
     this.bebida.fotos.splice(index, 1);
   }
 
+  /**
+   * Valida y persiste la nueva bebida en la base de datos.
+   * Incluye feedback háptico (vibración) en caso de errores de validación.
+   */
   async guardarBebida() {
+
     if (!this.bebida.nombre || this.bebida.nombre.length < 3) {
       await Haptics.impact({ style: ImpactStyle.Heavy });
       this.toastService.mostrarError('El nombre debe tener al menos 3 letras.');
@@ -98,7 +112,7 @@ export class AltaBebidaPage {
     try {
       await this.spinnerService.mostrar('Guardando bebida...');
 
-      // Validamos que no exista otra BEBIDA con el mismo nombre
+      // Verificación de duplicados por nombre y tipo
       const existe = await this.productoService.verificarSiExiste(this.bebida.nombre, 'bebida');
       if (existe) {
         await this.spinnerService.ocultar();
@@ -112,11 +126,11 @@ export class AltaBebidaPage {
       await this.spinnerService.ocultar();
       this.toastService.mostrarExito('¡Bebida agregada correctamente!');
       
-      this.router.navigate(['/home']); // CAMBIAR LA REDIRECCION HACIA EL DASHBOARD CORRESPONDIENTE
+      this.router.navigate(['/home']); 
 
     } catch (error) {
       await this.spinnerService.ocultar();
-      await Haptics.vibrate();
+      await Haptics.vibrate(); // Vibración generica de error
       console.error(error);
       this.toastService.mostrarError('Error al guardar la bebida.');
     }
