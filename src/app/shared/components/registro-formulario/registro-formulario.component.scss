@@ -1,54 +1,67 @@
 .risto-form {
   display: flex;
   flex-direction: column;
-  gap: 16px; /* Distancia entre grupos de elementos principal */
+  gap: 16px;
+  /* Distancia entre grupos de elementos principal */
   width: 100%;
-  
+
   .field-wrapper {
     display: flex;
     flex-direction: column;
-    margin-bottom: 8px; /* Espacio real visual entre campos para que respiren */
+    margin-bottom: 8px;
+    /* Espacio real visual entre campos para que respiren */
 
     .input-item {
-      --background: var(--risto-orange); /* Color Naranja puro solicitado */
-      --color: var(--risto-russet); /* Que la fuente sea oscura para lectura */
+      --background: var(--risto-orange);
+      /* Color Naranja puro solicitado */
+      --color: var(--risto-russet);
+      /* Que la fuente sea oscura para lectura */
       --placeholder-color: var(--risto-russet);
       --placeholder-opacity: 0.7;
       --border-radius: 8px;
       --padding-top: 14px;
       --padding-bottom: 14px;
       margin-bottom: 2px;
-      font-size: 1.05rem; /* Letras microscópicamente mas grandes para acompañar */
-      box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+      font-size: 1.05rem;
+      /* Letras microscópicamente mas grandes para acompañar */
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
     }
 
     .error-container {
-      min-height: 20px; /* Reservamos este espacio para que no salte todo */
+      min-height: 20px;
+      /* Reservamos este espacio para que no salte todo */
       display: flex;
       align-items: flex-start;
-      
+
       .error-msg {
         font-size: 0.8rem;
         padding-left: 8px;
-        &.text-center { text-align: center; margin-top: 4px; }
+
+        &.text-center {
+          text-align: center;
+          margin-top: 4px;
+        }
       }
     }
   }
 
   .foto-section {
-    align-self: center; /* Intento de flex, resuelto con margin 0 auto abajo */
-    margin: 0 auto 20px auto; /* Centrado estricto y separación debajo */
+    align-self: center;
+    /* Intento de flex, resuelto con margin 0 auto abajo */
+    margin: 0 auto 20px auto;
+    /* Centrado estricto y separación debajo */
     width: 120px;
     height: 120px;
     border-radius: 50%;
-    background-color: var(--risto-orange); /* Actualizado segun ordenes */
+    background-color: var(--risto-orange);
+    /* Actualizado segun ordenes */
     color: var(--risto-vanilla-cream);
     display: flex;
     justify-content: center;
     align-items: center;
     overflow: hidden;
     cursor: pointer;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
     position: relative;
 
     .foto-placeholder {
@@ -61,6 +74,7 @@
       ion-icon {
         font-size: 40px;
       }
+
       p {
         font-size: 0.55rem;
         margin: 4px 0 0;
@@ -83,10 +97,35 @@
         bottom: 0;
         width: 100%;
         text-align: center;
-        background: rgba(0,0,0,0.6);
+        background: rgba(0, 0, 0, 0.6);
         font-size: 0.6rem;
         padding: 4px 0;
       }
+    }
+  }
+
+  .scan-button-wrapper {
+    margin: 8px 0 16px 0;
+
+    .premium-scan-btn {
+      /* Estilos Premium del boton de escaneo (EDITA ESTO SI DESEAS CAMBIAR LOS COLORES) */
+      --background: var(--risto-fire-red);
+      /* Un negro elegante para contrastar o puedes usar var(--risto-purple) */
+      --color: var(--risto-vanilla-cream);
+      /* Texto claro */
+      --border-radius: 12px;
+      /* Cambia esto si lo quieres mas redondo, p. ej. 24px, 30px o 50px */
+      --box-shadow: 0px 4px 10px rgba(24, 20, 22, 0.596);
+      /* Sombra elegante */
+      --padding-top: 18px;
+      --padding-bottom: 18px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      font-size: 1rem;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+      /* Puedes hacer que deje de palpitar quitando esta línea: */
+      animation: gentle-pulse 3s 1;
     }
   }
 
@@ -114,18 +153,37 @@
         flex: 1;
         --color: var(--risto-vanilla-cream);
       }
+
       .stepper-button-next {
         flex: 2;
-        --background: var(--risto-purple); /* Color purpura claro solicitado */
-        --color: var(--risto-russet); /* Letras más nítidas encima del púrpura */
+        --background: var(--risto-purple);
+        /* Color purpura claro solicitado */
+        --color: var(--risto-russet);
+        /* Letras más nítidas encima del púrpura */
       }
     }
   }
 
   .error-container {
     min-height: 20px;
+
     .error-msg {
       font-size: 0.8rem;
     }
   }
+}
+
+@keyframes gentle-pulse {
+  0% {
+    border-radius: 12px;
+    box-shadow: 0 0 0 0 #f6a700;
+    transform: scale(1);
+  }
+
+  50% {
+    border-radius: 12px;
+    box-shadow: 0 0 0 12px rgba(226, 151, 12, 0.116);
+    transform: scale(1.02);
+  }
+
 }
