@@ -42,5 +42,29 @@ export const routes: Routes = [
     path: 'gestion-mesas',
     loadComponent: () => import('./features/admin/gestion-mesas/gestion-mesas.page').then( m => m.GestionMesasPage)
 
+  },  {
+    path: 'home-cocinero',
+    loadComponent: () => import('./features/staff/home-cocinero/home-cocinero.page').then( m => m.HomeCocineroPage)
+  },
+  {
+    path: 'home-cantinero',
+    loadComponent: () => import('./features/staff/home-cantinero/home-cantinero.page').then( m => m.HomeCantineroPage)
+  },
+  {
+    path: 'home-metre',
+    loadComponent: () => import('./features/admin/home-metre/home-metre.page').then( m => m.HomeMetrePage)
+  },
+  {
+    path: 'home-mozo',
+    loadComponent: () => import('./features/staff/home-mozo/home-mozo.page').then( m => m.HomeMozoPage)
+  },
+  {
+    path: 'home-dueno',
+    loadComponent: () => import('./features/admin/home-dueno/home-dueno.page').then( m => m.HomeDuenoPage)
+  },
+  {
+    path: 'home-cliente',
+    loadComponent: () => import('./features/cliente/home-cliente/home-cliente.page').then( m => m.HomeClientePage)
   }
+
 ];

@@ -1,0 +1,51 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar color="dark">
+    <ion-title>👨‍🍳 Comandas - Cocina</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="logout()">
+        <ion-icon slot="icon-only" name="log-out-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content color="light" class="ion-padding">
+  
+  <ion-card *ngFor="let pedido of pedidos" [ngClass]="{'pedido-listo': pedido.estado === 'Listo'}">
+    
+    <ion-card-header>
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <ion-card-subtitle>Mesa {{ pedido.mesa_numero }}</ion-card-subtitle>
+        <ion-badge [color]="getColorEstado(pedido.estado)">
+          {{ pedido.estado }}
+        </ion-badge>
+      </div>
+      <ion-card-title>{{ pedido.cantidad }}x {{ pedido.producto_nombre }}</ion-card-title>
+    </ion-card-header>
+
+    <ion-card-content>
+      <p>Ingresó: {{ pedido.created_at | date:'HH:mm' }} hs</p>
+      
+      <div class="ion-margin-top">
+        <ion-button expand="block" color="warning" 
+                    *ngIf="pedido.estado === 'Pendiente'" 
+                    (click)="tomarPedido(pedido)">
+          Tomar Pedido
+        </ion-button>
+
+        <ion-button expand="block" color="success" 
+                    *ngIf="pedido.estado === 'En Preparación'" 
+                    (click)="terminarPedido(pedido)">
+          Marcar como Listo
+        </ion-button>
+      </div>
+    </ion-card-content>
+
+  </ion-card>
+
+  <div *ngIf="pedidos.length === 0" class="ion-text-center ion-padding" style="color: gray;">
+    <h2>¡Sin comandas!</h2>
+    <p>La cocina está al día.</p>
+  </div>
+
+</ion-content>

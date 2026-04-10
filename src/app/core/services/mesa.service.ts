@@ -47,4 +47,41 @@ export class MesaService {
 
     return data;
   }
+
+  /**
+   * Obtiene todas las mesas de la base de datos, ordenadas por número.
+   */
+  async obtenerMesas(): Promise<Mesa[]> {
+    const supabase = this.authService.supabaseClient;
+    
+    const { data, error } = await supabase
+      .from('mesas')
+      .select('*')
+      .order('numero', { ascending: true }); // Para que aparezcan ordenadas en la grilla
+
+    if (error) {
+      console.error('Error al obtener mesas:', error);
+      throw error;
+    }
+
+    return data as Mesa[];
+  }
+
+  /**
+   * Actualiza el estado de una mesa en Supabase (Libre / Ocupada).
+   */
+  async actualizarEstado(id: string, nuevoEstado: string): Promise<void> {
+    const supabase = this.authService.supabaseClient;
+
+    const { error } = await supabase
+      .from('mesas')
+      .update({ estado: nuevoEstado })
+      .eq('id', id);
+
+    if (error) {
+      console.error('Error al actualizar el estado de la mesa:', error);
+      throw error;
+    }
+  }
+
 }
