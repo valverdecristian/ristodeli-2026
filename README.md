@@ -22,7 +22,7 @@ Angular versión `21.2.5`. <br>
 
 * **Valverde, Cristian Jorge** (Alfa): rama `dev-alfa`
 * **Chavez, Alejo** (Beta): rama `dev-beta`
-* **Pozo, Mariano** (Gamma): rama `dev-gamma`
+* **Trkmic Torres, Ignacio** (Gamma): rama `dev-gamma`
 
 <br>
 
@@ -41,8 +41,11 @@ De acuerdo a los requerimientos de la cátedra, se detallan las tareas asignadas
 | **Valverde, Cristian Jorge** | Toast Service y Sppiner | 08/04/2026 | pendiente |
 | **Valverde, Cristian Jorge** | Formulario de Cliente y Empleado. | 07/04/2026 | pendiente |
 | **Chavez, Alejo** | Vista Crear Nuevo Empleado. | 07/04/2026 | pendiente |
-|  | Sonidos y Vibraciones. | pendiente | pendiente |
-
+| **Trkmic Torres, Ignacio** | Feedback Sensorial: Sonidos y Vibraciones. | 08/04/2026 | 09/04/2026 |
+| **Trkmic Torres, Ignacio** | Vistas de Creación: Platos y Bebidas. | 08/04/2026 | 09/04/2026 |
+| **Trkmic Torres, Ignacio** | Dashboards Operativos: Cocinero, Cantinero y Metre. | 09/04/2026 | pendiente |
+| **Trkmic Torres, Ignacio** | Gestión de Mesas: Creación y Generación de QR. | 08/04/2026 | 09/04/2026 |
+| **Trkmic Torres, Ignacio** | Carga de activos y datos iniciales en Supabase. | 09/04/2026 | 09/04/2026 |
 <br>
 
 ## 🎨 Diseño y Prototipado (UI/UX)
