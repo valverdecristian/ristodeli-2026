@@ -7,6 +7,7 @@ import { BotonesAccesoRapidoComponent } from '../../../shared/components/botones
 import { AuthService } from '../../../core/services/auth.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { SpinnerService } from '../../../core/services/spinner.service';
+import { Haptics, ImpactStyle } from '@capacitor/haptics';
 
 @Component({
   selector: 'app-login',
@@ -25,7 +26,8 @@ export class LoginPage implements OnInit {
   constructor(
     private authService: AuthService,
     private toastService: ToastService,
-    private spinnerService: SpinnerService
+    private spinnerService: SpinnerService,
+    private router: Router
   ) { }
 
   ngOnInit() {
@@ -73,6 +75,7 @@ export class LoginPage implements OnInit {
     this.checkPasswordVal();
     
     if (!this.isEmailValid || !this.isPasswordValid || !this.email || !this.password) {
+      await Haptics.impact({ style: ImpactStyle.Heavy });
       this.toastService.mostrarError('Por favor, revise que los datos ingresados sean correctos.');
       return;
     }
@@ -82,10 +85,15 @@ export class LoginPage implements OnInit {
       await this.authService.ingresar(this.email, this.password);
       
       await this.spinnerService.ocultar();
+      
+      const audio = new Audio('assets/sounds/exito.mp3');
+      audio.play().catch(err => console.log('Error reproduciendo audio:', err));
+
       this.toastService.mostrarExito('¡Sesión iniciada con éxito!');
       await this.authService.redirigirSegunPerfil();
     } catch (e: any) {
       await this.spinnerService.ocultar();
+      await Haptics.vibrate();
       console.error('Credenciales inválidas o error de red:', e);
       this.toastService.mostrarError('Credenciales inválidas. Intente nuevamente.');
     }

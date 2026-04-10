@@ -92,8 +92,26 @@ export class AuthService {
    * Cierra la sesión activa
    */
   async cerrarSesion() {
-    await this.supabase.auth.signOut();
-    this.router.navigate(['/login']);
+    try {
+      
+      const audio = new Audio('assets/sounds/exito.mp3'); // PUEDE SER CAMBIADO POR UNO ESPECIFICO
+      audio.volume = 0.5;
+      
+      audio.play().catch(err => console.log('Error al reproducir audio de salida:', err));
+
+      await this.supabase.auth.signOut();
+
+      // Limpiar los signals 
+      this.currentSession.set(null);
+      this.currentUser.set(null);
+
+      this.router.navigate(['/login'], { replaceUrl: true });
+
+    } catch (error) {
+      console.error('Error durante el cierre de sesión:', error);
+      // Igualmente manda al login si algo falla
+      this.router.navigate(['/login']);
+    }
   }
 
   /**

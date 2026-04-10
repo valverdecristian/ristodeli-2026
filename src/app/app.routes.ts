@@ -29,5 +29,13 @@ export const routes: Routes = [
   {
     path: 'admin/crear-empleado',
     loadComponent: () => import('./features/admin/crear-empleado/crear-empleado.page').then( m => m.CrearEmpleadoPage)
+  },
+  {
+    path: 'alta-plato',
+    loadComponent: () => import('./features/cocina-bar/alta-plato/alta-plato.page').then( m => m.AltaPlatoPage)
+  },
+  {
+    path: 'alta-bebida',
+    loadComponent: () => import('./features/cocina-bar/alta-bebida/alta-bebida.page').then( m => m.AltaBebidaPage)
   }
 ];
