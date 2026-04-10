@@ -37,5 +37,10 @@ export const routes: Routes = [
   {
     path: 'alta-bebida',
     loadComponent: () => import('./features/cocina-bar/alta-bebida/alta-bebida.page').then( m => m.AltaBebidaPage)
+  },
+  {
+    path: 'gestion-mesas',
+    loadComponent: () => import('./features/admin/gestion-mesas/gestion-mesas.page').then( m => m.GestionMesasPage)
+
   }
 ];

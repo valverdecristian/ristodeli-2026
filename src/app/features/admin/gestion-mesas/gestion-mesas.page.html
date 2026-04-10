@@ -1,0 +1,56 @@
+<ion-header>
+  <ion-toolbar color="dark">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/admin"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Gestión de Mesas</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Dar de Alta Mesa</ion-card-title>
+    </ion-card-header>
+    
+    <ion-card-content>
+      <ion-item>
+        <ion-input label="Número de Mesa" labelPlacement="floating" type="number" [(ngModel)]="nuevaMesa.numero"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-input label="Cantidad de Comensales" labelPlacement="floating" type="number" [(ngModel)]="nuevaMesa.comensales"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-select label="Tipo de Mesa" labelPlacement="floating" [(ngModel)]="nuevaMesa.tipo" interface="popover">
+          <ion-select-option value="Estándar">Estándar</ion-select-option>
+          <ion-select-option value="VIP">VIP</ion-select-option>
+          <ion-select-option value="Discapacitados">Discapacitados</ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <ion-button expand="block" class="ion-margin-top" (click)="generarMesa()" color="primary">
+        Generar QR de Mesa
+      </ion-button>
+    </ion-card-content>
+  </ion-card>
+
+  <ion-card *ngIf="qrGenerado" class="ion-text-center">
+    <ion-card-header>
+      <ion-card-title>Código QR - Mesa {{nuevaMesa.numero}}</ion-card-title>
+    </ion-card-header>
+    
+    <ion-card-content>
+      <qrcode [qrdata]="nuevaMesa.qr_data!" [width]="256" [errorCorrectionLevel]="'M'"></qrcode>
+      
+      <p class="ion-margin-top">Tipo: {{nuevaMesa.tipo}} | Capacidad: {{nuevaMesa.comensales}} pax</p>
+
+      <ion-button fill="outline" color="medium" (click)="limpiarFormulario()">
+        Crear otra mesa
+      </ion-button>
+    </ion-card-content>
+  </ion-card>
+
+</ion-content>
