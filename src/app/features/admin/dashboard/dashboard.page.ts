@@ -26,10 +26,23 @@ export class DashboardPage implements OnInit {
 
   handleAction(action: string) {
     console.log('Action selected:', action);
-    if (action === 'add_employee') {
-      this.router.navigate(['/admin/crear-empleado']);
+    
+    switch (action) {
+      case 'add_employee':
+        this.router.navigate(['/admin/crear-empleado']);
+        break;
+        
+      case 'add_table':
+        this.router.navigate(['/gestion-mesas']);
+        break;
+        
+      case 'add_dish': 
+        this.router.navigate(['/alta-plato']);
+        break;
+        
+      default:
+        console.warn('Acción no programada:', action);
     }
-    // Aquí a futuro implementaremos la navegación a los forms de agregar plato y mesa
   }
 
   logout() {

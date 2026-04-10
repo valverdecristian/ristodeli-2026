@@ -160,31 +160,28 @@ export class AuthService {
 
     switch (perfilUsuario.perfil) {
       case 'admin':
+      case 'supervisor':  
         this.router.navigate(['/admin']);
         break;
 
       case 'cliente':
-        this.router.navigate(['/cliente']);
+        this.router.navigate(['/home-cliente']);
         break;
 
       case 'mozo':
-        this.router.navigate(['/mozo']);
-        break;
-
-      case 'supervisor':
-        this.router.navigate(['/supervisor']);
+        this.router.navigate(['/home-mozo']);
         break;
 
       case 'metre':
-        this.router.navigate(['/metre']);
+        this.router.navigate(['/home-metre']);
         break;
 
       case 'cantinero':
-        this.router.navigate(['/cantinero']);
+        this.router.navigate(['/home-cantinero']);
         break;
 
       case 'cocinero':
-        this.router.navigate(['/cocinero']);
+        this.router.navigate(['/home-cocinero']);
         break;
 
       default:
