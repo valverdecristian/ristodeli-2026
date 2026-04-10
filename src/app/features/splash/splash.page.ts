@@ -12,7 +12,7 @@ import { Router } from '@angular/router';
 })
 export class SplashPage implements OnInit, OnDestroy {
   private timeoutId: any;
-  private audio?: HTMLAudioElement; 
+  private audio?: HTMLAudioElement;
 
   constructor(private router: Router) { }
 

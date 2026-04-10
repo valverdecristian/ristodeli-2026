@@ -4,8 +4,9 @@ import { CommonModule } from '@angular/common';
 import { IonButton, IonIcon, IonInput, IonItem, IonSelect, IonSelectOption, IonText } from '@ionic/angular/standalone';
 import { DetalleRegistro } from 'src/app/core/models/usuario.model';
 import { FotoService } from 'src/app/core/services/foto.service';
+import { ScannerService } from 'src/app/core/services/scanner.service';
 import { addIcons } from 'ionicons';
-import { cameraOutline, personCircleOutline } from 'ionicons/icons';
+import { cameraOutline, personCircleOutline, barcodeOutline } from 'ionicons/icons';
 
 @Component({
   selector: 'app-registro-formulario',
@@ -25,9 +26,10 @@ export class RegistroFormularioComponent implements OnInit {
   
   private fb = inject(FormBuilder);
   private fotoService = inject(FotoService);
+  private scannerService = inject(ScannerService);
 
   constructor() {
-    addIcons({ cameraOutline, personCircleOutline });
+    addIcons({ cameraOutline, personCircleOutline, barcodeOutline });
   }
 
   ngOnInit() {
@@ -72,6 +74,26 @@ export class RegistroFormularioComponent implements OnInit {
     const foto = await this.fotoService.sacarFoto();
     if (foto && foto.dataUrl) {
       this.fotoUrlTemporal = foto.dataUrl;
+    }
+  }
+
+  async escanearDocumento() {
+    this.isLoading = true;
+    try {
+      const datos = await this.scannerService.scanDni();
+      if (datos) {
+        // Autocompleta los campos
+        this.registroForm.patchValue({
+          nombres: datos.nombres,
+          apellidos: datos.apellidos,
+          dni: datos.dni,
+          cuil: datos.cuil || ''
+        });
+        // Forzamos la validacion luego del patchValue
+        this.registroForm.updateValueAndValidity();
+      }
+    } finally {
+      this.isLoading = false;
     }
   }
 

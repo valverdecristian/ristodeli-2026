@@ -59,6 +59,13 @@
           }
         </div>
       </div>
+
+      <div class="scan-button-wrapper">
+        <ion-button expand="block" shape="round" class="premium-scan-btn" (click)="escanearDocumento()" type="button" [disabled]="isLoading">
+          <ion-icon name="barcode-outline" slot="start"></ion-icon>
+          ESCANEAR DNI
+        </ion-button>
+      </div>
     }
 
     @if (step === 2) {
