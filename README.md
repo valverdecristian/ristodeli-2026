@@ -10,14 +10,6 @@ Este proyecto consiste en el desarrollo de una aplicación móvil para la gesti�
 
 <br>
 
-## 🛠️ Entorno y Reglas de Desarrollo
-
-Ionic versión `7.2.1`. <br>
-Node.js versión `24.14.1`. <br>
-Angular versión `21.2.5`. <br>
-
-<br>
-
 ## 👥 Integrantes
 
 * **Valverde, Cristian Jorge** (Alfa): rama `dev-alfa`
@@ -33,19 +25,25 @@ De acuerdo a los requerimientos de la cátedra, se detallan las tareas asignadas
 | Apellidos y Nombres | Módulos (Objetivos) | Fecha Inicio | Fecha Fin |
 | :--- | :--- | :--- | :--- |
 | **Valverde, Cristian Jorge** | Creación del ícono de la aplicación. | 01/04/2026 | 01/04/2026 |
-| **Chavez, Alejo** | Splash Screen animada/estática. | 07/04/2026 | pendiente |
 | **Chavez, Alejo** | Desarrollo de la interfaz de Login. | 01/04/2026 | 03/04/2026 |
+| **Chavez, Alejo** | Splash Screen animada/estática. | 07/04/2026 | 07/04/2026 |
 | **Valverde, Cristian Jorge** | Configuración de Supabase (Auth, DB y Storage) | 05/04/2026 | 05/04/2026 |
 | **Valverde, Cristian Jorge** | Servicio de Cámara | 05/04/2026 | 05/04/2026 |
+| **Valverde, Cristian Jorge** | Toast Service y Sppiner. | 07/04/2026 | 07/04/2026 |
+| **Trkmic Torres, Ignacio** | Sonidos y Vibraciones. | 08/04/2026 | 09/04/2026 |
+| **Chavez, Alejo** | Accesos Rápidos en Login para Testing. | 07/04/2026 | 07/04/2026 |
 | **Chavez, Alejo** | Vista del Menú del Administrador. | 07/04/2026 | pendiente |
-| **Valverde, Cristian Jorge** | Toast Service y Sppiner | 08/04/2026 | pendiente |
-| **Valverde, Cristian Jorge** | Formulario de Cliente y Empleado. | 07/04/2026 | pendiente |
-| **Chavez, Alejo** | Vista Crear Nuevo Empleado. | 07/04/2026 | pendiente |
-| **Trkmic Torres, Ignacio** | Feedback Sensorial: Sonidos y Vibraciones. | 08/04/2026 | 09/04/2026 |
-| **Trkmic Torres, Ignacio** | Vistas de Creación: Platos y Bebidas. | 08/04/2026 | 09/04/2026 |
-| **Trkmic Torres, Ignacio** | Dashboards Operativos: Cocinero, Cantinero y Metre. | 09/04/2026 | pendiente |
-| **Trkmic Torres, Ignacio** | Gestión de Mesas: Creación y Generación de QR. | 08/04/2026 | 09/04/2026 |
+| **Valverde, Cristian Jorge** | Formulario de Cliente y Empleado. | 07/04/2026 | 08/04/2026 |
+| **Trkmic Torres, Ignacio** | Formulario y Vistas: Platos y Bebidas. | 09/04/2026 | 09/04/2026 |
+|  | Configuración de comunicaciones: Email y Push Notifications. |  |  |
 | **Trkmic Torres, Ignacio** | Carga de activos y datos iniciales en Supabase. | 09/04/2026 | 09/04/2026 |
+| **Trkmic Torres, Ignacio** | Gestión de Mesas: Creación y Generación de QR. | 09/04/2026 | 09/04/2026 |
+| **Trkmic Torres, Ignacio** | Dashboards Operativos: Cocinero, Cantinero y Metre. | 09/04/2026 | 10/04/2026 |
+|  | Experiencia del Cliente: Menú y Estado de Cuenta. |  |  |
+|  | Servicio de Notificaciones: Email Automático. |  |  |
+| **Chavez, Alejo** | Escaneo de DNI: Lector de código para carga automática de datos. | 09/04/2026 | 09/04/2026 |
+|  | Dashboard: Vista del Menú del Supervisor. |  |  |
+
 <br>
 
 ## 🎨 Diseño y Prototipado (UI/UX)
@@ -75,9 +73,9 @@ environments/
 theme/
 ```
 
-**core/**: Aquí van los servicios que manejan datos globales.
-**shared/**: Componentes que se usan en más de una pantalla.
-**features/**: Aquí va la lógica de cada punto funcional.
+**core/**: Aquí van los servicios que manejan datos globales. <br>
+**shared/**: Componentes que se usan en más de una pantalla. <br>
+**features/**: Aquí va la lógica de cada punto funcional. <br>
 
 <br>
 
@@ -88,3 +86,21 @@ Se utiliza una rama intermedia para asegurar la estabilidad antes de las entrega
 * **`main`**: Rama de producción para entregas de los sábados.
 * **`develop`**: Rama de integración y generación de APKs de prueba.
 * **`dev-alfa` / `dev-beta` / `dev-gamma`**: Ramas de desarrollo individual.
+
+<br>
+
+## ⚙️ Stack Tecnológico
+
+* Frontend Framework: Angular v20 utilizando la arquitectura de Standalone Components para optimizar el rendimiento y la carga del bundle.
+* Mobile UI Framework: Ionic v8, permitiendo una experiencia de usuario fluida y consistente con los estándares de diseño móvil actuales.
+* Backend & Infraestructura (BaaS): Supabase integrado vía @supabase/supabase-js para la gestión de:
+  - Autenticación: Manejo seguro de sesiones y perfiles de usuario.
+  - Base de Datos: PostgreSQL para la persistencia de la lógica de negocio (usuarios, pedidos, mesas).
+  - Storage: Gestión de archivos multimedia (avatares y fotos de productos) mediante Buckets.
+* Capacitor & Hardware Integration (v8):
+  - Escaneo de DNI: @capacitor-mlkit/barcode-scanning para la carga automatizada de datos desde el documento nacional de identidad.
+  - Cámara: @capacitor/camera para la captura de fotos obligatoria en registros.
+  - Feedback Háptico: @capacitor/haptics para notificar errores mediante vibraciones.
+* Utilidades Específicas:
+  - QR Generation: angularx-qrcode para la generación dinámica de códigos identificadores de mesas.
+  - Iconografía: ionicons v7 para una interfaz visual intuitiva.
