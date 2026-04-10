@@ -3,8 +3,12 @@ import { Routes } from '@angular/router';
 export const routes: Routes = [
   {
     path: '',
-    redirectTo: 'login',
+    redirectTo: 'splash',
     pathMatch: 'full',
+  },
+  {
+    path: 'splash',
+    loadComponent: () => import('./features/splash/splash.page').then(m => m.SplashPage)
   },
   {
     path: 'home',
@@ -13,6 +17,10 @@ export const routes: Routes = [
   {
     path: 'login',
     loadComponent: () => import('./features/auth/login/login.page').then( m => m.LoginPage)
+  },
+  {
+    path: 'registro-cliente',
+    loadComponent: () => import('./features/auth/registro-cliente/registro-cliente.page').then( m => m.RegistroClientePage)
   },
   {
     path: 'admin',
@@ -33,5 +41,6 @@ export const routes: Routes = [
   {
     path: 'gestion-mesas',
     loadComponent: () => import('./features/admin/gestion-mesas/gestion-mesas.page').then( m => m.GestionMesasPage)
+
   }
 ];

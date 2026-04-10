@@ -1,0 +1,70 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/home"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Agregar Plato</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  
+  <p class="instrucciones ion-text-center">
+    Complete los datos. Recuerde tomar <strong>3 fotos</strong> en el momento.
+  </p>
+
+  <ion-list class="formulario-lista">
+    
+    <ion-item class="input-item" lines="full">
+      <ion-input label="Nombre del Plato *" labelPlacement="floating" [(ngModel)]="plato.nombre"></ion-input>
+    </ion-item>
+
+    <ion-item class="input-item" lines="full">
+      <ion-textarea label="Descripción *" labelPlacement="floating" [(ngModel)]="plato.descripcion" rows="2"></ion-textarea>
+    </ion-item>
+
+    <ion-row>
+      <ion-col size="6">
+        <ion-item class="input-item" lines="full">
+          <ion-input type="number" label="Tiempo (Min) *" labelPlacement="floating" [(ngModel)]="plato.tiempo_elaboracion"></ion-input>
+        </ion-item>
+      </ion-col>
+      <ion-col size="6">
+        <ion-item class="input-item" lines="full">
+          <ion-input type="number" label="Precio ($) *" labelPlacement="floating" [(ngModel)]="plato.precio"></ion-input>
+        </ion-item>
+      </ion-col>
+    </ion-row>
+
+  </ion-list>
+
+  <div class="seccion-fotos">
+    <h3 class="ion-text-center">Fotos del Plato ({{ fotosPreview.length }}/3)</h3>
+    
+    <ion-button expand="block" size="large" color="light" class="btn-foto" (click)="tomarFoto()" [disabled]="fotosPreview.length >= 3">
+      📸 TOMAR FOTO
+    </ion-button>
+
+    <ion-grid *ngIf="fotosPreview.length > 0">
+      <ion-row>
+        <ion-col size="4" *ngFor="let foto of fotosPreview; let i = index">
+          <ion-card class="foto-card">
+            <img [src]="foto" alt="Foto" />
+            <ion-button fill="solid" color="danger" expand="full" class="btn-quitar" (click)="eliminarFoto(i)">
+              Quitar
+            </ion-button>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </div>
+
+</ion-content>
+
+<ion-footer class="ion-no-border">
+  <ion-toolbar class="ion-padding-horizontal ion-padding-bottom">
+    <ion-button expand="block" size="large" color="primary" class="btn-guardar" (click)="guardarPlato()">
+      GUARDAR PLATO
+    </ion-button>
+  </ion-toolbar>
+</ion-footer>

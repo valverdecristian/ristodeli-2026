@@ -1,0 +1,16 @@
+<ion-header>
+  <ion-toolbar color="warning">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/admin"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Nuevo Empleado</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <app-registro-formulario 
+    [esEmpleado]="true" 
+    [isLoading]="isSubmitting"
+    (formSubmit)="onSubmitEmpleado($event)">
+  </app-registro-formulario>
+</ion-content>
