@@ -1,4 +1,4 @@
-<form [formGroup]="registroForm" (ngSubmit)="enviarFormulario()" class="risto-form">
+<form [formGroup]="registroForm" class="risto-form">
   
   <div class="stepper-body">
     @if (step === 1) {
@@ -134,7 +134,7 @@
     <div class="stepper-buttons">
       @if (step === 2) {
         <ion-button fill="outline" class="stepper-button-back" color="medium" (click)="prevStep()" type="button">Anterior</ion-button>
-        <ion-button type="submit" class="stepper-button-next" [disabled]="isLoading">
+        <ion-button class="stepper-button-next" [disabled]="isLoading" (click)="enviarFormulario()">
           {{ esEmpleado ? 'Crear' : 'Registrar' }}
         </ion-button>
       }
