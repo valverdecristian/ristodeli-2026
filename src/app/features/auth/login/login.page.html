@@ -10,21 +10,21 @@
 
 
     <div class="form-section">
-      <form>
+      <form [formGroup]="loginForm" (ngSubmit)="login()">
 
-        <ion-item class="input-item" [ngClass]="{'has-error': !isEmailValid}">
-          <ion-input type="email" placeholder="Correo Electrónico" [(ngModel)]="email" name="email" required
-            (ngModelChange)="checkEmailVal()" (ionBlur)="onEmailBlur()" (keyup.enter)="login()">
+        <ion-item class="input-item" [ngClass]="{'has-error': f['email'].invalid && f['email'].touched}">
+          <ion-input type="email" placeholder="Correo Electrónico" formControlName="email"
+            (ionBlur)="onEmailBlur()" (keyup.enter)="login()">
           </ion-input>
         </ion-item>
 
-        <ion-item class="input-item" [ngClass]="{'has-error': !isPasswordValid}">
-          <ion-input type="password" placeholder="Contraseña" [(ngModel)]="password" name="password" required
-            (ngModelChange)="checkPasswordVal()" (ionBlur)="onPasswordBlur()" (keyup.enter)="login()">
+        <ion-item class="input-item" [ngClass]="{'has-error': f['password'].invalid && f['password'].touched}">
+          <ion-input type="password" placeholder="Contraseña" formControlName="password"
+            (ionBlur)="onPasswordBlur()" (keyup.enter)="login()">
           </ion-input>
         </ion-item>
 
-        <ion-button expand="block" class="login-button" (click)="login()">
+        <ion-button expand="block" type="submit" class="login-button">
           Iniciar sesión
         </ion-button>
 
