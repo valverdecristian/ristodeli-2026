@@ -85,9 +85,12 @@ export class ScannerService {
      const cuilParts = parts.filter(p => /^\d{11}$/.test(p));
      
      if (cuilParts.length > 0) {
-        // Encontramos cadenas de 11 dígitos. Nos quedamos con la que tenga el DNI adentro (o la última por descarte)
+        // Encontramos cadenas de 11 dígitos. Nos aseguramos de tomar estrictamente la que contenga el DNI
+        // para no confundirla accidentalmente con el número de trámite (que también tiene 11 dígitos).
         const exactCuil = cuilParts.find(p => p.includes(dni) || p.includes(dniPadded));
-        cuil = exactCuil ? exactCuil : cuilParts[cuilParts.length - 1];
+        if (exactCuil) {
+           cuil = exactCuil;
+        }
      }
 
      if (!dni || !nombres || !apellidos) {
