@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { IonButton, IonContent, IonInput, IonItem } from '@ionic/angular/standalone';
 import { Router, RouterModule } from '@angular/router';
 import { BotonesAccesoRapidoComponent } from '../../../shared/components/botones-acceso-rapido/botones-acceso-rapido.component';
@@ -14,14 +14,12 @@ import { Haptics, ImpactStyle } from '@capacitor/haptics';
   templateUrl: './login.page.html',
   styleUrls: ['./login.page.scss'],
   standalone: true,
-  imports: [IonContent, CommonModule, FormsModule, IonButton, IonInput, IonItem, BotonesAccesoRapidoComponent, RouterModule]
+  imports: [IonContent, CommonModule, ReactiveFormsModule, IonButton, IonInput, IonItem, BotonesAccesoRapidoComponent, RouterModule]
 })
 export class LoginPage implements OnInit {
 
-  email: string = '';
-  password: string = '';
-  isEmailValid: boolean = true;
-  isPasswordValid: boolean = true;
+  loginForm!: FormGroup;
+  private fb = inject(FormBuilder);
 
   constructor(
     private authService: AuthService,
@@ -31,58 +29,48 @@ export class LoginPage implements OnInit {
   ) { }
 
   ngOnInit() {
+    this.loginForm = this.fb.group({
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required, Validators.minLength(6)]]
+    });
   }
 
-  checkEmailVal() {
-    if (this.email.length === 0) {
-      this.isEmailValid = true;
-      return;
-    }
-    this.isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.email);
-  }
-
-  checkPasswordVal() {
-    if (this.password.length === 0) {
-      this.isPasswordValid = true;
-      return;
-    }
-    this.isPasswordValid = this.password.length >= 6;
+  get f() {
+    return this.loginForm.controls;
   }
 
   onEmailBlur() {
-    this.checkEmailVal();
-    if (!this.isEmailValid && this.email.length > 0) {
+    if (this.f['email'].invalid && this.f['email'].value?.length > 0) {
       this.toastService.mostrarAdvertencia('Por favor ingrese un formato de email válido.');
     }
   }
 
   onPasswordBlur() {
-    this.checkPasswordVal();
-    if (!this.isPasswordValid && this.password.length > 0) {
+    if (this.f['password'].invalid && this.f['password'].value?.length > 0) {
       this.toastService.mostrarAdvertencia('La contraseña debe contener al menos 6 caracteres.');
     }
   }
 
   onCredentialsSelected(credentials: { email: string, password: string }) {
-    this.email = credentials.email;
-    this.password = credentials.password;
-    this.checkEmailVal();
-    this.checkPasswordVal();
+    this.loginForm.patchValue({
+      email: credentials.email,
+      password: credentials.password
+    });
   }
 
   async login() {
-    this.checkEmailVal();
-    this.checkPasswordVal();
-    
-    if (!this.isEmailValid || !this.isPasswordValid || !this.email || !this.password) {
-      await Haptics.impact({ style: ImpactStyle.Heavy });
+    if (this.loginForm.invalid) {
+      this.loginForm.markAllAsTouched();
+      Haptics.impact({ style: ImpactStyle.Heavy }).catch(() => {});
       this.toastService.mostrarError('Por favor, revise que los datos ingresados sean correctos.');
       return;
     }
 
+    const value = this.loginForm.value;
+
     try {
       await this.spinnerService.mostrar('Iniciando sesión...');
-      await this.authService.ingresar(this.email, this.password);
+      await this.authService.ingresar(value.email, value.password);
       
       await this.spinnerService.ocultar();
       
@@ -93,7 +81,7 @@ export class LoginPage implements OnInit {
       await this.authService.redirigirSegunPerfil();
     } catch (e: any) {
       await this.spinnerService.ocultar();
-      await Haptics.vibrate();
+      Haptics.vibrate().catch(() => {});
       console.error('Credenciales inválidas o error de red:', e);
       this.toastService.mostrarError('Credenciales inválidas. Intente nuevamente.');
     }
