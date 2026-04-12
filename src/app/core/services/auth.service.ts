@@ -164,7 +164,7 @@ export class AuthService {
         this.router.navigate(['/admin']);
         break;
 
-      case 'cliente':
+      case 'cliente_reg':
         this.router.navigate(['/home-cliente']);
         break;
 

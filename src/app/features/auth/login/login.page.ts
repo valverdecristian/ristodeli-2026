@@ -2,7 +2,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { IonButton, IonContent, IonInput, IonItem } from '@ionic/angular/standalone';
-import { Router, RouterModule } from '@angular/router';
+import { RouterModule } from '@angular/router';
 import { BotonesAccesoRapidoComponent } from '../../../shared/components/botones-acceso-rapido/botones-acceso-rapido.component';
 import { AuthService } from '../../../core/services/auth.service';
 import { ToastService } from '../../../core/services/toast.service';
@@ -25,7 +25,6 @@ export class LoginPage implements OnInit {
     private authService: AuthService,
     private toastService: ToastService,
     private spinnerService: SpinnerService,
-    private router: Router
   ) { }
 
   ngOnInit() {
@@ -72,6 +71,15 @@ export class LoginPage implements OnInit {
       await this.spinnerService.mostrar('Iniciando sesión...');
       await this.authService.ingresar(value.email, value.password);
       
+      const perfilUsuario = await this.authService.obtenerPerfilUsuarioActual();
+      if (perfilUsuario?.perfil === 'pendiente') {
+         await this.authService.supabaseClient.auth.signOut();
+         await this.spinnerService.ocultar();
+         import('@capacitor/haptics').then(m => m.Haptics.impact({ style: m.ImpactStyle.Medium }).catch(() => {}));
+         this.toastService.mostrarAdvertencia('Tu cuenta aún está pendiente de aprobación por un administrador.');
+         return;
+      }
+
       await this.spinnerService.ocultar();
       
       const audio = new Audio('assets/sounds/exito.mp3');

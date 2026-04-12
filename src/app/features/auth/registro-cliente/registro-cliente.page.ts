@@ -51,8 +51,8 @@ export class RegistroClientePage {
       await this.authService.registrar(datos.password, datos);
 
       await this.spinnerService.ocultar();
-      this.toastService.mostrarExito('¡Cuenta creada correctamente!');
-      this.router.navigate(['/home']);
+      this.toastService.mostrarExito('¡Cuenta creada exitosamente! Pendiente de aprobación.');
+      this.router.navigate(['/login']);
 
     } catch (error: any) {
       await this.spinnerService.ocultar();

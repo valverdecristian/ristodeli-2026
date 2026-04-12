@@ -65,6 +65,10 @@ export const routes: Routes = [
   {
     path: 'home-cliente',
     loadComponent: () => import('./features/cliente/home-cliente/home-cliente.page').then( m => m.HomeClientePage)
+  },
+  {
+    path: 'aprobacion-clientes',
+    loadComponent: () => import('./features/admin/aprobacion-clientes/aprobacion-clientes.page').then( m => m.AprobacionClientesPage)
   }
 
 ];

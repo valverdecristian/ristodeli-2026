@@ -35,14 +35,14 @@ De acuerdo a los requerimientos de la cátedra, se detallan las tareas asignadas
 | **Chavez, Alejo** | Vista del Menú del Administrador. | 07/04/2026 | pendiente |
 | **Valverde, Cristian Jorge** | Formulario de Cliente y Empleado. | 07/04/2026 | 08/04/2026 |
 | **Trkmic Torres, Ignacio** | Formulario y Vistas: Platos y Bebidas. | 09/04/2026 | 09/04/2026 |
-|  | Configuración de comunicaciones: Email y Push Notifications. |  |  |
+| **Valverde, Cristian Jorge** | Configuración de comunicaciones: Email y Push Notifications. | 12/04/2026 | pendiente |
 | **Trkmic Torres, Ignacio** | Carga de activos y datos iniciales en Supabase. | 09/04/2026 | 09/04/2026 |
 | **Trkmic Torres, Ignacio** | Gestión de Mesas: Creación y Generación de QR. | 09/04/2026 | 09/04/2026 |
 | **Trkmic Torres, Ignacio** | Dashboards Operativos: Cocinero, Cantinero y Metre. | 09/04/2026 | 10/04/2026 |
-|  | Experiencia del Cliente: Menú y Estado de Cuenta. |  |  |
+| **Valverde, Cristian Jorge** | Experiencia del Cliente: Menú y Estado de Cuenta. | 12/04/2026 | 12/04/2026 |
 |  | Servicio de Notificaciones: Email Automático. |  |  |
 | **Chavez, Alejo** | Escaneo de DNI: Lector de código para carga automática de datos. | 09/04/2026 | 09/04/2026 |
-|  | Dashboard: Vista del Menú del Supervisor. |  |  |
+| **Trkmic Torres, Ignacio** | Dashboard: Vista del Menú del Supervisor. |  |  |
 
 <br>
 
