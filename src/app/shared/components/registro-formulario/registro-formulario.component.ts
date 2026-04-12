@@ -122,7 +122,7 @@ export class RegistroFormularioComponent implements OnInit {
       apellidos: value.apellidos,
       dni: value.dni,
       cuil: value.cuil,
-      perfil: this.esEmpleado ? value.perfil : 'cliente_reg',
+      perfil: this.esEmpleado ? value.perfil : 'pendiente',
       foto_url: this.fotoUrlTemporal // Se subirá luego
     };
 
