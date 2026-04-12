@@ -6,8 +6,9 @@ export type PerfilUsuario =
   | 'cocinero' 
   | 'cantinero' 
   | 'cliente_reg' 
-  | 'cliente_anon';
-
+  | 'cliente_anon'
+  | 'pendiente';
+  
 /**
  * Interfaz para MOSTRAR y TRABAJAR con los datos del usuario en la App.
  */

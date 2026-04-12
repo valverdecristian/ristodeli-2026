@@ -12,9 +12,9 @@ export class AuthService {
   private router = inject(Router);
 
   // Usamos signals para manejar el estado del usuario actual de manera reactiva en Angular >= 16
-  public currentUser = signal<User | null>(null);
+  public currentUser = signal<UsuarioPerfil | null>(null);
   public currentSession = signal<Session | null>(null);
-
+  
   constructor() {
     this.supabase = createClient(environment.supabaseUrl, environment.supabaseKey);
     this.inicializarAuth();
@@ -22,16 +22,28 @@ export class AuthService {
 
   private async inicializarAuth() {
     const { data: { session } } = await this.supabase.auth.getSession();
-    this.actualizarEstado(session);
-
-    this.supabase.auth.onAuthStateChange((_event, session) => {
-      this.actualizarEstado(session);
+    await this.actualizarEstado(session); // Ahora es async
+  
+    this.supabase.auth.onAuthStateChange(async (_event, session) => {
+      await this.actualizarEstado(session);
     });
   }
 
-  private actualizarEstado(session: Session | null) {
+  private async actualizarEstado(session: Session | null) {
     this.currentSession.set(session);
-    this.currentUser.set(session?.user ?? null);
+    
+    if (session?.user) {
+      // Buscamos los datos extendidos en tu tabla de la DB
+      const { data } = await this.supabase
+        .from('usuarios')
+        .select('*')
+        .eq('id', session.user.id)
+        .single();
+      
+      this.currentUser.set(data as UsuarioPerfil);
+    } else {
+      this.currentUser.set(null);
+    }
   }
 
   /**
@@ -164,7 +176,7 @@ export class AuthService {
         this.router.navigate(['/admin']);
         break;
 
-      case 'cliente':
+      case 'cliente_reg':
         this.router.navigate(['/home-cliente']);
         break;
 

@@ -38,9 +38,9 @@ export class RegistroClientePage {
         // Camera plugin DataUrl format: data:image/jpeg;base64,...
         const base64Data = datos.foto_url.split(',')[1];
         const res = await this.authService.supabaseClient.storage
-           .from('avatares')
-           .upload(`cliente_${timestamp}.jpeg`, this.fotoService.b64toBlob(base64Data), { upsert: true, contentType: 'image/jpeg' });
-           
+          .from('avatares')
+          .upload(`cliente_${timestamp}.jpeg`, this.fotoService.b64toBlob(base64Data), { upsert: true, contentType: 'image/jpeg' });
+          
         if (res.data) {
           const { data: { publicUrl } } = this.authService.supabaseClient.storage.from('avatares').getPublicUrl(res.data.path);
           datos.foto_url = publicUrl;
