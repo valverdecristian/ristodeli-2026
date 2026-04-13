@@ -1,9 +1,13 @@
 <div class="actions-grid">
-  <div class="action-card ion-activatable" *ngFor="let act of actions" [style.--bg-color]="act.color" (click)="handleAction(act.action)">
-    <div class="icon-container">
-      <ion-icon [name]="act.icon"></ion-icon>
+  @for (act of visibleActions; track act.action) {
+    <div class="action-card ion-activatable" 
+        [style.background-color]="act.color" 
+        (click)="handleAction(act.action)">
+      <div class="icon-container">
+        <ion-icon [name]="act.icon"></ion-icon>
+      </div>
+      <span class="action-title">{{ act.title }}</span>
+      <ion-ripple-effect></ion-ripple-effect>
     </div>
-    <span class="action-title">{{ act.title }}</span>
-    <ion-ripple-effect></ion-ripple-effect>
-  </div>
+  }
 </div>
