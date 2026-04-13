@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonButton, IonIcon } from '@ionic/angular/standalone';
@@ -9,47 +9,40 @@ import { addIcons } from 'ionicons';
 import { logOutOutline } from 'ionicons/icons';
 
 @Component({
-  selector: 'app-dashboard',
-  templateUrl: './dashboard.page.html',
-  styleUrls: ['./dashboard.page.scss'],
+  selector: 'app-supervisor',
+  templateUrl: './supervisor.page.html',
+  styleUrls: ['./supervisor.page.scss'],
   standalone: true,
   imports: [IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonButton, IonIcon, CommonModule, FormsModule, ManagementActionsComponent]
 })
-export class DashboardPage implements OnInit {
 
-  constructor(private authService: AuthService, private router: Router) {
+export class SupervisorPage {
+  private authService = inject(AuthService);
+  private router = inject(Router);
+
+  constructor() {
     addIcons({ logOutOutline });
   }
 
-  ngOnInit() {
-  }
-
   handleAction(action: string) {
-    console.log('Action selected:', action);
-    
     switch (action) {
-      case 'add_employee':
+      case 'add_employee': 
         this.router.navigate(['/admin/crear-empleado']);
         break;
-        
-      case 'add_table':
+      case 'add_table':   
         this.router.navigate(['/gestion-mesas']);
         break;
-        
-      case 'add_plato': 
+      case 'add_plato':   
         this.router.navigate(['/alta-producto/plato']);
         break;
-
-      case 'add_bebida': 
+      case 'add_bebida':   
         this.router.navigate(['/alta-producto/bebida']);
         break;
-
       case 'approve_clients': 
         this.router.navigate(['/aprobacion-clientes']);
         break;
-        
       default:
-        console.warn('Acción no programada:', action);
+        console.warn('Acción no permitida para Supervisor:', action);
     }
   }
 

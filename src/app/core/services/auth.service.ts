@@ -172,8 +172,12 @@ export class AuthService {
 
     switch (perfilUsuario.perfil) {
       case 'admin':
-      case 'supervisor':  
+        case 'dueno':
         this.router.navigate(['/admin']);
+        break;
+
+      case 'supervisor':
+        this.router.navigate(['/supervisor']); // Ahora sí irá a la carpeta nueva
         break;
 
       case 'cliente_reg':

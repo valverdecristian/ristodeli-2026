@@ -1,12 +1,12 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { AltaPlatoPage } from './alta-plato.page';
+import { SupervisorPage } from './supervisor.page';
 
-describe('AltaPlatoPage', () => {
-  let component: AltaPlatoPage;
-  let fixture: ComponentFixture<AltaPlatoPage>;
+describe('SupervisorPage', () => {
+  let component: SupervisorPage;
+  let fixture: ComponentFixture<SupervisorPage>;
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(AltaPlatoPage);
+    fixture = TestBed.createComponent(SupervisorPage);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

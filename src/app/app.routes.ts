@@ -23,8 +23,6 @@ export const routes: Routes = [
 
   /* --- RUTAS PROTEGIDAS --- */
 
-  // Admin y Supervisor comparten el dashboard de gestion
-
   {
     path: 'admin',
     loadComponent: () => import('./features/admin/dashboard/dashboard.page').then(m => m.DashboardPage),
@@ -34,7 +32,7 @@ export const routes: Routes = [
     path: 'admin/crear-empleado',
     loadComponent: () => import('./features/admin/crear-empleado/crear-empleado.page').then(m => m.CrearEmpleadoPage),
     canActivate: [authGuard, roleGuard],
-    data: { roles: ['admin', 'supervisor'] } // Solo el admin crea empleados
+    data: { roles: ['admin', 'supervisor'] }
   },
   {
     path: 'gestion-mesas',
@@ -43,44 +41,56 @@ export const routes: Routes = [
     data: { roles: ['admin', 'supervisor'] }
   },
 
-  // Staff Operativo
-
+  // Staff Operativo (Unificados a plural 'roles' para que el Guard no falle)
   {
     path: 'home-cocinero',
     loadComponent: () => import('./features/staff/home-cocinero/home-cocinero.page').then(m => m.HomeCocineroPage),
     canActivate: [authGuard, roleGuard],
-    data: { role: 'cocinero' }
+    data: { roles: ['cocinero'] }
   },
   {
     path: 'home-cantinero',
     loadComponent: () => import('./features/staff/home-cantinero/home-cantinero.page').then(m => m.HomeCantineroPage),
     canActivate: [authGuard, roleGuard],
-    data: { role: 'cantinero' }
+    data: { roles: ['bartender'] } // Cambiado a bartender para consistencia
   },
   {
     path: 'home-metre',
     loadComponent: () => import('./features/admin/home-metre/home-metre.page').then(m => m.HomeMetrePage),
     canActivate: [authGuard, roleGuard],
-    data: { role: 'metre' }
+    data: { roles: ['metre'] }
   },
   {
     path: 'home-mozo',
     loadComponent: () => import('./features/staff/home-mozo/home-mozo.page').then(m => m.HomeMozoPage),
     canActivate: [authGuard, roleGuard],
-    data: { role: 'mozo' }
+    data: { roles: ['mozo'] }
   },
+
 
   // Clientes
   {
     path: 'home-cliente',
     loadComponent: () => import('./features/cliente/home-cliente/home-cliente.page').then(m => m.HomeClientePage),
     canActivate: [authGuard, roleGuard],
-    data: { role: 'cliente_reg' }
+    data: { roles: ['cliente_reg'] }
   },
   {
     path: 'aprobacion-clientes',
     loadComponent: () => import('./features/admin/aprobacion-clientes/aprobacion-clientes.page').then(m => m.AprobacionClientesPage),
     canActivate: [authGuard, roleGuard],
     data: { roles: ['admin', 'supervisor'] } 
-  }
+  },
+  {
+    path: 'alta-producto/:tipo',
+    loadComponent: () => import('./features/cocina-bar/alta-producto/alta-producto.page').then(m => m.AltaProductoPage),
+    canActivate: [authGuard, roleGuard], 
+    data: { roles: ['cocinero', 'bartender', 'admin', 'supervisor'] }
+  },
+  {
+    path: 'supervisor',
+    loadComponent: () => import('./features/admin/supervisor/supervisor.page').then(m => m.SupervisorPage),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['supervisor', 'admin'] } 
+  },
 ];
