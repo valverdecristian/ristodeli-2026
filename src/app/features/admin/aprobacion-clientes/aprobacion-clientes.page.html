@@ -1,0 +1,76 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="toolbar-saffron">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/login" color="dark"></ion-back-button>
+    </ion-buttons>
+    <ion-title class="text-russet title-bold">Clientes Pendientes</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding bg-green">
+  
+  <!-- ESTADO DE CARGA SKELETON -->
+  @if (isLoading) {
+    @for (item of [1,2,3,4]; track $index) {
+      <div class="risto-card">
+        <ion-item lines="none" class="transparent-item">
+          <ion-avatar slot="start">
+            <ion-skeleton-text animated class="skeleton-avatar"></ion-skeleton-text>
+          </ion-avatar>
+          <ion-label>
+            <h3><ion-skeleton-text animated class="skeleton-heading"></ion-skeleton-text></h3>
+            <p><ion-skeleton-text animated class="skeleton-p1"></ion-skeleton-text></p>
+            <p><ion-skeleton-text animated class="skeleton-p2"></ion-skeleton-text></p>
+          </ion-label>
+        </ion-item>
+      </div>
+    }
+  }
+
+  <!-- ESTADO VACÍO -->
+  @if (!isLoading && pendientes.length === 0) {
+    <div class="empty-state-container fade-in">
+      <ion-icon name="checkmark-circle-outline" class="empty-icon"></ion-icon>
+      <h2 class="text-cream empty-title">¡Todo al día!</h2>
+      <p class="text-cream empty-desc">No hay clientes pendientes de aprobación en este momento.</p>
+    </div>
+  }
+
+  <!-- LISTA DE CLIENTES -->
+  @if (!isLoading && pendientes.length > 0) {
+    @for (c of pendientes; track c.id) {
+      <div class="risto-card fade-in">
+        <ion-item lines="none" class="transparent-item">
+          <ion-avatar slot="start" class="avatar-large">
+            <img [src]="c.foto_url || 'assets/icon/favicon.ico'" />
+          </ion-avatar>
+          <ion-label class="text-cream">
+            <h2 class="name-heading">{{ c.nombres }} {{ c.apellidos }}</h2>
+            <p class="text-saffron dni-cuil-text">DNI: {{ c.dni }}</p>
+            <p class="text-saffron dni-cuil-text">CUIL: {{ c.cuil }}</p>
+            <p class="email-text">{{ c.email }}</p>
+          </ion-label>
+        </ion-item>
+        
+        <!-- BOTONERA DE ACCIÓN -->
+        <ion-grid class="action-grid">
+          <ion-row>
+            <ion-col size="6">
+              <ion-button expand="block" color="danger" shape="round" class="btn-flat" (click)="rechazar(c)">
+                <ion-icon slot="start" name="close-circle-outline"></ion-icon>
+                Rechazar
+              </ion-button>
+            </ion-col>
+            <ion-col size="6">
+              <ion-button expand="block" shape="round" class="btn-saffron" (click)="aprobar(c)">
+                <ion-icon slot="start" name="checkmark-circle-outline"></ion-icon>
+                Aprobar
+              </ion-button>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </div>
+    }
+  }
+
+</ion-content>

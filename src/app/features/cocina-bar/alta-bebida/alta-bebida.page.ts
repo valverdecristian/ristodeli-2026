@@ -27,14 +27,12 @@ import { Router } from '@angular/router';
   ]
 })
 export class AltaBebidaPage {
-  // Inyeccion de dependencias mediante inject 
   private fotoService = inject(FotoService);
   private productoService = inject(ProductoService);
   private toastService = inject(ToastService);
   private spinnerService = inject(SpinnerService);
   private router = inject(Router);
 
-  // Modelo de datos inicial para la bebida
   bebida: Producto = {
     nombre: '',
     descripcion: '',
@@ -49,9 +47,18 @@ export class AltaBebidaPage {
   constructor() {}
 
   /**
-   * Captura una foto utilizando la cámara del dispositivo.
-   * Limita la carga a un máximo de 3 fotografías.
+   * Limita la entrada a 2 decimales mientras el usuario escribe.
    */
+  validarDecimales(event: any) {
+    const valor = event.target.value;
+    if (valor && valor.includes('.')) {
+      const partes = valor.split('.');
+      if (partes[1].length > 2) {
+        this.bebida.precio = parseFloat(parseFloat(valor).toFixed(2));
+      }
+    }
+  }
+
   async tomarFoto() {
     if (this.fotosPreview.length >= 3) {
       this.toastService.mostrarAdvertencia('Ya tomaste las 3 fotos requeridas.');
@@ -65,74 +72,61 @@ export class AltaBebidaPage {
     }
   }
 
-  /**
-   * Elimina una foto seleccionada de la lista de previsualización.
-   */
   eliminarFoto(index: number) {
     this.fotosPreview.splice(index, 1);
     this.bebida.fotos.splice(index, 1);
   }
 
-  /**
-   * Valida y persiste la nueva bebida en la base de datos.
-   * Incluye feedback háptico (vibración) en caso de errores de validación.
-   */
+  private async notificarError(mensaje: string) {
+    await Haptics.impact({ style: ImpactStyle.Heavy });
+    this.toastService.mostrarError(mensaje);
+  }
+
   async guardarBebida() {
-
-    if (!this.bebida.nombre || this.bebida.nombre.length < 3) {
-      await Haptics.impact({ style: ImpactStyle.Heavy });
-      this.toastService.mostrarError('El nombre debe tener al menos 3 letras.');
-      return;
+    // Validaciones de negocio con .trim() para evitar espacios vacíos
+    if (!this.bebida.nombre?.trim() || this.bebida.nombre.length < 3) {
+      return this.notificarError('El nombre debe tener al menos 3 letras.');
     }
 
-    if (!this.bebida.descripcion || this.bebida.descripcion.length < 3) {
-      await Haptics.impact({ style: ImpactStyle.Heavy });
-      this.toastService.mostrarError('La descripción debe tener al menos 3 letras.');
-      return;
+    if (!this.bebida.descripcion?.trim() || this.bebida.descripcion.length < 3) {
+      return this.notificarError('La descripción debe tener al menos 3 letras.');
     }
 
-    if (this.bebida.tiempo_elaboracion <= 0) {
-      await Haptics.impact({ style: ImpactStyle.Heavy });
-      this.toastService.mostrarError('El tiempo de preparación debe ser mayor a 0.');
-      return;
+    // A diferencia de la comida, una bebida podría ser de preparación inmediata (0 min)
+    if (this.bebida.tiempo_elaboracion < 0) {
+      return this.notificarError('El tiempo no puede ser negativo.');
     }
 
     if (this.bebida.precio <= 0) {
-      await Haptics.impact({ style: ImpactStyle.Heavy });
-      this.toastService.mostrarError('El precio debe ser mayor a 0.');
-      return;
+      return this.notificarError('El precio debe ser mayor a 0.');
     }
 
     if (this.fotosPreview.length !== 3) {
-      await Haptics.impact({ style: ImpactStyle.Heavy });
-      this.toastService.mostrarError('Debe tomar exactamente 3 fotos de la bebida.');
-      return;
+      return this.notificarError('Debe tomar exactamente 3 fotos.');
     }
 
     try {
       await this.spinnerService.mostrar('Guardando bebida...');
 
-      // Verificación de duplicados por nombre y tipo
       const existe = await this.productoService.verificarSiExiste(this.bebida.nombre, 'bebida');
       if (existe) {
         await this.spinnerService.ocultar();
-        await Haptics.impact({ style: ImpactStyle.Heavy });
-        this.toastService.mostrarError(`La bebida "${this.bebida.nombre}" ya existe.`);
-        return;
+        return this.notificarError(`La bebida "${this.bebida.nombre}" ya existe.`);
       }
+
+      // Limpieza de decimales por seguridad para la DB
+      this.bebida.precio = Math.round(this.bebida.precio * 100) / 100;
 
       await this.productoService.crearProducto(this.bebida);
       
       await this.spinnerService.ocultar();
-      this.toastService.mostrarExito('¡Bebida agregada correctamente!');
-      
+      this.toastService.mostrarExito('¡Bebida agregada con éxito!');
       this.router.navigate(['/home']); 
 
     } catch (error) {
       await this.spinnerService.ocultar();
-      await Haptics.vibrate(); // Vibración generica de error
-      console.error(error);
-      this.toastService.mostrarError('Error al guardar la bebida.');
+      await Haptics.vibrate();
+      this.toastService.mostrarError('Error al guardar en la base de datos.');
     }
   }
 }

@@ -26,12 +26,19 @@
     <ion-row>
       <ion-col size="6">
         <ion-item class="input-item" lines="full">
-          <ion-input type="number" label="Tiempo (Min) *" labelPlacement="floating" [(ngModel)]="plato.tiempo_elaboracion"></ion-input>
+          <ion-input type="number" label="Tiempo (Min) *" labelPlacement="floating" [(ngModel)]="plato.tiempo_elaboracion" min="1"></ion-input>
         </ion-item>
       </ion-col>
       <ion-col size="6">
         <ion-item class="input-item" lines="full">
-          <ion-input type="number" label="Precio ($) *" labelPlacement="floating" [(ngModel)]="plato.precio"></ion-input>
+          <ion-input type="number" 
+                    label="Precio ($) *" 
+                    labelPlacement="floating" 
+                    [(ngModel)]="plato.precio"
+                    (ionInput)="validarDecimales($event)"
+                    step="0.01"
+                    min="0.01">
+          </ion-input>
         </ion-item>
       </ion-col>
     </ion-row>
@@ -45,18 +52,22 @@
       📸 TOMAR FOTO
     </ion-button>
 
-    <ion-grid *ngIf="fotosPreview.length > 0">
-      <ion-row>
-        <ion-col size="4" *ngFor="let foto of fotosPreview; let i = index">
-          <ion-card class="foto-card">
-            <img [src]="foto" alt="Foto" />
-            <ion-button fill="solid" color="danger" expand="full" class="btn-quitar" (click)="eliminarFoto(i)">
-              Quitar
-            </ion-button>
-          </ion-card>
-        </ion-col>
-      </ion-row>
-    </ion-grid>
+    @if (fotosPreview.length > 0) {
+      <ion-grid>
+        <ion-row>
+          @for (foto of fotosPreview; track $index) {
+            <ion-col size="4">
+              <ion-card class="foto-card">
+                <img [src]="foto" alt="Foto" />
+                <ion-button fill="solid" color="danger" expand="full" class="btn-quitar" (click)="eliminarFoto($index)">
+                  Quitar
+                </ion-button>
+              </ion-card>
+            </ion-col>
+          }
+        </ion-row>
+      </ion-grid>
+    }
   </div>
 
 </ion-content>

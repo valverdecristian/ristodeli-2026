@@ -33,7 +33,6 @@ export class AltaPlatoPage {
   private spinnerService = inject(SpinnerService);
   private router = inject(Router);
 
-  // Inicialización del objeto plato siguiendo la interfaz Producto
   plato: Producto = {
     nombre: '',
     descripcion: '',
@@ -48,8 +47,18 @@ export class AltaPlatoPage {
   constructor() {}
 
   /**
-   * Abre la cámara mediante FotoService para capturar evidencias del plato.
+   * Asegura que el precio no tenga más de 2 decimales mientras el usuario escribe.
    */
+  validarDecimales(event: any) {
+    const valor = event.target.value;
+    if (valor && valor.includes('.')) {
+      const partes = valor.split('.');
+      if (partes[1].length > 2) {
+        this.plato.precio = parseFloat(parseFloat(valor).toFixed(2));
+      }
+    }
+  }
+
   async tomarFoto() {
     if (this.fotosPreview.length >= 3) {
       this.toastService.mostrarAdvertencia('Ya tomaste las 3 fotos requeridas.');
@@ -63,66 +72,55 @@ export class AltaPlatoPage {
     }
   }
 
-  /**
-   * Remueve una foto de los arreglos locales antes de confirmar el guardado.
-   */
   eliminarFoto(index: number) {
     this.fotosPreview.splice(index, 1);
     this.plato.fotos.splice(index, 1);
   }
 
-  /**
-   * Procesa el guardado del plato.
-   * Realiza validaciones de longitud, valores positivos y cantidad de imágenes.
-   */
+  private async notificarError(mensaje: string) {
+    await Haptics.impact({ style: ImpactStyle.Heavy });
+    this.toastService.mostrarError(mensaje);
+  }
+
   async guardarPlato() {
-    
-    if (!this.plato.nombre || this.plato.nombre.length < 3) {
-      await Haptics.impact({ style: ImpactStyle.Heavy });
-      this.toastService.mostrarError('El nombre debe tener al menos 3 letras.');
-      return;
+    // Validaciones básicas
+    if (!this.plato.nombre || this.plato.nombre.trim().length < 3) {
+      return this.notificarError('El nombre debe tener al menos 3 letras.');
     }
 
-    if (!this.plato.descripcion || this.plato.descripcion.length < 3) {
-      await Haptics.impact({ style: ImpactStyle.Heavy });
-      this.toastService.mostrarError('La descripción debe tener al menos 3 letras.');
-      return;
+    if (!this.plato.descripcion || this.plato.descripcion.trim().length < 3) {
+      return this.notificarError('La descripción debe tener al menos 3 letras.');
     }
 
     if (this.plato.tiempo_elaboracion <= 0) {
-      await Haptics.impact({ style: ImpactStyle.Heavy });
-      this.toastService.mostrarError('El tiempo de elaboración debe ser mayor a 0.');
-      return;
+      return this.notificarError('El tiempo debe ser mayor a 0.');
     }
 
     if (this.plato.precio <= 0) {
-      await Haptics.impact({ style: ImpactStyle.Heavy });
-      this.toastService.mostrarError('El precio debe ser mayor a 0.');
-      return;
+      return this.notificarError('El precio debe ser mayor a 0.');
     }
 
     if (this.fotosPreview.length !== 3) {
-      await Haptics.impact({ style: ImpactStyle.Heavy });
-      this.toastService.mostrarError('Debe tomar exactamente 3 fotos del plato.');
-      return;
+      return this.notificarError('Debe tomar exactamente 3 fotos.');
     }
 
     try {
       await this.spinnerService.mostrar('Guardando plato...');
 
+      // Verificación de duplicados
       const existe = await this.productoService.verificarSiExiste(this.plato.nombre, 'plato');
       if (existe) {
         await this.spinnerService.ocultar();
-        await Haptics.impact({ style: ImpactStyle.Heavy });
-        this.toastService.mostrarError(`El plato "${this.plato.nombre}" ya existe en el menú.`);
-        return;
+        return this.notificarError(`El plato "${this.plato.nombre}" ya existe.`);
       }
+
+      // Limpieza final de decimales antes de enviar a la DB
+      this.plato.precio = Math.round(this.plato.precio * 100) / 100;
 
       await this.productoService.crearProducto(this.plato);
       
       await this.spinnerService.ocultar();
       this.toastService.mostrarExito('¡Plato agregado correctamente!');
-      
       this.router.navigate(['/home']); 
 
     } catch (error) {

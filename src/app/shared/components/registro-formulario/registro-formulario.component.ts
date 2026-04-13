@@ -5,6 +5,7 @@ import { IonButton, IonIcon, IonInput, IonItem, IonSelect, IonSelectOption, IonT
 import { DetalleRegistro } from 'src/app/core/models/usuario.model';
 import { FotoService } from 'src/app/core/services/foto.service';
 import { ScannerService } from 'src/app/core/services/scanner.service';
+import { ToastService } from 'src/app/core/services/toast.service';
 import { addIcons } from 'ionicons';
 import { cameraOutline, personCircleOutline, barcodeOutline } from 'ionicons/icons';
 
@@ -27,6 +28,7 @@ export class RegistroFormularioComponent implements OnInit {
   private fb = inject(FormBuilder);
   private fotoService = inject(FotoService);
   private scannerService = inject(ScannerService);
+  private toastService = inject(ToastService);
 
   constructor() {
     addIcons({ cameraOutline, personCircleOutline, barcodeOutline });
@@ -100,6 +102,14 @@ export class RegistroFormularioComponent implements OnInit {
   enviarFormulario() {
     if (this.registroForm.invalid) {
       this.registroForm.markAllAsTouched();
+      import('@capacitor/haptics').then(m => m.Haptics.impact({ style: m.ImpactStyle.Heavy }).catch(() => {}));
+      this.toastService.mostrarError('Por favor complete todos los datos requeridos correctamente.');
+      return;
+    }
+
+    if (!this.fotoUrlTemporal) {
+      import('@capacitor/haptics').then(m => m.Haptics.impact({ style: m.ImpactStyle.Heavy }).catch(() => {}));
+      this.toastService.mostrarError('Es obligatorio tomarse una fotografía para registrarse.');
       return;
     }
 
@@ -112,7 +122,7 @@ export class RegistroFormularioComponent implements OnInit {
       apellidos: value.apellidos,
       dni: value.dni,
       cuil: value.cuil,
-      perfil: this.esEmpleado ? value.perfil : 'cliente_reg',
+      perfil: this.esEmpleado ? value.perfil : 'pendiente',
       foto_url: this.fotoUrlTemporal // Se subirá luego
     };
 

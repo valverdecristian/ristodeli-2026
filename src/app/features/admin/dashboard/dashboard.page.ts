@@ -39,6 +39,10 @@ export class DashboardPage implements OnInit {
       case 'add_dish': 
         this.router.navigate(['/alta-plato']);
         break;
+
+      case 'approve_clients': 
+        this.router.navigate(['/aprobacion-clientes']);
+        break;
         
       default:
         console.warn('Acción no programada:', action);

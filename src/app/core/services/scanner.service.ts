@@ -24,7 +24,7 @@ export class ScannerService {
         nombres: 'Julio Cesar',
         apellidos: 'Mendieta',
         dni: '31234567',
-        cuil: ''
+        cuil: '20312345678'
       };
     }
 
@@ -57,7 +57,8 @@ export class ScannerService {
      if (!rawData) return null;
      
      // El string devuelto por el escaner en Argentina suele separarse con '@'
-     const parts = rawData.split('@');
+     // Limpiamos espacios y retornos de carro (\r o \n) que pueden venir al final
+     const parts = rawData.split('@').map(p => p.trim());
      
      let nombres = '';
      let apellidos = '';
@@ -79,11 +80,17 @@ export class ScannerService {
        }
      }
      
-     // Detectar cuil si el formato es muy nuevo y lo trae,
-     // sino, se retorna string vacio como pidio el usuasrio.
-     const cuilParts = parts.filter(p => /^\d{11}$/.test(p) && p.includes(dni));
+     // Detectar cuil si el formato es muy nuevo y lo trae
+     const dniPadded = dni.padStart(8, '0');
+     const cuilParts = parts.filter(p => /^\d{11}$/.test(p));
+     
      if (cuilParts.length > 0) {
-        cuil = cuilParts[0];
+        // Encontramos cadenas de 11 dígitos. Nos aseguramos de tomar estrictamente la que contenga el DNI
+        // para no confundirla accidentalmente con el número de trámite (que también tiene 11 dígitos).
+        const exactCuil = cuilParts.find(p => p.includes(dni) || p.includes(dniPadded));
+        if (exactCuil) {
+           cuil = exactCuil;
+        }
      }
 
      if (!dni || !nombres || !apellidos) {

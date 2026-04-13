@@ -1,11 +1,17 @@
 import { inject, Injectable } from '@angular/core';
-import { ToastController } from '@ionic/angular';
+import { ToastController } from '@ionic/angular/standalone';
+import { addIcons } from 'ionicons';
+import { checkmarkCircleOutline, warningOutline, informationCircleOutline } from 'ionicons/icons';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ToastService {
   private toastController = inject(ToastController);
+
+  constructor() {
+    addIcons({ checkmarkCircleOutline, warningOutline, informationCircleOutline });
+  }
 
   /**
    * Muestra un toast de éxito en la parte superior.
@@ -14,7 +20,7 @@ export class ToastService {
     const toast = await this.toastController.create({
       message: mensaje,
       duration: duracion,
-      position: 'top',
+      position: 'bottom',
       cssClass: 'custom-toast-success',
       icon: 'checkmark-circle-outline' // Icono opcional
     });
@@ -28,7 +34,7 @@ export class ToastService {
     const toast = await this.toastController.create({
       message: mensaje,
       duration: duracion,
-      position: 'top',
+      position: 'bottom',
       cssClass: 'custom-toast-error',
       icon: 'warning-outline'
     });
@@ -42,7 +48,7 @@ export class ToastService {
     const toast = await this.toastController.create({
       message: mensaje,
       duration: duracion,
-      position: 'top',
+      position: 'bottom',
       cssClass: 'custom-toast-warning',
       icon: 'information-circle-outline'
     });

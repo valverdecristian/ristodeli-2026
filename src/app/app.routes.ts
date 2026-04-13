@@ -76,5 +76,11 @@ export const routes: Routes = [
     loadComponent: () => import('./features/cliente/home-cliente/home-cliente.page').then(m => m.HomeClientePage),
     canActivate: [authGuard, roleGuard],
     data: { role: 'cliente_reg' }
+  },
+  {
+    path: 'aprobacion-clientes',
+    loadComponent: () => import('./features/admin/aprobacion-clientes/aprobacion-clientes.page').then(m => m.AprobacionClientesPage),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['admin', 'supervisor'] } 
   }
 ];
