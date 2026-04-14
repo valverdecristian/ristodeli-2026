@@ -42,7 +42,7 @@ De acuerdo a los requerimientos de la cátedra, se detallan las tareas asignadas
 | **Valverde, Cristian Jorge** | Experiencia del Cliente: Menú y Estado de Cuenta. | 12/04/2026 | 12/04/2026 |
 |  | Servicio de Notificaciones: Email Automático. |  |  |
 | **Chavez, Alejo** | Escaneo de DNI: Lector de código para carga automática de datos. | 09/04/2026 | 09/04/2026 |
-| **Trkmic Torres, Ignacio** | Dashboard: Vista del Menú del Supervisor. |  |  |
+| **Trkmic Torres, Ignacio** | Dashboard: Vista del Menú del Supervisor. | 10/04/2026 | 12/04/2026 |
 
 <br>
 
