@@ -3,6 +3,7 @@ import { createClient, SupabaseClient, User, Session } from '@supabase/supabase-
 import { environment } from 'src/environments/environment';
 import { Router } from '@angular/router';
 import { DetalleRegistro, UsuarioPerfil } from '../models/usuario.model';
+import { NotificacionService } from './notificacion.service';
 
 @Injectable({
   providedIn: 'root'
@@ -10,6 +11,7 @@ import { DetalleRegistro, UsuarioPerfil } from '../models/usuario.model';
 export class AuthService {
   private supabase: SupabaseClient;
   private router = inject(Router);
+  private notificacionService = inject(NotificacionService);
 
   // Usamos signals para manejar el estado del usuario actual de manera reactiva en Angular >= 16
   public currentUser = signal<UsuarioPerfil | null>(null);
@@ -63,6 +65,15 @@ export class AuthService {
     });
 
     if (error) throw error;
+
+    // Obtener token y guardarlo si existe
+    if (data.user) {
+      const token = await this.notificacionService.obtenerPushToken();
+      if (token) {
+        await this.notificacionService.guardarTokenEnDB(data.user.id, token);
+      }
+    }
+
     return data;
   }
 
@@ -88,7 +99,8 @@ export class AuthService {
       dni: detalles.dni,
       cuil: detalles.cuil,
       perfil: detalles.perfil,
-      foto_url: detalles.foto_url || null
+      foto_url: detalles.foto_url || null,
+      push_token: await this.notificacionService.obtenerPushToken() || null
     };
 
     const { data: profileData, error: profileError } = await this.supabase
@@ -110,6 +122,11 @@ export class AuthService {
       audio.volume = 0.5;
       
       audio.play().catch(err => console.log('Error al reproducir audio de salida:', err));
+
+      const current = this.currentUser();
+      if (current?.id) {
+        await this.notificacionService.eliminarTokenEnDB(current.id);
+      }
 
       await this.supabase.auth.signOut();
 

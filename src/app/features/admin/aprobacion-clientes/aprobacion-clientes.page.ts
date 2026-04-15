@@ -24,6 +24,7 @@ export class AprobacionClientesPage {
 
   pendientes: any[] = [];
   isLoading = true;
+  private channel: any;
 
   constructor() {
     addIcons({ checkmarkCircleOutline, closeCircleOutline, warningOutline });
@@ -31,6 +32,16 @@ export class AprobacionClientesPage {
 
   ionViewWillEnter() {
     this.cargarPendientes();
+    this.channel = this.clienteAprobacionService.suscribirseANuevosPendientes(() => {
+      // Recargar lista si hay un nuevo pendiente
+      this.cargarPendientes();
+    });
+  }
+
+  ionViewWillLeave() {
+    if (this.channel) {
+      this.channel.unsubscribe();
+    }
   }
 
   async cargarPendientes() {

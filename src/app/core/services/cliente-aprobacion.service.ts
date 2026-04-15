@@ -61,4 +61,22 @@ export class ClienteAprobacionService {
 
     return data;
   }
+
+  /**
+   * Suscribe a cambios en tiempo real en la tabla de usuarios.
+   */
+  suscribirseANuevosPendientes(callback: () => void) {
+    const channel = this.authService.supabaseClient
+      .channel('usuarios-cambios')
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'usuarios', filter: "perfil=eq.pendiente" },
+        (payload) => {
+          callback();
+        }
+      )
+      .subscribe();
+      
+    return channel;
+  }
 }

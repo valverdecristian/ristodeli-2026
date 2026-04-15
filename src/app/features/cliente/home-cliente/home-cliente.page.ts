@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonButton, IonIcon, } from '@ionic/angular/standalone';
 import { AuthService } from '../../../core/services/auth.service';
 import { SpinnerService } from '../../../core/services/spinner.service';
+import { NotificacionService } from '../../../core/services/notificacion.service';
 import { addIcons } from 'ionicons';
 import { logOutOutline, restaurantOutline, barChartOutline, qrCodeOutline } from 'ionicons/icons';
 
@@ -18,6 +19,7 @@ import { logOutOutline, restaurantOutline, barChartOutline, qrCodeOutline } from
 export class HomeClientePage {
   private authService = inject(AuthService);
   private spinnerService = inject(SpinnerService);
+  private notificacionService = inject(NotificacionService);
 
   nombreCliente: string = 'Cargando...';
 
@@ -32,6 +34,9 @@ export class HomeClientePage {
     } else {
       this.nombreCliente = 'Cliente';
     }
+    
+    // Inicializar Push Notifications
+    await this.notificacionService.inicializarPushNotifications();
   }
 
   async cerrarSesion() {
