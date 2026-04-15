@@ -21,6 +21,7 @@ export interface UsuarioPerfil {
   cuil: string;
   perfil: PerfilUsuario;
   foto_url?: string | null;
+  push_token?: string | null;
   created_at?: string;
 }
 
