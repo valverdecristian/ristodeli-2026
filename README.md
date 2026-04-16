@@ -68,10 +68,10 @@ De acuerdo a los requerimientos de la cátedra, se detallan las tareas asignadas
 | Funcionalidad | Perfiles | Estado | Fecha |
 | :--- | :--- | :--- | :--- |
 | 1. Agregar un empleado | dueño o supervisor | 🚀 Listo para Demo |  |
-| 2. Agregar un nuevo plato | cocinero | 🚀 Listo para Demo |  |
-| 3. Agregar una nueva bebida | cantinero | 🚀 Listo para Demo |  |
-| 4. Agregar una nueva mesa | dueño o supervisor | 🚀 Listo para Demo |  |
-| 5. Crear un cliente registrado | cliente o metre | 🚀 Listo para Demo |  |
+| 2. Agregar un nuevo plato | cocinero | 🛠️ En Pruebas |  |
+| 3. Agregar una nueva bebida | cantinero | 🛠️ En Pruebas |  |
+| 4. Agregar una nueva mesa | dueño o supervisor | 🛠️ En Pruebas |  |
+| 5. Crear un cliente registrado | cliente o metre | 🛠️ En Pruebas |  |
 | 6. Verificar ingreso del cliente registrado | dueño o supervisor | 🚀 Listo para Demo |  |
 | 7. Rechazar a un cliente registrado | dueño o supervisor | 🚀 Listo para Demo |  |
 | 8. Aceptar a un cliente registrado | dueño o supervisor | 🚀 Listo para Demo |  |
