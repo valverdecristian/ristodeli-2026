@@ -1,8 +1,8 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.ristodeli.app',
-  appName: 'Ristodeli App',
+  appId: 'com.myapp.ristodeli',
+  appName: 'ristodeli-2026',
   webDir: 'www',
   plugins: {
     SplashScreen: {
