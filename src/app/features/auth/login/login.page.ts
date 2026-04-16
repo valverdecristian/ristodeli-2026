@@ -73,11 +73,7 @@ export class LoginPage implements OnInit {
   
     try {
       await this.spinnerService.mostrar('Iniciando sesión...');
-      
-      
       await this.authService.ingresar(email, password);
-      
-      
       const perfilUsuario = await this.authService.obtenerPerfilUsuarioActual();
   
       if (!perfilUsuario) {

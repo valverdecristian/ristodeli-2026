@@ -21,6 +21,11 @@ export const routes: Routes = [
     loadComponent: () => import('./features/auth/registro-cliente/registro-cliente.page').then(m => m.RegistroClientePage)
   },
 
+  {
+    path: 'registro-anonimo',
+    loadComponent: () => import('./shared/components/registro-formulario/registro-formulario.component').then(m => m.RegistroFormularioComponent)
+  },
+
   /* --- RUTAS PROTEGIDAS --- */
 
   {

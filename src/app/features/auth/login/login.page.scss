@@ -11,7 +11,8 @@
   align-items: center;
   padding-top: 6vh;
   padding-bottom: 2rem;
-  flex: 0.5;;
+  flex: 0.5;
+  ;
 }
 
 .logo {
@@ -36,7 +37,7 @@ form {
 
 .input-item {
   --background: #F8EECB;
-  --border-radius: 16px;  
+  --border-radius: 16px;
   --inner-border-width: 0px;
   border-radius: 16px;
   overflow: hidden;
@@ -64,4 +65,18 @@ ion-input {
   --border-radius: 16px;
   height: 48px;
   font-weight: 700;
+}
+
+.register-button {
+  height: 48px;
+  --border-radius: 160px;
+  --color: var(--risto-retro-green);
+  --background: var(--risto-saffron);
+}
+
+.anonymous-button {
+  --border-radius: 16px;
+  height: 50px;
+  --color: var(--risto-retro-green);
+  --background: var(--risto-purple);
 }

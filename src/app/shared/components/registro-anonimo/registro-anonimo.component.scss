@@ -1,0 +1,55 @@
+/* Caja gigante para la cámara */
+.photo-capture-box {
+  background-color: var(--risto-russet);
+  border: 2px dashed var(--risto-saffron);
+  border-radius: 12px;
+  width: 100%;
+  height: 250px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: var(--risto-vanilla-cream);
+  margin-top: 1rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  font-family: inherit;
+  font-weight: bold;
+}
+
+.photo-capture-box ion-icon {
+  font-size: 5rem;
+  margin-bottom: 15px;
+  color: var(--risto-saffron);
+}
+
+.photo-capture-box span {
+  font-size: 1.3rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Previsualización de la foto completa */
+.photo-preview-container {
+  margin-top: 1rem;
+  width: 100%;
+}
+
+.photo-img-preview {
+  width: 100%;
+  height: 250px;
+  border-radius: 12px;
+  object-fit: cover;
+  border: 2px solid var(--risto-saffron);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.change-photo-text {
+  color: var(--risto-vanilla-cream);
+  margin-top: 10px;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  opacity: 0.8;
+}
