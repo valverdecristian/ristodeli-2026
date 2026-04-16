@@ -43,13 +43,13 @@ De acuerdo a los requerimientos de la cátedra, se detallan las tareas asignadas
 | **Trkmic Torres, Ignacio** | Gestión de Mesas: Creación y Generación de QR. | 09/04/2026 | 09/04/2026 |
 | **Trkmic Torres, Ignacio** | Dashboards Operativos: Cocinero, Cantinero y Metre. | 09/04/2026 | 10/04/2026 |
 | **Valverde, Cristian Jorge** | Experiencia del Cliente: Menú y Estado de Cuenta. | 12/04/2026 | 12/04/2026 |
-| **Valverde, Cristian Jorge** | Servicio de Notificaciones: Email Automático. |  |  |
+| **Valverde, Cristian Jorge** | Servicio de Notificaciones: Email Automático. | 15/04/2026 | 15/04/2026 |
 | **Chavez, Alejo** | Escaneo de DNI: Lector de código para carga automática de datos. | 09/04/2026 | 09/04/2026 |
 | **Trkmic Torres, Ignacio** | Dashboard: Vista del Menú del Supervisor. | 10/04/2026 | 12/04/2026 |
 | **Valverde, Cristian Jorge** | Sistema de Notificaciones: Asignación de mesa. |  |  |
 | **Valverde, Cristian Jorge** | Validación de QR de Mesa Asignada. |  |  |
-| **Valverde, Cristian Jorge** | Plantillas de Correo: Aceptación/Rechazo. |  |  |
-| **Valverde, Cristian Jorge** | Integración de Email Service. |  |  |
+| **Valverde, Cristian Jorge** | Plantillas de Correo: Aceptación/Rechazo. | 15/04/2026 | 15/04/2026 |
+| **Valverde, Cristian Jorge** | Integración de Email Service. | 15/04/2026 | 15/04/2026 |
 | **Trkmic Torres, Ignacio** | Visualización del Menú vía QR. |  |  |
 | **Trkmic Torres, Ignacio** | Actualización Home Cocinero. | 14/04/2026 |  |
 | **Trkmic Torres, Ignacio** | Actualización Home Cantinero. |  |  |
@@ -67,20 +67,20 @@ De acuerdo a los requerimientos de la cátedra, se detallan las tareas asignadas
 
 | Funcionalidad | Perfiles | Estado | Fecha |
 | :--- | :--- | :--- | :--- |
-| 1. Agregar un empleado | dueño o supervisor |  |  |
-| 2. Agregar un nuevo plato | cocinero |  |  |
-| 3. Agregar una nueva bebida | cantinero |  |  |
-| 4. Agregar una nueva mesa | dueño o supervisor |  |  |
-| 5. Crear un cliente registrado | cliente o metre |  |  |
-| 6. Verificar ingreso del cliente registrado | dueño o supervisor |  |  |
-| 7. Rechazar a un cliente registrado | dueño o supervisor |  |  |
-| 8. Aceptar a un cliente registrado | dueño o supervisor |  |  |
-| 9. Ingresar al local | cliente anónimo |  |  |
-| 10. Asignar una mesa a un cliente registrado | metre |  |  |
-| 11. Ver el listado de los productos | cliente registrado o anónimo |  |  |
-| 12. Realizar el pedido para todos los comensales de la mesa | cliente registrado o anónimo |  |  |
-| 13. Rechazar el pedido, para que el usuario lo modifique | mozo |  |  |
-| 14. Confirmar el pedido | mozo |  |  |
+| 1. Agregar un empleado | dueño o supervisor | 🚀 Listo para Demo |  |
+| 2. Agregar un nuevo plato | cocinero | 🚀 Listo para Demo |  |
+| 3. Agregar una nueva bebida | cantinero | 🚀 Listo para Demo |  |
+| 4. Agregar una nueva mesa | dueño o supervisor | 🚀 Listo para Demo |  |
+| 5. Crear un cliente registrado | cliente o metre | 🚀 Listo para Demo |  |
+| 6. Verificar ingreso del cliente registrado | dueño o supervisor | 🚀 Listo para Demo |  |
+| 7. Rechazar a un cliente registrado | dueño o supervisor | 🚀 Listo para Demo |  |
+| 8. Aceptar a un cliente registrado | dueño o supervisor | 🚀 Listo para Demo |  |
+| 9. Ingresar al local | cliente anónimo | 🏗️ En Desarrollo |  |
+| 10. Asignar una mesa a un cliente registrado | metre | 🏗️ En Desarrollo |  |
+| 11. Ver el listado de los productos | cliente registrado o anónimo | 🏗️ En Desarrollo |  |
+| 12. Realizar el pedido para todos los comensales de la mesa | cliente registrado o anónimo | ⏳ Próximo |  |
+| 13. Rechazar el pedido, para que el usuario lo modifique | mozo | ⏳ Próximo |  |
+| 14. Confirmar el pedido | mozo | ⏳ Próximo |  |
 | 15. Acceder a los juegos | cliente registrado o anónimo |  |  |
 | 16. Recepción de los productos correspondientes | cocinero |  |  |
 | 17. Recepción de los productos correspondientes | cantinero |  |  |
@@ -89,6 +89,13 @@ De acuerdo a los requerimientos de la cátedra, se detallan las tareas asignadas
 | 20. Acceder a la encuesta de satisfacción | cliente registrado o anónimo |  |  |
 | 21. Solicitar cuenta al mozo | cliente registrado o anónimo |  |  |
 | 22. Confirmar el pago y liberar mesa | mozo |  |  |
+
+### Estados
+
+🚀 Listo para Demo (testeado y estable) <br>
+🛠️ En Pruebas (terminado, solo requiere validación) <br>
+🏗️ En Desarrollo (lo que se esta haciendo actualmente) <br>
+⏳ Próximo (planificado para la próxima semana) <br>
 
 <br>
 
