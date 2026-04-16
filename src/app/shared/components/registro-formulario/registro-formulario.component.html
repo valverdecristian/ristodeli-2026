@@ -40,7 +40,7 @@
 
       <div class="field-wrapper">
         <ion-item class="input-item" lines="none">
-          <ion-input formControlName="dni" type="number" placeholder="DNI"></ion-input>
+          <ion-input formControlName="dni" type="text" inputmode="numeric" maxlength="8" placeholder="DNI"></ion-input>
         </ion-item>
         <div class="error-container">
           @if (f['dni'].invalid && f['dni'].touched) {
@@ -51,7 +51,7 @@
 
       <div class="field-wrapper">
         <ion-item class="input-item" lines="none">
-          <ion-input formControlName="cuil" type="number" placeholder="CUIL"></ion-input>
+          <ion-input formControlName="cuil" type="text" inputmode="numeric" maxlength="11" placeholder="CUIL"></ion-input>
         </ion-item>
         <div class="error-container">
           @if (f['cuil'].invalid && f['cuil'].touched) {
@@ -82,7 +82,7 @@
 
       <div class="field-wrapper">
         <ion-item class="input-item" lines="none">
-          <ion-input type="password" formControlName="password" placeholder="Contraseña"></ion-input>
+          <ion-input [type]="mostrarPassword ? 'text' : 'password'" formControlName="password" placeholder="Contraseña"></ion-input>
         </ion-item>
         <div class="error-container">
           @if (f['password'].invalid && f['password'].touched) {
@@ -93,7 +93,7 @@
 
       <div class="field-wrapper">
         <ion-item class="input-item" lines="none">
-          <ion-input type="password" formControlName="confirmPassword" placeholder="Confirmar Contraseña"></ion-input>
+          <ion-input [type]="mostrarPassword ? 'text' : 'password'" formControlName="confirmPassword" placeholder="Confirmar Contraseña"></ion-input>
         </ion-item>
         <div class="error-container">
           @if (f['confirmPassword'].hasError('required') && f['confirmPassword'].touched) {
@@ -102,6 +102,13 @@
             <ion-text class="error-msg text-vanilla">Las contraseñas no coinciden.</ion-text>
           }
         </div>
+      </div>
+
+      <div class="password-toggle-wrapper" style="text-align: center; margin-bottom: 20px;">
+        <ion-button fill="clear" size="small" (click)="togglePassword()" type="button" color="medium">
+          <ion-icon [name]="mostrarPassword ? 'eye-off-outline' : 'eye-outline'" slot="start"></ion-icon>
+          {{ mostrarPassword ? 'Ocultar contraseñas' : 'Mostrar contraseñas' }}
+        </ion-button>
       </div>
 
       @if (esEmpleado) {

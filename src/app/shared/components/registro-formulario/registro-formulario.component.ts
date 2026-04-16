@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output, inject } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, inject, ChangeDetectorRef } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { IonButton, IonIcon, IonInput, IonItem, IonSelect, IonSelectOption, IonText } from '@ionic/angular/standalone';
@@ -7,7 +7,7 @@ import { FotoService } from 'src/app/core/services/foto.service';
 import { ScannerService } from 'src/app/core/services/scanner.service';
 import { ToastService } from 'src/app/core/services/toast.service';
 import { addIcons } from 'ionicons';
-import { cameraOutline, personCircleOutline, barcodeOutline } from 'ionicons/icons';
+import { cameraOutline, personCircleOutline, barcodeOutline, eyeOutline, eyeOffOutline } from 'ionicons/icons';
 
 @Component({
   selector: 'app-registro-formulario',
@@ -24,19 +24,21 @@ export class RegistroFormularioComponent implements OnInit {
   registroForm!: FormGroup;
   fotoUrlTemporal: string | null = null;
   step: number = 1; // Manejador del paso actual
+  mostrarPassword: boolean = false;
   
   private fb = inject(FormBuilder);
   private fotoService = inject(FotoService);
   private scannerService = inject(ScannerService);
   private toastService = inject(ToastService);
+  private cdr = inject(ChangeDetectorRef);
 
   constructor() {
-    addIcons({ cameraOutline, personCircleOutline, barcodeOutline });
+    addIcons({ cameraOutline, personCircleOutline, barcodeOutline, eyeOutline, eyeOffOutline });
   }
 
   ngOnInit() {
     this.registroForm = this.fb.group({
-      email: ['', [Validators.required, Validators.email]],
+      email: ['', [Validators.required, Validators.pattern('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$')]],
       password: ['', [Validators.required, Validators.minLength(6)]],
       confirmPassword: ['', [Validators.required]],
       nombres: ['', [Validators.required, Validators.minLength(3)]],
@@ -72,10 +74,15 @@ export class RegistroFormularioComponent implements OnInit {
     this.step = 1;
   }
 
+  togglePassword() {
+    this.mostrarPassword = !this.mostrarPassword;
+  }
+
   async tomarFotografia() {
     const foto = await this.fotoService.sacarFoto();
     if (foto && foto.dataUrl) {
       this.fotoUrlTemporal = foto.dataUrl;
+      this.cdr.detectChanges();
     }
   }
 
@@ -96,6 +103,7 @@ export class RegistroFormularioComponent implements OnInit {
       }
     } finally {
       this.isLoading = false;
+      this.cdr.detectChanges();
     }
   }
 
