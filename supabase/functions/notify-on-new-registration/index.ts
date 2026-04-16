@@ -19,11 +19,66 @@ try {
   // It might already be initialized if function is warm
 }
 
+const sendBrevoEmail = async (toEmail: string, toName: string, subject: string, htmlContent: string) => {
+  const BREVO_API_KEY = Deno.env.get('BREVO_API_KEY');
+  if (!BREVO_API_KEY) {
+      console.log("No BREVO_API_KEY found, saltando envío de correo.");
+      return;
+  }
+  
+  try {
+    const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+        method: 'POST',
+        headers: {
+            'accept': 'application/json',
+            'api-key': BREVO_API_KEY,
+            'content-type': 'application/json'
+        },
+        body: JSON.stringify({
+            sender: { name: 'Ristodeli App', email: 'ristodeliapp@gmail.com' },
+            to: [{ email: toEmail, name: toName }],
+            subject: subject,
+            htmlContent: htmlContent
+        })
+    });
+    const result = await response.json();
+    console.log("Respuesta de Brevo:", JSON.stringify(result));
+    return result;
+  } catch (err) {
+    console.error("Error al enviar email Brevo:", err);
+  }
+}
+
 serve(async (req) => {
   console.log("Notificación de Nuevo Registro disparada");
   const payload = await req.json();
   console.log("Payload recibido:", JSON.stringify(payload));
   
+  // 1. Mandar correo al cliente registrado
+  if (payload.record?.email) {
+    const htmlAvisoPendiente = `
+    <div style="font-family: Tahoma, sans-serif; max-width: 600px; margin: 0 auto; background-color: #F8EECB; border-radius: 12px; overflow: hidden; border: 1px solid #31603D;">
+      <div style="background-color: #31603D; padding: 25px; text-align: center;">
+        <!-- LOGO CIRCULAR -->
+        <img src="https://wtjylfdfdwowzzvunlpa.supabase.co/storage/v1/object/public/avatares/icon.png" alt="Ristodeli" style="width: 90px; height: 90px; border-radius: 50%; border: 3px solid #F5C065; object-fit: cover; margin-bottom: 15px; background-color: #F8EECB;" />
+        <h1 style="color: #F5C065; margin: 0; letter-spacing: 2px;">RISTODELI</h1>
+      </div>
+      <div style="padding: 30px; color: #6E433D; line-height: 1.6;">
+        <h2 style="color: #31603D;">¡Hola ${payload.record.nombres}!</h2>
+        <p>Tu registro en Ristodeli ha sido recibido con éxito. En este momento tu cuenta se encuentra en estado <span style="background-color:#F5C065; padding: 4px 8px; border-radius: 4px; color:#31603D; font-weight:bold;">Pendiente</span>.</p>
+        <p>Nuestro equipo de supervisores ya ha sido notificado y está revisando tu solicitud. Te enviaremos un correo electrónico en cuanto tu cuenta sea aprobada para que puedas acceder a la aplicación y disfrutar de todas nuestras funcionalidades.</p>
+        <br/>
+        <p>¡Gracias por elegirnos!<br><strong>El equipo de Ristodeli</strong></p>
+      </div>
+      <div style="background-color: #6E433D; padding: 15px; text-align: center; color: #F8EECB; font-size: 12px;">
+        © 2026 Ristodeli. Todos los derechos reservados.
+      </div>
+    </div>
+    `;
+    console.log("Enviando correo de aviso al cliente: " + payload.record.email);
+    await sendBrevoEmail(payload.record.email, payload.record.nombres, "Tu registro en Ristodeli está en revisión", htmlAvisoPendiente);
+  }
+
   const supabaseClient = createClient(
     Deno.env.get('SUPABASE_URL') ?? '',
     Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
