@@ -23,7 +23,7 @@ export const routes: Routes = [
 
   {
     path: 'registro-anonimo',
-    loadComponent: () => import('./shared/components/registro-formulario/registro-formulario.component').then(m => m.RegistroFormularioComponent)
+    loadComponent: () => import('./shared/components/registro-anonimo/registro-anonimo.component').then(m => m.RegistroAnonimoComponent)
   },
 
   /* --- RUTAS PROTEGIDAS --- */
