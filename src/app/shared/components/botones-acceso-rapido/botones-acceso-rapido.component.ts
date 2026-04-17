@@ -17,12 +17,12 @@ export class BotonesAccesoRapidoComponent implements OnInit {
   @Output() credentialsSelected = new EventEmitter<{ email: string, password: string }>();
 
   profiles = [ //ver en el futuro posibles cambios de iconos por unos mejores (diseñados por ALEJO (IA))
-    { name: 'Admin', perfil: 'admin', icon: 'shield-outline' },
-    { name: 'Mozo', perfil: 'mozo', icon: 'man' },
-    { name: 'Metre', perfil: 'metre', icon: 'notifications-outline' },
-    { name: 'Supervisor', perfil: 'supervisor', icon: 'clipboard-outline' },
-    { name: 'Cocinero', perfil: 'cocinero', icon: 'flame-outline' },
-    { name: 'Cantinero', perfil: 'cantinero', icon: 'wine-outline' }
+    { name: 'Admin', perfil: 'admin', icon: 'shield-outline', email: 'admin@ristodeli.com' },
+    { name: 'Mozo', perfil: 'mozo', icon: 'man', email: 'mozo1@ristodeli.com' },
+    { name: 'Metre', perfil: 'metre', icon: 'notifications-outline', email: 'metre@ristodeli.com' },
+    { name: 'Supervisor', perfil: 'supervisor', icon: 'clipboard-outline', email: 'supervisor@ristodeli.com' },
+    { name: 'Cocinero', perfil: 'cocinero', icon: 'flame-outline', email: 'cocinero@ristodeli.com' },
+    { name: 'Cantinero', perfil: 'cantinero', icon: 'wine-outline', email: 'cantinero@ristodeli.com' } // Corregido el perfil
   ];
 
   constructor(private supabaseService: AuthService) {
@@ -31,15 +31,19 @@ export class BotonesAccesoRapidoComponent implements OnInit {
 
   ngOnInit() { }
 
-  async selectProfile(perfil: string) {
+  async selectProfile(profile: any) {
     try {
-      // Usar el método correcto para buscar por perfil y no por sesión actual
-      const email = await this.supabaseService.obtenerEmailPorPerfil(perfil);
+      // Si el perfil ya tiene un email definido (hardcodeado para las pruebas rápido), usar ese.
+      // Si no, lo va a buscar dinámicamente a la base de datos.
+      let email = profile.email;
+      if (!email) {
+        email = await this.supabaseService.obtenerEmailPorPerfil(profile.perfil);
+      }
 
       if (email) {
         this.credentialsSelected.emit({ email, password: '12345678' });
       } else {
-        console.warn(`No se encontró un correo para el perfil: ${perfil}`);
+        console.warn(`No se encontró un correo para el perfil: ${profile.perfil}`);
       }
     } catch (e) {
       console.error('Error obteniendo el correo desde Supabase:', e);

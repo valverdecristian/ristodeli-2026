@@ -1,74 +1,43 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonicModule} from '@ionic/angular';
-import { MesaService } from 'src/app/core/services/mesa.service';
-import { Mesa } from 'src/app/core/models/mesa.model';
+import { IonicModule } from '@ionic/angular';
+import { RouterModule, Router } from '@angular/router';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { addIcons } from 'ionicons';
-import { logOutOutline } from 'ionicons/icons';
+import { logOutOutline, restaurantOutline, personAddOutline, listOutline, gridOutline } from 'ionicons/icons';
+import { ToastService } from 'src/app/core/services/toast.service';
 
 @Component({
   selector: 'app-home-metre',
   templateUrl: './home-metre.page.html',
   styleUrls: ['./home-metre.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule, FormsModule]
+  imports: [IonicModule, CommonModule, FormsModule, RouterModule]
 })
 export class HomeMetrePage implements OnInit {
-  mesas: Mesa[] = [];
 
   constructor(
-    private mesaService: MesaService,
-    private cdr: ChangeDetectorRef,
-    private authService: AuthService
+    private authService: AuthService,
+    private toastService: ToastService,
+    private router: Router
   ) { 
-    addIcons({ logOutOutline });
+    addIcons({ logOutOutline, restaurantOutline, personAddOutline, listOutline, gridOutline });
   }
 
   ngOnInit() {
-    this.cargarMesas();
   }
 
-  // actualice cada vez que se entra a la pantalla
-  ionViewWillEnter() {
-    this.cargarMesas();
+  verListaEspera() {
+    this.toastService.mostrarAdvertencia('La función de Lista de Espera estará disponible próximamente.');
   }
 
-  async cargarMesas() {
-    try {
-      this.mesas = await this.mesaService.obtenerMesas(); 
-      this.cdr.detectChanges();
-    } catch (error) {
-      console.error('Error al cargar mesas:', error);
-    }
-  }
-
-  // El Metre puede liberar una mesa cuando los clientes se van
-  async liberarMesa(mesa: Mesa) {
-    if (!mesa.id) return;
-
-    try {
-      await this.mesaService.actualizarEstado(mesa.id, 'Libre');
-      mesa.estado = 'Libre'; 
-    } catch (error) {
-      console.error('Error al liberar mesa:', error);
-    }
-  }
-
-  // El Metre asigna una mesa cuando llega gente
-  async ocuparMesa(mesa: Mesa) {
-    if (!mesa.id) return;
-
-    try {
-      await this.mesaService.actualizarEstado(mesa.id, 'Ocupada');
-      mesa.estado = 'Ocupada';
-    } catch (error) {
-      console.error('Error al ocupar mesa:', error);
-    }
+  verListaMesas() {
+    this.toastService.mostrarAdvertencia('La función de Lista de Mesas estará disponible próximamente.');
   }
 
   logout() {
     this.authService.cerrarSesion();
   }
+
 }

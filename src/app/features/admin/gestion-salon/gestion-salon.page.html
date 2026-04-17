@@ -1,0 +1,47 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar color="dark">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/home-metre"></ion-back-button>
+    </ion-buttons>
+    <ion-title>🤵 Gestión de Salón</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content color="light" class="ion-padding">
+  
+  <p class="ion-text-center instruccion-texto">Toca una mesa para cambiar su estado.</p>
+
+  <ion-grid>
+    <ion-row>
+      @for (mesa of mesas; track mesa.id) {
+        <ion-col size="6" size-md="3">
+          
+          <ion-card class="mesa-card" [color]="mesa.estado === 'Ocupada' ? 'danger' : 'success'">
+            <ion-card-header class="ion-text-center">
+              <ion-card-title class="mesa-numero">{{ mesa.numero }}</ion-card-title>
+              <ion-card-subtitle>{{ mesa.comensales }} comensales</ion-card-subtitle>
+            </ion-card-header>
+            
+            <ion-card-content class="ion-text-center">
+              <strong>{{ mesa.estado || 'Libre' }}</strong>
+              
+              <div class="ion-margin-top">
+                @if (mesa.estado !== 'Ocupada') {
+                  <ion-button fill="outline" color="light" size="small" (click)="ocuparMesa(mesa)">
+                    Ocupar
+                  </ion-button>
+                } @else {
+                  <ion-button fill="outline" color="light" size="small" (click)="liberarMesa(mesa)">
+                    Liberar
+                  </ion-button>
+                }
+              </div>
+            </ion-card-content>
+          </ion-card>
+
+        </ion-col>
+      }
+    </ion-row>
+  </ion-grid>
+
+</ion-content>
