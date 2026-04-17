@@ -78,7 +78,7 @@ export const routes: Routes = [
     path: 'home-cliente',
     loadComponent: () => import('./features/cliente/home-cliente/home-cliente.page').then(m => m.HomeClientePage),
     canActivate: [authGuard, roleGuard],
-    data: { roles: ['cliente_reg'] }
+    data: { roles: ['cliente_reg', 'anonimo'] }
   },
   {
     path: 'aprobacion-clientes',

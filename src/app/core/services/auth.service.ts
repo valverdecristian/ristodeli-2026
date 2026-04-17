@@ -133,6 +133,7 @@ export class AuthService {
       // Limpiar los signals 
       this.currentSession.set(null);
       this.currentUser.set(null);
+      localStorage.removeItem('anonimo_id');
 
       this.router.navigate(['/login'], { replaceUrl: true });
 
