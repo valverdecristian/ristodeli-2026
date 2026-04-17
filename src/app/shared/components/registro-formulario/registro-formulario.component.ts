@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, OnDestroy, Output, inject, ChangeDetectorRef } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { IonButton, IonIcon, IonInput, IonItem, IonSelect, IonSelectOption, IonText } from '@ionic/angular/standalone';
@@ -16,7 +16,7 @@ import { cameraOutline, personCircleOutline, barcodeOutline, eyeOutline, eyeOffO
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, IonItem, IonInput, IonButton, IonIcon, IonText, IonSelect, IonSelectOption]
 })
-export class RegistroFormularioComponent implements OnInit {
+export class RegistroFormularioComponent implements OnInit, OnDestroy {
   @Input() esEmpleado: boolean = false;
   @Input() isLoading: boolean = false;
   @Output() formSubmit = new EventEmitter<DetalleRegistro>();
@@ -140,5 +140,9 @@ export class RegistroFormularioComponent implements OnInit {
   // Helpers para checkear errores visualmente
   get f() {
     return this.registroForm.controls;
+  }
+
+  ngOnDestroy() {
+    this.scannerService.detenerEscaneo();
   }
 }

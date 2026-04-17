@@ -9,27 +9,33 @@ export class SpinnerService {
   private currentLoading: HTMLIonLoadingElement | null = null;
   private showTimestamp: number = 0;
   private MINIMUM_SPIN_MS = 2000;
+  private isCreating: boolean = false;
 
   /**
    * Muestra el LoadingOverlay forzando nuestra animación del logo.
    * @param mensaje Mensaje a mostrar bajo el logo (Opcional)
    */
   async mostrar(mensaje: string = 'Aguarde un momento...') {
-    // Si ya hay uno mostrándose, no creamos otro.
-    if (this.currentLoading) {
+    // Si ya hay uno mostrándose o en proceso de creación, omitimos.
+    if (this.currentLoading || this.isCreating) {
       return;
     }
 
+    this.isCreating = true;
     this.showTimestamp = Date.now();
 
-    this.currentLoading = await this.loadingCtrl.create({
-      spinner: null, // Desactivar el de defecto
-      message: mensaje,
-      cssClass: 'custom-spinner-logo',
-      backdropDismiss: false // Impedir que toquen atrás
-    });
+    try {
+      this.currentLoading = await this.loadingCtrl.create({
+        spinner: null, // Desactivar el de defecto
+        message: mensaje,
+        cssClass: 'custom-spinner-logo',
+        backdropDismiss: false // Impedir que toquen atrás
+      });
 
-    await this.currentLoading.present();
+      await this.currentLoading.present();
+    } finally {
+      this.isCreating = false;
+    }
   }
 
   /**
@@ -48,8 +54,13 @@ export class SpinnerService {
     }
 
     if (this.currentLoading) {
-      await this.currentLoading.dismiss();
-      this.currentLoading = null;
+      try {
+        await this.currentLoading.dismiss();
+      } catch (err) {
+        console.warn('Spinner ignorado; probablemente destruido por la navegación:', err);
+      } finally {
+        this.currentLoading = null;
+      }
     }
   }
 }
