@@ -21,7 +21,7 @@ export class ManagementActionsComponent implements OnInit {
     { title: 'Agregar Plato', icon: 'fast-food-outline', color: '#f5a623', action: 'add_plato', roles: ['admin', 'supervisor'] },
     { title: 'Agregar Bebida', icon: 'wine-outline', color: '#f5a623', action: 'add_bebida', roles: ['admin', 'supervisor'] },
     { title: 'Agregar Mesa', icon: 'grid-outline', color: '#f5a623', action: 'add_table', roles: ['admin', 'supervisor'] },
-    { title: 'Aprobar Clientes', icon: 'people-outline', color: '#f5a623', action: 'approve_clients', roles: ['admin', 'supervisor'] }
+    { title: 'Gestión De Clientes', icon: 'people-outline', color: '#f5a623', action: 'approve_clients', roles: ['admin', 'supervisor'] }
   ];
 
   visibleActions: any[] = [];

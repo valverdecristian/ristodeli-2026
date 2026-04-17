@@ -52,7 +52,7 @@ export class NotificacionService {
 
     PushNotifications.addListener('pushNotificationReceived', (notification: PushNotificationSchema) => {
       console.log('Push received in foreground: ' + JSON.stringify(notification));
-      this.toastService.mostrarExito(`${notification.title} - ${notification.body}`);
+      // Se delega a la configuración nativa mostrar el alert en primer plano
     });
 
     PushNotifications.addListener('pushNotificationActionPerformed', (notification: ActionPerformed) => {

@@ -1,10 +1,13 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.myapp.ristodeli',
-  appName: 'ristodeli-2026',
+  appId: 'com.ristodeli.app',
+  appName: 'RistoDeli App',
   webDir: 'www',
   plugins: {
+    PushNotifications: {
+      presentationOptions: ["badge", "sound", "alert"],
+    },
     SplashScreen: {
       launchShowDuration: 0,
       launchAutoHide: true,

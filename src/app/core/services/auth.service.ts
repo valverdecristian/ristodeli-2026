@@ -189,7 +189,6 @@ export class AuthService {
 
     switch (perfilUsuario.perfil) {
       case 'admin':
-        case 'dueno':
         this.router.navigate(['/admin']);
         break;
 
