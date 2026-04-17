@@ -5,6 +5,6 @@ export interface Producto {
     tiempo_elaboracion: number;
     precio: number;
     fotos: string[]; // URLs de las 3 fotos
-    tipo: 'plato' | 'bebida';
+    tipo: 'plato' | 'bebida' | 'postre';
     estado?: 'disponible' | 'agotado';
 }

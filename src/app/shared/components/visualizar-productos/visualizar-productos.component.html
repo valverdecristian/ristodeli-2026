@@ -1,0 +1,50 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="toolbar-saffron"> <ion-buttons slot="start">
+      <ion-back-button defaultHref="/home-cocinero" color="dark"></ion-back-button>
+    </ion-buttons>
+    <ion-title class="text-russet title-bold">{{ titulo }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="risto-background" [scrollY]="false">
+  <div class="vertical-slider">
+    @for (p of productos; track p.id) {
+      <div class="product-slide">
+        <ion-card class="producto-card">
+          
+          <div class="carrusel-fotos">
+            <div class="carrusel-scroll-horizontal">
+              @for (img of p.fotos; track $index) {
+                <div class="slide-foto">
+                  <img [src]="img" alt="Foto del producto">
+                </div>
+              }
+            </div>
+            <div class="categoria-overlay">{{ p.tipo | uppercase }}</div>
+          </div>
+
+          <ion-card-header>
+            <div class="header-row">
+              <h2 class="nombre">{{ p.nombre | uppercase }}</h2>
+              <span class="precio-tag">${{ p.precio }}</span>
+            </div>
+            <div class="tiempo">
+              <ion-icon name="time-outline"></ion-icon>
+              <span>{{ p.tiempo_elaboracion }} MINUTOS</span>
+            </div>
+          </ion-card-header>
+
+          <ion-card-content>
+            <p class="descripcion">{{ p.descripcion }}</p>
+            
+            <div class="swipe-hint">
+              <ion-icon name="chevron-up-outline"></ion-icon>
+              <span>Desliza para el siguiente</span>
+            </div>
+          </ion-card-content>
+
+        </ion-card>
+      </div>
+    }
+  </div>
+</ion-content>

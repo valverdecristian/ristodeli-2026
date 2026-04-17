@@ -4,7 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { 
   IonContent, IonHeader, IonTitle, IonToolbar, IonItem, IonInput, 
   IonSelect, IonSelectOption, IonButton, IonCard, IonCardHeader, 
-  IonCardTitle, IonCardContent, IonButtons, IonBackButton 
+  IonCardTitle, IonCardContent, IonButtons, IonBackButton, IonIcon, IonLabel,
+
 } from '@ionic/angular/standalone';
 import { QRCodeComponent } from 'angularx-qrcode';
 import { Mesa } from '../../../core/models/mesa.model';
@@ -12,6 +13,9 @@ import { ToastService } from '../../../core/services/toast.service';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { MesaService } from '../../../core/services/mesa.service';
 import { SpinnerService } from '../../../core/services/spinner.service';
+import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
+import { cameraOutline, qrCodeOutline, chevronDownOutline,refreshOutline } from 'ionicons/icons';
+import { addIcons } from 'ionicons';
 
 @Component({
   selector: 'app-gestion-mesas',
@@ -22,24 +26,29 @@ import { SpinnerService } from '../../../core/services/spinner.service';
     IonContent, IonHeader, IonTitle, IonToolbar, IonItem, IonInput, 
     IonSelect, IonSelectOption, IonButton, IonCard, IonCardHeader, 
     IonCardTitle, IonCardContent, IonButtons, IonBackButton,
-    CommonModule, FormsModule, QRCodeComponent
+    CommonModule, FormsModule, QRCodeComponent,IonIcon, IonLabel,
+
   ]
 })
 export class GestionMesasPage {
   private toastService = inject(ToastService);
   private mesaService = inject(MesaService);       
   private spinnerService = inject(SpinnerService);
+  fotoMesa: string | undefined = undefined;
 
-  nuevaMesa: Mesa = {
+  nuevaMesa: any = { 
     numero: 1,
     comensales: 2,
     tipo: 'Estándar',
-    qr_data: ''
+    qr_data: '',
+    foto_url: '' 
   };
 
   qrGenerado: boolean = false;
 
-  constructor() {}
+  constructor() {
+    addIcons({ cameraOutline, qrCodeOutline, chevronDownOutline, refreshOutline });
+  }
 
   async generarMesa() {
     if (this.nuevaMesa.numero <= 0 || this.nuevaMesa.comensales <= 0) {
@@ -51,7 +60,6 @@ export class GestionMesasPage {
     try {
       await this.spinnerService.mostrar('Guardando mesa y generando QR...');
 
-      // 1. Verificamos que no exista otra mesa con ese número
       const existe = await this.mesaService.verificarSiExiste(this.nuevaMesa.numero);
       if (existe) {
         await this.spinnerService.ocultar();
@@ -60,17 +68,23 @@ export class GestionMesasPage {
         return;
       }
 
-      // 2. Armamos el dato del QR
       const datosQR = {
         numeroMesa: this.nuevaMesa.numero,
         tipo: this.nuevaMesa.tipo
       };
       this.nuevaMesa.qr_data = JSON.stringify(datosQR);
 
-      // 3. Guardamos en Supabase
-      await this.mesaService.crearMesa(this.nuevaMesa);
+      const mesaFinal = {
+        numero: this.nuevaMesa.numero,
+        comensales: this.nuevaMesa.comensales,
+        tipo: this.nuevaMesa.tipo,
+        qr_data: this.nuevaMesa.qr_data,
+        foto: this.nuevaMesa.foto_url, 
+        estado: 'Libre'
+      };
 
-      // 4. Mostramos el éxito (QR y Sonido)
+      await this.mesaService.crearMesa(mesaFinal);
+
       this.qrGenerado = true;
       await this.spinnerService.ocultar();
       
@@ -88,7 +102,30 @@ export class GestionMesasPage {
   }
 
   limpiarFormulario() {
-    this.nuevaMesa = { numero: 1, comensales: 2, tipo: 'Estándar', qr_data: '' };
+  this.nuevaMesa = { 
+    numero: 1, 
+    comensales: 2, 
+    tipo: 'Estándar', 
+    qr_data: '', 
+    foto_url: '' 
+  };
+    this.fotoMesa = undefined; 
     this.qrGenerado = false;
   }
+
+  async tomarFoto() {
+    try {
+      const image = await Camera.getPhoto({
+        quality: 90,
+        allowEditing: false,
+        resultType: CameraResultType.DataUrl,
+        source: CameraSource.Camera 
+      });
+      this.fotoMesa = image.dataUrl;
+      this.nuevaMesa.foto_url = image.dataUrl; 
+    } catch (error) {
+      console.log('El usuario cerró la cámara');
+    }
+  }
+
 }

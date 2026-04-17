@@ -1,72 +1,46 @@
-/* Toolbar Styles */
+.risto-background {
+  --background: #1e3d1a;
+}
+
 .toolbar-saffron {
-  --background: var(--risto-saffron);
+  --background: #f5a623; 
+  --color: #1e3d1a;
 }
 
-.title-bold {
-  font-weight: bold;
+.welcome-section {
+  text-align: center;
+  padding-top: 50px;
+  padding-bottom: 30px;
+
+  .welcome-title {
+      color: #f5a623;
+      font-weight: 900;
+      font-size: 2.4rem;
+      margin: 0;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+  }
+
+  .welcome-subtitle {
+      color: #fdfaf0; 
+      font-size: 1rem;
+      font-weight: 400;
+      margin-top: 5px;
+      opacity: 0.9;
+  }
 }
 
-.menu-container {
-  /* Al quitar las propiedades de centrado, los elementos fluirán 
-     naturalmente desde arriba hacia abajo */
-  width: 100%;
-}
-
-.bienvenida-title {
-  font-family: 'Outfit', sans-serif;
-  color: var(--risto-retro-green);
-  font-weight: 700;
-  margin-bottom: 2rem;
-  text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
-}
-
-.botones-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 1.5rem;
-  padding: 0 1rem;
-}
-
-.custom-btn {
-  --border-radius: 12px;
-  height: 65px;
-  font-size: 1.1rem;
-  font-weight: 600;
-  letter-spacing: 0.5px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s, box-shadow 0.2s;
-  background: transparent;
-}
-
-.custom-btn:active {
-  transform: scale(0.96);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
-}
-
-/* Colores Ristodeli - Botones Monocromáticos Metre */
-.primary, .secondary, .accent, .highlight {
-  --background: var(--risto-purple);
-  --color: var(--risto-russet);
-}
-
-.logo-wrapper {
+.footer-decoration {
   display: flex;
   justify-content: center;
-  align-items: center;
-  height: 100px;
-  margin-top: 15px;
-  margin-bottom: 5px;
+  margin-top: 40px;
+  opacity: 0.15;
+
+  img {
+      width: 80px;
+      filter: sepia(1) saturate(5);
+  }
 }
 
-.spin-logo {
-  width: 90px;
-  height: 90px;
-  object-fit: contain;
-  animation: singleSpin 1s cubic-bezier(0.25, 1, 0.5, 1) forwards;
-}
-
-@keyframes singleSpin {
-  0% { transform: rotate(0deg) scale(0.5); opacity: 0; }
-  100% { transform: rotate(360deg) scale(1); opacity: 1; }
-}
+/* Clases de utilidad requeridas */
+.text-russet { color: #1e3d1a; }
+.title-bold { font-weight: 900; }

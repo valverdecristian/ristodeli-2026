@@ -38,16 +38,12 @@ export class DashboardPage implements OnInit {
         this.router.navigate(['/admin/crear-empleado']);
         break;
         
-      case 'add_table':
-        this.router.navigate(['/gestion-mesas']);
-        break;
-        
-      case 'add_plato': 
-        this.router.navigate(['/alta-producto/plato']);
+      case 'view_tables': 
+        this.router.navigate(['/listado-mesas']);
         break;
 
-      case 'add_bebida': 
-        this.router.navigate(['/alta-producto/bebida']);
+      case 'add_table':
+        this.router.navigate(['/gestion-mesas']);
         break;
 
       case 'approve_clients': 

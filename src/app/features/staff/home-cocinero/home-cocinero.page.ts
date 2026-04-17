@@ -1,65 +1,62 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonicModule } from '@ionic/angular';
-import { PedidoService, Pedido } from 'src/app/core/services/pedido.service';
+import { Router } from '@angular/router';
+import { 
+  IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonButton, IonIcon 
+} from '@ionic/angular/standalone';
+import { ManagementActionsComponent } from '../../../shared/components/management-actions/management-actions.component';
+import { AuthService } from '../../../core/services/auth.service';
 import { addIcons } from 'ionicons';
 import { logOutOutline } from 'ionicons/icons';
-import { AuthService } from 'src/app/core/services/auth.service';
 
 @Component({
   selector: 'app-home-cocinero',
   templateUrl: './home-cocinero.page.html',
   styleUrls: ['./home-cocinero.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule, FormsModule]
+  imports: [
+    IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, 
+    IonButton, IonIcon, CommonModule, FormsModule, ManagementActionsComponent
+  ]
 })
 export class HomeCocineroPage implements OnInit {
-  pedidos: Pedido[] = []; 
+  private authService = inject(AuthService);
+  private router = inject(Router);
 
-  constructor(
-    private pedidoService: PedidoService,
-    private authService: AuthService
-  ) { 
+  constructor() {
     addIcons({ logOutOutline });
   }
 
-  ngOnInit() {
-    this.cargarPedidos();
-  }
+  ngOnInit() {}
 
-  // Busca los pedidos reales en Supabase
-  async cargarPedidos() {
-    this.pedidos = await this.pedidoService.obtenerPedidosActivos('plato');
-  }
+  handleAction(action: string) {
+    console.log('Acción seleccionada:', action);
+    
+    switch (action) {
+      case 'add_plato': 
+        this.router.navigate(['/alta-producto/plato']);
+        break;
 
-  // Toma los pedidos 
-  async tomarPedido(pedido: Pedido) {
-    try {
-      await this.pedidoService.cambiarEstado(pedido.id, 'En Preparación');
-      pedido.estado = 'En Preparación'; // Actualizamos la vista rápido
-    } catch (error) {
-      console.error('Error al actualizar', error);
-    }
-  }
+      case 'add_postre': 
+        this.router.navigate(['/alta-producto/postre']);
+        break;
 
-  // Pone los pedidos en listo
-  async terminarPedido(pedido: Pedido) {
-    try {
-      await this.pedidoService.cambiarEstado(pedido.id, 'Listo');
-      this.cargarPedidos(); 
-    } catch (error) {
-      console.error('Error al actualizar', error);
-    }
-  }
+      case 'view_orders':
 
-  // Para el cambio de colores de los pedidos dependiendo en que instancia estan
-  getColorEstado(estado: string): string {
-    switch (estado) {
-      case 'Pendiente': return 'danger';
-      case 'En Preparación': return 'warning';
-      case 'Listo': return 'success';
-      default: return 'medium';
+        this.router.navigate(['/pedidos-pendientes/cocina']);
+        break;
+
+      case 'view_menu_platos':
+        this.router.navigate(['/visualizar-productos/plato']);
+        break;
+
+      case 'view_menu_postres':
+        this.router.navigate(['/visualizar-productos/postre']);
+        break;
+        
+      default:
+        console.warn('Acción no programada:', action);
     }
   }
 

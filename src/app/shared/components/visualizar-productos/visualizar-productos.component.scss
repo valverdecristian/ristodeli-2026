@@ -1,0 +1,145 @@
+.risto-background {
+    --background: #1e3d1a; 
+    height: 100%;
+}
+
+.toolbar-saffron {
+    --background: #f5a623; 
+    --color: #1e3d1a;
+}
+
+.vertical-slider {
+    height: 100%;
+    overflow-y: auto;
+    scroll-snap-type: y mandatory;
+    scroll-behavior: smooth;
+    &::-webkit-scrollbar { display: none; }
+}
+
+.product-slide {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+    padding: 20px;
+}
+
+.producto-card {
+    width: 100%;
+    height: 85%; 
+    --background: #fdfaf0; 
+    border-radius: 30px;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+    border: 2px solid #f5a623; 
+}
+
+.carrusel-fotos {
+  height: 45%;
+  position: relative;
+  border-bottom: 3px solid #f5a623; 
+  border-top-left-radius: 25px;
+  border-top-right-radius: 25px;
+  overflow: hidden; 
+
+  .carrusel-scroll-horizontal {
+    display: flex;
+    height: 100%;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory; 
+    &::-webkit-scrollbar { display: none; }
+
+    .slide-foto {
+      min-width: 100%;
+      height: 100%;   
+      scroll-snap-align: center; 
+      
+      display: flex;
+      align-items: center;   
+      justify-content: center;
+      background: #fdfaf0;    
+
+      img {
+        
+        width: 100%;
+        height: 100%;
+        object-fit: cover; 
+        object-fit: contain; 
+        object-position: center; 
+      }
+    }
+  }
+}
+
+.categoria-overlay {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    background: #1e3d1a;
+    color: #fdfaf0;
+    padding: 5px 15px;
+    border-radius: 10px;
+    font-size: 0.7rem;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+.header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    
+    .nombre {
+        color: #1e3d1a; 
+        font-size: 1.4rem;
+        font-weight: 900;
+    }
+
+    .precio-tag {
+        background: #f5a623;
+        color: #1e3d1a;
+        padding: 5px 12px;
+        border-radius: 12px;
+        font-weight: 800;
+        font-size: 1.1rem;
+    }
+}
+
+.tiempo {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: #f5a623; 
+    font-weight: bold;
+    font-size: 0.8rem;
+    margin-top: 5px;
+}
+
+.descripcion {
+    color: #3d3d3d; 
+    font-size: 1rem;
+    line-height: 1.4;
+    font-style: italic;
+}
+
+.swipe-hint {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #1e3d1a;
+    font-weight: bold;
+    font-size: 0.7rem;
+    margin-top: auto; 
+    padding-bottom: 10px;
+    animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}

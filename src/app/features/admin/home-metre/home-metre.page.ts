@@ -1,11 +1,20 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { IonicModule } from '@ionic/angular';
-import { RouterModule, Router } from '@angular/router';
-import { AuthService } from 'src/app/core/services/auth.service';
+import { 
+  IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonButton, IonIcon 
+} from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { logOutOutline, restaurantOutline, personAddOutline, listOutline, gridOutline } from 'ionicons/icons';
+import { 
+  logOutOutline, 
+  gridOutline, 
+  imagesOutline, 
+  restaurantOutline, 
+  personAddOutline, 
+  listOutline 
+} from 'ionicons/icons';
+import { ManagementActionsComponent } from 'src/app/shared/components/management-actions/management-actions.component';
+import { AuthService } from 'src/app/core/services/auth.service';
 import { ToastService } from 'src/app/core/services/toast.service';
 
 @Component({
@@ -13,31 +22,47 @@ import { ToastService } from 'src/app/core/services/toast.service';
   templateUrl: './home-metre.page.html',
   styleUrls: ['./home-metre.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule, FormsModule, RouterModule]
+  imports: [
+    IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, 
+    IonButton, IonIcon, CommonModule, ManagementActionsComponent
+  ]
 })
-export class HomeMetrePage implements OnInit {
+export class HomeMetrePage { 
+  private router = inject(Router);
+  private authService = inject(AuthService);
+  private toastService = inject(ToastService);
 
-  constructor(
-    private authService: AuthService,
-    private toastService: ToastService,
-    private router: Router
-  ) { 
-    addIcons({ logOutOutline, restaurantOutline, personAddOutline, listOutline, gridOutline });
+  constructor() {
+    addIcons({ 
+      logOutOutline, 
+      gridOutline, 
+      imagesOutline, 
+      restaurantOutline, 
+      personAddOutline, 
+      listOutline 
+    });
   }
 
-  ngOnInit() {
-  }
-
-  verListaEspera() {
-    this.toastService.mostrarAdvertencia('La función de Lista de Espera estará disponible próximamente.');
-  }
-
-  verListaMesas() {
-    this.toastService.mostrarAdvertencia('La función de Lista de Mesas estará disponible próximamente.');
+  handleAction(action: string) {
+    switch (action) {
+      case 'view_tables':
+        this.router.navigate(['/listado-mesas']); 
+        break;
+      case 'manage_status':
+        this.router.navigate(['/estado-mesas']); 
+        break;
+      case 'view_waiting_list':
+        this.toastService.mostrarAdvertencia('La lista de espera se habilitará en la próxima entrega.');
+        break;
+      case 'register_client':
+        this.router.navigate(['/registro-cliente']);
+        break;
+      default:
+        console.warn('Acción no reconocida:', action);
+    }
   }
 
   logout() {
-    this.authService.cerrarSesion();
+    this.authService.cerrarSesion(); 
   }
-
 }

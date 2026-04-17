@@ -48,6 +48,11 @@ export class SupervisorPage {
       case 'approve_clients': 
         this.router.navigate(['/aprobacion-clientes']);
         break;
+
+      case 'view_tables': 
+        this.router.navigate(['/listado-mesas']);
+        break;
+
       default:
         console.warn('Acción no permitida para Supervisor:', action);
     }
