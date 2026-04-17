@@ -66,23 +66,20 @@
 .actions-container {
   display: flex;
   flex-direction: column;
-  gap: 1.2rem;
+  gap: 2.5rem; /* Gap más grande para separar más los dos únicos botones */
   padding: 0 10px;
+  margin-top: 1rem;
 }
 
 .action-btn {
-  height: 60px;
-  font-size: 1.1rem;
-  font-weight: 600;
-  --box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  height: 90px; /* Botones más altos y masivos */
+  font-size: 1.25rem; /* El texto crece proporcionalmente */
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  --box-shadow: 0 6px 14px rgba(0, 0, 0, 0.35); /* Sombra un poco más fuerte para el tamaño */
 }
 
 /* Colores específicos para cada botón */
-.menu-btn {
-  --background: var(--risto-saffron);
-  --color: var(--risto-russet);
-}
-
 .chart-btn {
   --background: var(--risto-purple);
   --color: var(--risto-russet);

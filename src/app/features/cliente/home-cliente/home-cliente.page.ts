@@ -8,6 +8,9 @@ import { NotificacionService } from '../../../core/services/notificacion.service
 import { addIcons } from 'ionicons';
 import { logOutOutline, restaurantOutline, barChartOutline, qrCodeOutline } from 'ionicons/icons';
 
+import { QrScannerService } from '../../../core/services/qr-scanner.service';
+import { ToastService } from '../../../core/services/toast.service';
+
 @Component({
   selector: 'app-home-cliente',
   templateUrl: './home-cliente.page.html',
@@ -20,6 +23,8 @@ export class HomeClientePage {
   private authService = inject(AuthService);
   private spinnerService = inject(SpinnerService);
   private notificacionService = inject(NotificacionService);
+  private qrScannerService = inject(QrScannerService);
+  private toastService = inject(ToastService);
 
   nombreCliente: string = 'Cargando...';
 
@@ -43,6 +48,15 @@ export class HomeClientePage {
     await this.spinnerService.mostrar('Cerrando sesión...');
     await this.authService.cerrarSesion();
     await this.spinnerService.ocultar();
+  }
+
+  async escanearQr() {
+    const qrText = await this.qrScannerService.scanQr();
+    if (qrText) {
+      this.toastService.mostrarExito('QR detectado: ' + qrText);
+    } else {
+      this.toastService.mostrarError('Escaneo de QR cancelado o fallido');
+    }
   }
 
 }
