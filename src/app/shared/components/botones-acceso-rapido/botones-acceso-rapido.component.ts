@@ -22,7 +22,7 @@ export class BotonesAccesoRapidoComponent implements OnInit {
     { name: 'Metre', perfil: 'metre', icon: 'notifications-outline', email: 'metre@ristodeli.com' },
     { name: 'Supervisor', perfil: 'supervisor', icon: 'clipboard-outline', email: 'supervisor@ristodeli.com' },
     { name: 'Cocinero', perfil: 'cocinero', icon: 'flame-outline', email: 'cocinero@ristodeli.com' },
-    { name: 'Cantinero', perfil: 'cantinero', icon: 'wine-outline', email: 'cantinero@ristodeli.com' } // Corregido el perfil
+    { name: 'Cantinero', perfil: 'cantinero', icon: 'wine-outline', email: 'cantinero1@ristodeli.com' } // Corregido el perfil
   ];
 
   constructor(private supabaseService: AuthService) {

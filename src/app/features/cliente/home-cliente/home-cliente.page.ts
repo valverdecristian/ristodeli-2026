@@ -59,4 +59,9 @@ export class HomeClientePage {
     }
   }
 
+  ionViewWillLeave() {
+    // Si el usuario sale de la app repentinamente o vuelve atrás, destruimos instancia activa.
+    this.qrScannerService.detenerEscaneo();
+  }
+
 }
