@@ -37,7 +37,21 @@ export class HomeClientePage {
     if (perfil) {
       this.nombreCliente = perfil.nombres;
     } else {
-      this.nombreCliente = 'Cliente';
+      const anonimoId = localStorage.getItem('anonimo_id');
+      if (anonimoId) {
+        const { data } = await this.authService.supabaseClient
+          .from('anonimos')
+          .select('nombre')
+          .eq('id', anonimoId)
+          .single();
+        if (data && data.nombre) {
+          this.nombreCliente = data.nombre;
+        } else {
+          this.nombreCliente = 'Invitado';
+        }
+      } else {
+        this.nombreCliente = 'Cliente';
+      }
     }
     
     // Inicializar Push Notifications

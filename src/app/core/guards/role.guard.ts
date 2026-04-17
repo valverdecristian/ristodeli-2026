@@ -6,15 +6,24 @@ export const roleGuard: CanActivateFn = (route, state) => {
     const authService = inject(AuthService);
     const router = inject(Router);
     const user = authService.currentUser(); 
+    const anonimoId = localStorage.getItem('anonimo_id');
 
-    if (!user) {
+    if (!user && !anonimoId) {
         router.navigate(['/login']);
         return false;
     }
 
     const expectedRoles = route.data['roles'] || [route.data['role']];
 
-    if (expectedRoles && expectedRoles.includes(user.perfil)) {
+    if (anonimoId && !user) {
+        if (expectedRoles && expectedRoles.includes('anonimo')) {
+            return true;
+        }
+        router.navigate(['/login']);
+        return false;
+    }
+
+    if (expectedRoles && expectedRoles.includes(user?.perfil)) {
         return true;
     }
 
