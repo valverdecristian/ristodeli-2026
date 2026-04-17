@@ -9,24 +9,20 @@
 
 <ion-content class="ion-padding">
   <div class="welcome-banner text-cream" style="margin-bottom: 2rem; text-align: center;">
-    <img src="assets/icon/favicon.ico" alt="Ristodeli Logo" style="width: 100px; height: 100px; border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.5); margin-bottom: 1rem;" />
+    <img src="assets/icon/favicon.ico" alt="Ristodeli Logo"
+      style="width: 100px; height: 100px; border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.5); margin-bottom: 1rem;" />
     <p>¡Ingresa como anónimo para explorar nuestro menú y realizar pedidos!</p>
   </div>
 
   <form [formGroup]="registroForm" (ngSubmit)="registrarAnonimo()">
     <!-- Campo Nombre -->
-    <ion-item class="input-item" style="--background: var(--risto-russet); border-radius: 8px;">
-      <ion-input 
-        label="Tu Nombre" 
-        labelPlacement="floating" 
-        type="text" 
-        formControlName="nombre" 
-        placeholder="Ej: Juan"
-        [clearInput]="true"
-        color="secondary">
+    <ion-item class="input-item" lines="none">
+      <ion-input label="Tu Nombre" labelPlacement="floating" type="text" formControlName="nombre" placeholder="Ej: Juan"
+        [clearInput]="true" color="secondary">
       </ion-input>
     </ion-item>
-    <div *ngIf="f['nombre'].invalid && (f['nombre'].dirty || f['nombre'].touched)" class="error-message" style="margin-top: 8px;">
+    <div *ngIf="f['nombre'].invalid && (f['nombre'].dirty || f['nombre'].touched)" class="error-message"
+      style="margin-top: 8px;">
       <ion-text color="danger" style="display: flex; align-items: center;">
         <ion-icon name="alert-circle-outline" style="margin-right: 5px;"></ion-icon>
         El nombre debe tener al menos 3 caracteres.
@@ -35,7 +31,7 @@
 
     <!-- Fotografía -->
     <div class="photo-section" style="margin-top: 1.5rem; text-align: center;">
-      
+
       <!-- Cuadrado grande para tomar foto si no hay foto temporal -->
       <div *ngIf="!fotoUrlTemporal" class="photo-capture-box" (click)="tomarFotografia()">
         <ion-icon name="camera-outline"></ion-icon>
@@ -49,17 +45,12 @@
           <ion-icon name="camera-outline"></ion-icon> Toca la imagen para cambiarla
         </p>
       </div>
-      
+
     </div>
 
     <!-- Submit Action -->
-    <div class="action-buttons" style="margin-top: 3rem;">
-      <ion-button 
-        type="submit" 
-        expand="block" 
-        color="warning" 
-        shape="round" 
-        class="submit-button"
+    <div class="action-buttons">
+      <ion-button type="submit" expand="block" color="warning" shape="round" class="submit-button"
         [disabled]="isSubmitting">
         <strong style="color: var(--risto-russet);">
           {{ isSubmitting ? 'INGRESANDO...' : 'ENTRAR AHORA' }}
