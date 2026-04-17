@@ -11,6 +11,11 @@ export const authGuard: CanActivateFn = (route, state) => {
     return true;
   }
 
+  // Si hay un anónimo en localStorage, también lo dejamos pasar
+  if (localStorage.getItem('anonimo_id')) {
+    return true;
+  }
+
   // Si no está logueado, lo mandamos al login
   router.navigate(['/login']);
   return false;

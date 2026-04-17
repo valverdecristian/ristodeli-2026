@@ -34,6 +34,10 @@ export class LoginPage implements OnInit {
     });
   }
 
+  ionViewWillEnter() {
+    this.loginForm?.reset();
+  }
+
   get f() {
     return this.loginForm.controls;
   }
@@ -69,11 +73,7 @@ export class LoginPage implements OnInit {
   
     try {
       await this.spinnerService.mostrar('Iniciando sesión...');
-      
-      
       await this.authService.ingresar(email, password);
-      
-      
       const perfilUsuario = await this.authService.obtenerPerfilUsuarioActual();
   
       if (!perfilUsuario) {

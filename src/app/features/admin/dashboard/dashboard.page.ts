@@ -5,6 +5,7 @@ import { IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonButton, Ion
 import { Router } from '@angular/router';
 import { ManagementActionsComponent } from '../../../shared/components/management-actions/management-actions.component';
 import { AuthService } from '../../../core/services/auth.service';
+import { NotificacionService } from '../../../core/services/notificacion.service';
 import { addIcons } from 'ionicons';
 import { logOutOutline } from 'ionicons/icons';
 
@@ -17,11 +18,16 @@ import { logOutOutline } from 'ionicons/icons';
 })
 export class DashboardPage implements OnInit {
 
-  constructor(private authService: AuthService, private router: Router) {
+  constructor(private authService: AuthService, private router: Router, private notificacionService: NotificacionService) {
     addIcons({ logOutOutline });
   }
 
   ngOnInit() {
+  }
+
+  async ionViewWillEnter() {
+    const user = this.authService.currentUser();
+    await this.notificacionService.inicializarPushNotifications(user?.id);
   }
 
   handleAction(action: string) {

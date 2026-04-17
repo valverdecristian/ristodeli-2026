@@ -3,8 +3,9 @@ import { CommonModule } from '@angular/common';
 import { IonIcon, IonRippleEffect } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { 
-  personAddOutline, fastFoodOutline, gridOutline, peopleOutline, wineOutline, restaurantOutline, 
-  iceCreamOutline, clipboardOutline, bookOutline, flaskOutline 
+  personAddOutline, fastFoodOutline, gridOutline, peopleOutline, wineOutline, 
+  restaurantOutline, iceCreamOutline, clipboardOutline, bookOutline, 
+  flaskOutline, swapHorizontalOutline, listOutline 
 } from 'ionicons/icons';
 
 @Component({
@@ -20,34 +21,35 @@ export class ManagementActionsComponent implements OnInit {
   @Output() actionClicked = new EventEmitter<string>();
 
   private allActions = [
-    // Acciones de Administración (Admin y Supervisor)
+    // Acciones de Administración (Admin y Supervisor) 
     { title: 'Agregar Empleado', icon: 'person-add-outline', color: '#f5a623', action: 'add_employee', roles: ['admin', 'supervisor'] },
     { title: 'Agregar Mesa', icon: 'grid-outline', color: '#f5a623', action: 'add_table', roles: ['admin', 'supervisor'] },
-    { title: 'Aprobar Clientes', icon: 'people-outline', color: '#f5a623', action: 'approve_clients', roles: ['admin', 'supervisor'] },
+    { title: 'Gestión De Clientes', icon: 'people-outline', color: '#f5a623', action: 'approve_clients', roles: ['admin', 'supervisor'] },
     
-    // Acciones Compartidas y de Cocina (Cocinero y Admin)
-    { title: 'Menú de Platos', icon: 'restaurant-outline', color: '#3880ff', action: 'view_menu_platos', roles: ['cocinero'] },
+    // Acciones de Cocina 
     { title: 'Agregar Plato', icon: 'fast-food-outline', color: '#3880ff', action: 'add_plato', roles: ['cocinero'] },
-    { title: 'Agregar Postre', icon: 'ice-cream-outline', color: '#3dc2ff', action: 'add_postre', roles: ['cocinero'] },
-    { title: 'Menú de Postres', icon: 'ice-cream-outline', color: '#3dc2ff', action: 'view_menu_postres', roles: ['cocinero'] },
+    { title: 'Menú de Platos', icon: 'restaurant-outline', color: '#3880ff', action: 'view_menu_platos', roles: ['cocinero'] },
     { title: 'Pedidos Pendientes', icon: 'clipboard-outline', color: '#2dd36f', action: 'view_orders', roles: ['cocinero'] },
     
-    // Acciones de Bar
+    // Acciones de Bar 
     { title: 'Agregar Bebida', icon: 'wine-outline', color: '#eb445a', action: 'add_bebida', roles: ['bartender', 'cantinero'] },
-    { title: 'Comandas Bar', icon: 'clipboard-outline', color: '#eb445a', action: 'view_orders_bar', roles: ['bartender', 'cantinero'] },
     { title: 'Menú Bebidas', icon: 'book-outline', color: '#eb445a', action: 'view_menu_bebidas', roles: ['bartender', 'cantinero'] },
+    { title: 'Comandas Bar', icon: 'clipboard-outline', color: '#eb445a', action: 'view_orders_bar', roles: ['bartender', 'cantinero'] },
     
-    // Ver mesa y estado de mesas
-    { title: 'Ver Mesas', icon: 'grid-outline', color: '#1e3d1a',action: 'view_tables', roles: ['admin', 'supervisor', 'metre'] },
+    // Acciones de Metre 
+    { title: 'Lista de Espera', icon: 'list-outline', color: '#f5a623', action: 'view_waiting_list', roles: ['metre'] },
+    { title: 'Ver Mesas', icon: 'grid-outline', color: '#1e3d1a', action: 'view_tables', roles: ['admin', 'supervisor', 'metre'] },
     { title: 'Estado Mesas', icon: 'swap-horizontal-outline', color: '#f5a623', action: 'manage_status', roles: ['metre'] },
+    { title: 'Crear Cliente', icon: 'person-add-outline', color: '#3880ff', action: 'register_client', roles: ['metre'] }
   ];
 
   visibleActions: any[] = [];
 
   constructor() {
     addIcons({ 
-      personAddOutline, fastFoodOutline, gridOutline, peopleOutline, wineOutline, restaurantOutline, 
-      iceCreamOutline, clipboardOutline, bookOutline, flaskOutline
+      personAddOutline, fastFoodOutline, gridOutline, peopleOutline, wineOutline, 
+      restaurantOutline, iceCreamOutline, clipboardOutline, bookOutline, 
+      flaskOutline, swapHorizontalOutline, listOutline 
     });
   }
 

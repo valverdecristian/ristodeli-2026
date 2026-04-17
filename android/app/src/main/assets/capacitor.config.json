@@ -1,8 +1,15 @@
 {
-	"appId": "io.ionic.starter",
-	"appName": "Ristodeli App",
+	"appId": "com.ristodeli.app",
+	"appName": "RistoDeli App",
 	"webDir": "www",
 	"plugins": {
+		"PushNotifications": {
+			"presentationOptions": [
+				"badge",
+				"sound",
+				"alert"
+			]
+		},
 		"SplashScreen": {
 			"launchShowDuration": 0,
 			"launchAutoHide": true,

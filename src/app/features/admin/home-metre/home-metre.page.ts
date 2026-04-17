@@ -5,11 +5,17 @@ import {
   IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonButton, IonIcon 
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { logOutOutline,swapHorizontalOutline, 
-  gridOutline,
-  imagesOutline } from 'ionicons/icons';
+import { 
+  logOutOutline, 
+  gridOutline, 
+  imagesOutline, 
+  restaurantOutline, 
+  personAddOutline, 
+  listOutline 
+} from 'ionicons/icons';
 import { ManagementActionsComponent } from 'src/app/shared/components/management-actions/management-actions.component';
 import { AuthService } from 'src/app/core/services/auth.service';
+import { ToastService } from 'src/app/core/services/toast.service';
 
 @Component({
   selector: 'app-home-metre',
@@ -21,14 +27,20 @@ import { AuthService } from 'src/app/core/services/auth.service';
     IonButton, IonIcon, CommonModule, ManagementActionsComponent
   ]
 })
-export class HomeMetrePage {
+export class HomeMetrePage { 
   private router = inject(Router);
   private authService = inject(AuthService);
+  private toastService = inject(ToastService);
 
   constructor() {
-    addIcons({ logOutOutline,swapHorizontalOutline, 
-      gridOutline,
-      imagesOutline });
+    addIcons({ 
+      logOutOutline, 
+      gridOutline, 
+      imagesOutline, 
+      restaurantOutline, 
+      personAddOutline, 
+      listOutline 
+    });
   }
 
   handleAction(action: string) {
@@ -39,12 +51,18 @@ export class HomeMetrePage {
       case 'manage_status':
         this.router.navigate(['/estado-mesas']); 
         break;
+      case 'view_waiting_list':
+        this.toastService.mostrarAdvertencia('La lista de espera se habilitará en la próxima entrega.');
+        break;
+      case 'register_client':
+        this.router.navigate(['/registro-cliente']);
+        break;
       default:
         console.warn('Acción no reconocida:', action);
     }
   }
 
   logout() {
-    this.authService.cerrarSesion();
+    this.authService.cerrarSesion(); 
   }
 }

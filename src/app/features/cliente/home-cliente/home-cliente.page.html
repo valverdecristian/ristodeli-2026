@@ -22,19 +22,14 @@
   </div>
 
   <div class="actions-container fade-in">
-    <ion-button expand="block" shape="round" class="action-btn menu-btn">
-      <ion-icon slot="start" name="restaurant-outline"></ion-icon>
-      Ver Menú
-    </ion-button>
-
     <ion-button expand="block" shape="round" class="action-btn chart-btn">
       <ion-icon slot="start" name="bar-chart-outline"></ion-icon>
       Ver Gráfico de Encuestas
     </ion-button>
 
-    <ion-button expand="block" shape="round" class="action-btn qr-btn">
+    <ion-button expand="block" shape="round" class="action-btn qr-btn" (click)="escanearQr()">
       <ion-icon slot="start" name="qr-code-outline"></ion-icon>
-      Ver QR
+      Escanear QR
     </ion-button>
   </div>
 

@@ -23,6 +23,7 @@ import { QRCodeComponent } from 'angularx-qrcode';
     CommonModule,IonCardContent
   ]
 })
+
 export class ListadoMesasPage implements OnInit {
   private mesaService = inject(MesaService);
   mesas: Mesa[] = [];

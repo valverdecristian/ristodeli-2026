@@ -8,6 +8,7 @@ import { AuthService } from 'src/app/core/services/auth.service';
 import { ToastService } from 'src/app/core/services/toast.service';
 import { SpinnerService } from 'src/app/core/services/spinner.service';
 import { FotoService } from 'src/app/core/services/foto.service';
+import { NotificacionService } from 'src/app/core/services/notificacion.service';
 import { Router } from '@angular/router';
 
 @Component({
@@ -23,9 +24,14 @@ export class RegistroClientePage {
   private toastService = inject(ToastService);
   private spinnerService = inject(SpinnerService);
   private fotoService = inject(FotoService);
+  private notificacionService = inject(NotificacionService);
   private router = inject(Router);
 
   isSubmitting = false;
+
+  async ionViewWillEnter() {
+    await this.notificacionService.inicializarPushNotifications();
+  }
 
   async onSubmitCliente(datos: DetalleRegistro) {
     this.isSubmitting = true;
