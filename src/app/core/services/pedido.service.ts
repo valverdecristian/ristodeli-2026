@@ -1,15 +1,17 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { createClient, SupabaseClient } from '@supabase/supabase-js'; 
 import { environment } from 'src/environments/environment';
+import { ToastService } from './toast.service'; 
+import { Haptics, ImpactStyle } from '@capacitor/haptics'; 
 
 export interface Pedido {
   id: string;
   mesa_numero: number;
   producto_nombre: string;
-  categoria: string;
+  categoria: 'plato' | 'bebida' | 'postre'; 
   cantidad: number;
-  estado: 'Pendiente' | 'En Preparación' | 'Listo';
-  created_at: Date;
+  estado: 'Pendiente' | 'En Preparacion' | 'Listo'; 
+  created_at: string;
 }
 
 @Injectable({
@@ -17,18 +19,18 @@ export interface Pedido {
 })
 export class PedidoService {
   private supabase: SupabaseClient;
+  private toastService = inject(ToastService);
 
   constructor() {
     this.supabase = createClient(environment.supabaseUrl, environment.supabaseKey);
   }
 
-  // Trae solo los pedidos que sean de una categoría y que no estén Listos
-  async obtenerPedidosActivos(categoria: string) {
+  async obtenerPedidosPorSectores(categorias: string[]) {
     const { data, error } = await this.supabase
       .from('pedidos')
       .select('*')
-      .eq('categoria', categoria)
-      .neq('estado', 'Listo') // Oculta los que ya se entregaron
+      .in('categoria', categorias) 
+      .neq('estado', 'Listo') 
       .order('created_at', { ascending: true }); 
 
     if (error) {
@@ -38,13 +40,19 @@ export class PedidoService {
     return data as Pedido[];
   }
 
-  // Actualiza el estado en la base de datos
-  async cambiarEstado(id: string, nuevoEstado: string) {
-    const { error } = await this.supabase
-      .from('pedidos')
-      .update({ estado: nuevoEstado })
-      .eq('id', id);
+  async actualizarEstado(id: string, nuevoEstado: string) {
+    try {
+      const { error } = await this.supabase
+        .from('pedidos')
+        .update({ estado: nuevoEstado })
+        .eq('id', id);
 
-    if (error) throw error;
+      if (error) throw error;
+    } catch (error) {
+
+      await Haptics.impact({ style: ImpactStyle.Heavy });
+      this.toastService.mostrarError('No se pudo actualizar el estado.');
+      throw error;
+    }
   }
 }

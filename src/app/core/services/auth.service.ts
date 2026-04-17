@@ -130,16 +130,30 @@ export class AuthService {
    * Obtener detalles del perfil del usuario actual (tabla public.usuarios)
    */
   async obtenerPerfilUsuarioActual() {
-    const user = this.currentUser();
-    if (!user) return null;
-
+    // 1. Intentamos obtenerlo del signal
+    let userId = this.currentUser()?.id;
+  
+    // 2. Si el signal aún no se actualizó, lo buscamos en la sesión activa
+    if (!userId) {
+      const { data: { session } } = await this.supabase.auth.getSession();
+      userId = session?.user?.id;
+    }
+  
+    if (!userId) return null;
+  
+    // 3. Buscamos en la tabla usuarios
     const { data, error } = await this.supabase
       .from('usuarios')
       .select('*')
-      .eq('id', user.id)
+      .eq('id', userId)
       .single();
-
-    return error ? null : data;
+  
+    if (error) {
+      console.error('Error al obtener perfil:', error.message);
+      return null;
+    }
+  
+    return data;
   }
 
   /**
@@ -177,7 +191,7 @@ export class AuthService {
         break;
 
       case 'supervisor':
-        this.router.navigate(['/supervisor']); // Ahora sí irá a la carpeta nueva
+        this.router.navigate(['/supervisor']); 
         break;
 
       case 'cliente_reg':
@@ -187,11 +201,10 @@ export class AuthService {
       case 'mozo':
         this.router.navigate(['/home-mozo']);
         break;
-
       case 'metre':
         this.router.navigate(['/home-metre']);
         break;
-
+      case 'bartender':
       case 'cantinero':
         this.router.navigate(['/home-cantinero']);
         break;

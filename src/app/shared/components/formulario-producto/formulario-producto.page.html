@@ -1,7 +1,7 @@
 <ion-header class="ion-no-border">
   <ion-toolbar [color]="config.color">
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/home" color="light"></ion-back-button>
+      <ion-back-button defaultHref="/home-cocinero" color="light"></ion-back-button>
     </ion-buttons>
     <ion-title color="light">{{ config.titulo }}</ion-title>
   </ion-toolbar>
@@ -12,32 +12,53 @@
     <ion-list class="input-card" lines="none">
       
       <ion-item class="risto-input-item">
-        <ion-input [label]="'Nombre ' + config.label" labelPlacement="floating" formControlName="nombre"></ion-input>
+        <ion-input 
+          [label]="'Nombre ' + config.label" 
+          labelPlacement="floating" 
+          formControlName="nombre"
+          placeholder="Ej: Milanesa Napolitana">
+        </ion-input>
       </ion-item>
       @if (submitted && productoForm.get('nombre')?.invalid) {
-        <p class="error-msg">El nombre es obligatorio (mín. 3 letras).</p>
+        <p class="error-msg">El nombre es obligatorio (mínimo 3 letras).</p>
       }
 
       <ion-item class="risto-input-item">
-        <ion-textarea label="Descripción" labelPlacement="floating" formControlName="descripcion" rows="2"></ion-textarea>
+        <ion-textarea 
+          label="Descripción" 
+          labelPlacement="floating" 
+          formControlName="descripcion" 
+          rows="2"
+          placeholder="Detalle los ingredientes o preparación...">
+        </ion-textarea>
       </ion-item>
       @if (submitted && productoForm.get('descripcion')?.invalid) {
-        <p class="error-msg">Debe ingresar una descripción.</p>
+        <p class="error-msg">Debe ingresar una descripción completa.</p>
       }
 
       <ion-row>
         <ion-col size="6">
           <ion-item class="risto-input-item">
-            <ion-input type="number" label="Tiempo (Min)" labelPlacement="floating" formControlName="tiempo_elaboracion"></ion-input>
+            <ion-input 
+              type="number" 
+              label="Tiempo (Minutos)" 
+              labelPlacement="floating" 
+              formControlName="tiempo_elaboracion">
+            </ion-input>
           </ion-item>
           @if (submitted && productoForm.get('tiempo_elaboracion')?.invalid) {
-            <p class="error-msg">Mínimo 1 min.</p>
+            <p class="error-msg">Mínimo 1 minuto.</p>
           }
         </ion-col>
         
         <ion-col size="6">
           <ion-item class="risto-input-item">
-            <ion-input type="number" label="Precio ($)" labelPlacement="floating" formControlName="precio" step="0.01"></ion-input>
+            <ion-input 
+              type="number" 
+              label="Precio ($)" 
+              labelPlacement="floating" 
+              formControlName="precio">
+            </ion-input>
           </ion-item>
           @if (submitted && productoForm.get('precio')?.invalid) {
             <p class="error-msg">Precio obligatorio.</p>
@@ -51,7 +72,7 @@
     <div class="photo-zone-content">
       <ion-icon name="camera-outline" class="camera-main-icon"></ion-icon>
       <h3>CÁMARA DEL PRODUCTO</h3>
-      <p class="photo-status">TOME 3 FOTOS ({{ fotosPreview.length }}/3)</p>
+      <p class="photo-status">CAPTURA 3 FOTOS ({{ fotosPreview.length }}/3)</p>
     </div>
 
     <div class="photo-slots">
@@ -72,8 +93,9 @@
       }
     </div>
   </div>
+
   @if (submitted && fotosPreview.length < 3) {
-    <p class="error-msg ion-text-center">Debe tomar las 3 fotos obligatoriamente.</p>
+    <p class="error-msg ion-text-center">Debe capturar las 3 fotos para continuar.</p>
   }
 </ion-content>
 

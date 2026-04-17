@@ -1,54 +1,71 @@
-<ion-header>
-  <ion-toolbar color="dark">
+<ion-header class="ion-no-border">
+  <ion-toolbar class="toolbar-saffron">
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/admin"></ion-back-button>
+      <ion-back-button defaultHref="/admin" color="dark"></ion-back-button>
     </ion-buttons>
-    <ion-title>Gestión de Mesas</ion-title>
+    <ion-title class="text-russet title-bold">GESTIÓN DE MESAS</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
+<ion-content class="risto-background ion-padding">
   
-  <ion-card>
+  <ion-card class="producto-card" [disabled]="qrGenerado">
     <ion-card-header>
-      <ion-card-title>Dar de Alta Mesa</ion-card-title>
+      <ion-card-title class="nombre" color=" #1e3d1a">ALTA DE MESA</ion-card-title>
     </ion-card-header>
     
     <ion-card-content>
-      <ion-item>
-        <ion-input label="Número de Mesa" labelPlacement="floating" type="number" [(ngModel)]="nuevaMesa.numero"></ion-input>
+      <div class="foto-mesa-container" (click)="!qrGenerado && tomarFoto()" [style.opacity]="qrGenerado ? '0.5' : '1'">
+        @if (fotoMesa) {
+          <img [src]="fotoMesa" alt="Foto Mesa">
+        } @else {
+          <div class="placeholder-foto">
+            <ion-icon name="camera-outline"></ion-icon>
+            <p>SUBIR FOTO DE LA MESA</p>
+          </div>
+        }
+      </div>
+
+      <ion-item lines="none" class="custom-input-mesa">
+        <ion-label position="stacked">NÚMERO DE MESA</ion-label>
+        <ion-input type="number" [(ngModel)]="nuevaMesa.numero" placeholder="Ej: 1"></ion-input>
       </ion-item>
 
-      <ion-item>
-        <ion-input label="Cantidad de Comensales" labelPlacement="floating" type="number" [(ngModel)]="nuevaMesa.comensales"></ion-input>
+      <ion-item lines="none" class="custom-input-mesa">
+        <ion-label position="stacked">CAPACIDAD </ion-label>
+        <ion-input type="number" [(ngModel)]="nuevaMesa.comensales" placeholder="Ej: 4"></ion-input>
       </ion-item>
 
-      <ion-item>
-        <ion-select label="Tipo de Mesa" labelPlacement="floating" [(ngModel)]="nuevaMesa.tipo" interface="popover">
+      <ion-item lines="none" class="custom-input-mesa">
+        <ion-label position="stacked">CATEGORÍA</ion-label>
+        <ion-select [(ngModel)]="nuevaMesa.tipo" interface="popover" toggleIcon="chevron-down-outline">
           <ion-select-option value="Estándar">Estándar</ion-select-option>
           <ion-select-option value="VIP">VIP</ion-select-option>
-          <ion-select-option value="Discapacitados">Discapacitados</ion-select-option>
+          <ion-select-option value="Exterior">Exterior</ion-select-option>
         </ion-select>
       </ion-item>
 
-      <ion-button expand="block" class="ion-margin-top" (click)="generarMesa()" color="primary">
-        Generar QR de Mesa
+      <ion-button expand="block" shape="round" class="btn-generar-qr" (click)="generarMesa()">
+        <ion-icon slot="start" name="qr-code-outline"></ion-icon>
+        GENERAR MESA Y QR
       </ion-button>
     </ion-card-content>
   </ion-card>
 
-  <ion-card *ngIf="qrGenerado" class="ion-text-center">
-    <ion-card-header>
-      <ion-card-title>Código QR - Mesa {{nuevaMesa.numero}}</ion-card-title>
+  <ion-card *ngIf="qrGenerado" class="qr-result-card fade-in">
+    <ion-card-header class="ion-text-center"> <ion-card-title class="nombre">QR - MESA {{nuevaMesa.numero}}</ion-card-title>
     </ion-card-header>
     
-    <ion-card-content>
-      <qrcode [qrdata]="nuevaMesa.qr_data!" [width]="256" [errorCorrectionLevel]="'M'"></qrcode>
+    <ion-card-content class="ion-text-center">
+      <div class="qr-wrapper">
+        <qrcode [qrdata]="nuevaMesa.qr_data!" [width]="200" [errorCorrectionLevel]="'M'"></qrcode>
+      </div>
       
-      <p class="ion-margin-top">Tipo: {{nuevaMesa.tipo}} | Capacidad: {{nuevaMesa.comensales}} pax</p>
-
-      <ion-button fill="outline" color="medium" (click)="limpiarFormulario()">
-        Crear otra mesa
+      <p class="pax-info">Tipo: {{nuevaMesa.tipo}} | Capacidad: {{nuevaMesa.comensales}} </p>
+  
+      <ion-button expand="block" fill="outline" class="btn-otra-mesa" (click)="limpiarFormulario()">
+        <ion-icon slot="start" name="refresh-outline"></ion-icon>
+        CARGAR OTRA MESA
       </ion-button>
     </ion-card-content>
   </ion-card>

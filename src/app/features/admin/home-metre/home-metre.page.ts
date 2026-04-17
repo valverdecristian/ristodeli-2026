@@ -1,70 +1,46 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { IonicModule} from '@ionic/angular';
-import { MesaService } from 'src/app/core/services/mesa.service';
-import { Mesa } from 'src/app/core/models/mesa.model';
-import { AuthService } from 'src/app/core/services/auth.service';
+import { 
+  IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonButton, IonIcon 
+} from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { logOutOutline } from 'ionicons/icons';
+import { logOutOutline,swapHorizontalOutline, 
+  gridOutline,
+  imagesOutline } from 'ionicons/icons';
+import { ManagementActionsComponent } from 'src/app/shared/components/management-actions/management-actions.component';
+import { AuthService } from 'src/app/core/services/auth.service';
 
 @Component({
   selector: 'app-home-metre',
   templateUrl: './home-metre.page.html',
   styleUrls: ['./home-metre.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule, FormsModule]
+  imports: [
+    IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, 
+    IonButton, IonIcon, CommonModule, ManagementActionsComponent
+  ]
 })
-export class HomeMetrePage implements OnInit {
-  mesas: Mesa[] = [];
+export class HomeMetrePage {
+  private router = inject(Router);
+  private authService = inject(AuthService);
 
-  constructor(
-    private mesaService: MesaService,
-    private cdr: ChangeDetectorRef,
-    private authService: AuthService
-  ) { 
-    addIcons({ logOutOutline });
+  constructor() {
+    addIcons({ logOutOutline,swapHorizontalOutline, 
+      gridOutline,
+      imagesOutline });
   }
 
-  ngOnInit() {
-    this.cargarMesas();
-  }
-
-  // actualice cada vez que se entra a la pantalla
-  ionViewWillEnter() {
-    this.cargarMesas();
-  }
-
-  async cargarMesas() {
-    try {
-      this.mesas = await this.mesaService.obtenerMesas(); 
-      this.cdr.detectChanges();
-    } catch (error) {
-      console.error('Error al cargar mesas:', error);
-    }
-  }
-
-  // El Metre puede liberar una mesa cuando los clientes se van
-  async liberarMesa(mesa: Mesa) {
-    if (!mesa.id) return;
-
-    try {
-      await this.mesaService.actualizarEstado(mesa.id, 'Libre');
-      mesa.estado = 'Libre'; 
-    } catch (error) {
-      console.error('Error al liberar mesa:', error);
-    }
-  }
-
-  // El Metre asigna una mesa cuando llega gente
-  async ocuparMesa(mesa: Mesa) {
-    if (!mesa.id) return;
-
-    try {
-      await this.mesaService.actualizarEstado(mesa.id, 'Ocupada');
-      mesa.estado = 'Ocupada';
-    } catch (error) {
-      console.error('Error al ocupar mesa:', error);
+  handleAction(action: string) {
+    switch (action) {
+      case 'view_tables':
+        this.router.navigate(['/listado-mesas']); 
+        break;
+      case 'manage_status':
+        this.router.navigate(['/estado-mesas']); 
+        break;
+      default:
+        console.warn('Acción no reconocida:', action);
     }
   }
 

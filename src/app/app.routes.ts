@@ -52,7 +52,7 @@ export const routes: Routes = [
     path: 'home-cantinero',
     loadComponent: () => import('./features/staff/home-cantinero/home-cantinero.page').then(m => m.HomeCantineroPage),
     canActivate: [authGuard, roleGuard],
-    data: { roles: ['bartender'] } // Cambiado a bartender para consistencia
+    data: { roles: ['bartender', 'cantinero'] } // Cambiado a bartender para consistencia
   },
   {
     path: 'home-metre',
@@ -83,9 +83,9 @@ export const routes: Routes = [
   },
   {
     path: 'alta-producto/:tipo',
-    loadComponent: () => import('./features/cocina-bar/alta-producto/alta-producto.page').then(m => m.AltaProductoPage),
+    loadComponent: () => import('./shared/components/formulario-producto/formulario-producto.page').then(m => m.FormularioProductoComponent),
     canActivate: [authGuard, roleGuard], 
-    data: { roles: ['cocinero', 'bartender', 'admin', 'supervisor'] }
+    data: { roles: ['cocinero',  'bartender', 'cantinero', 'admin', 'supervisor'] }
   },
   {
     path: 'supervisor',
@@ -93,4 +93,32 @@ export const routes: Routes = [
     canActivate: [authGuard, roleGuard],
     data: { roles: ['supervisor', 'admin'] } 
   },
+  {
+    path: 'pedidos-pendientes/:sector',
+    loadComponent: () => import('./features/cocina-bar/pedidos-pendientes/pedidos-pendientes.page').then(m => m.PedidosPendientesPage),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['cocinero', 'bartender', 'admin', 'cantinero'] }
+  },
+  {
+    path: 'pedidos-pendientes-cocina',
+    redirectTo: 'pedidos-pendientes/cocina',
+    pathMatch: 'full'
+  },
+  {
+    path: 'visualizar-productos/:tipo',
+    loadComponent: () => import('./shared/components/visualizar-productos/visualizar-productos.component').then(m => m.VisualizarProductosComponent),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['cocinero', 'bartender', 'cantinero', 'admin', 'supervisor'] }
+  },
+  {
+    path: 'listado-mesas',
+    loadComponent: () => import('./features/admin/listado-mesas/listado-mesas.page').then(m => m.ListadoMesasPage),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['admin', 'supervisor', 'metre'] } 
+  },  {
+    path: 'estado-mesas',
+    loadComponent: () => import('./features/admin/estado-mesas/estado-mesas.page').then( m => m.EstadoMesasPage)
+  },
+
+
 ];

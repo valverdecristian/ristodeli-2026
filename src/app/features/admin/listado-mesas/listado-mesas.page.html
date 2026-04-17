@@ -1,0 +1,45 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="toolbar-saffron">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/admin" color="dark"></ion-back-button>
+    </ion-buttons>
+    <ion-title class="text-russet title-bold">ESTADO DE MESAS</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="risto-background">
+  <ion-grid class="ion-padding">
+    <ion-row>
+      @for (mesa of mesas; track mesa.id) {
+        <ion-col size="12">
+          <ion-card class="mesa-card">
+            <div class="foto-mesa">
+              <img [src]="mesa.foto || 'assets/icon/favicon.ico'" alt="Mesa">
+              <div class="estado-badge" [ngClass]="mesa.estado?.toLowerCase() || 'libre'">
+                {{ mesa.estado || 'LIBRE' }}
+              </div>
+            </div>
+
+            <ion-card-header>
+              <ion-card-title class="numero">MESA {{ mesa.numero }}</ion-card-title>
+              <ion-card-subtitle class="pax">
+                <ion-icon name="people-outline"></ion-icon>
+                {{ mesa.comensales }} PERSONAS
+              </ion-card-subtitle>
+            </ion-card-header>
+
+            <ion-card-content class="ion-text-center">
+              <div class="qr-container-listado">
+                <qrcode 
+                [qrdata]="mesa.qr_data || ''" 
+                [width]="120" 
+                [errorCorrectionLevel]="'M'">
+              </qrcode>
+              </div>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+      }
+    </ion-row>
+  </ion-grid>
+</ion-content>

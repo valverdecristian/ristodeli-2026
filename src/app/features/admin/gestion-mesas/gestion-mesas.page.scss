@@ -1,0 +1,117 @@
+.nombre {
+    color: #f5a623 !important; // Naranja solicitado
+    font-size: 1.5rem;
+    font-weight: 800;
+    text-align: center;
+    letter-spacing: 1px;
+}
+
+.risto-background {
+    --background: #1e3d1a; // Verde bosque
+}
+
+.toolbar-saffron {
+    --background: #f5a623; // Naranja
+    --color: #1e3d1a;
+}
+
+.producto-card {
+    --background: #fdfaf0; // Crema
+    border-radius: 25px;
+    border: 2px solid #f5a623;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+}
+
+.foto-mesa-container {
+    width: 100%;
+    height: 180px;
+    background: #e9e5d9;
+    border: 2px dashed #f5a623;
+    border-radius: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    margin-bottom: 20px;
+    cursor: pointer;
+
+    img { width: 100%; height: 100%; object-fit: cover; }
+    
+    .placeholder-foto {
+        text-align: center;
+        color: #f5a623;
+        ion-icon { font-size: 3rem; }
+        p { font-size: 0.8rem; font-weight: bold; margin-top: 5px; }
+    }
+}
+
+.custom-input-mesa {
+    --background: transparent;
+    --padding-start: 0;
+    margin-bottom: 10px;
+    border-bottom: 2px solid #f5a623;
+
+    ion-label {
+        color: #f5a623 !important; 
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 0.9rem;
+    }
+
+    ion-input, ion-select {
+        --color: #f5a623 !important;
+        color: #f5a623 !important;
+        font-weight: 600;
+        font-size: 1.1rem;
+    }
+}
+
+.btn-generar-qr {
+    --background: #f5a623;
+    --color: #1e3d1a;
+    margin-top: 20px;
+    font-weight: 900;
+}
+
+.qr-result-card {
+    --background: #fdfaf0;
+    border-radius: 25px;
+    border: 2px solid #f5a623;
+    margin-top: 25px;
+    margin-bottom: 30px;
+
+    .qr-wrapper {
+        background: white;
+        padding: 15px;
+        display: inline-block;
+        border-radius: 20px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        margin-bottom: 15px;
+    }
+
+    .pax-info {
+        color: #1e3d1a;
+        font-weight: 700;
+        margin-bottom: 20px;
+        font-size: 0.9rem;
+    }
+
+    /* El nuevo botón de Cargar Otra Mesa */
+    .btn-otra-mesa {
+        --border-color: #f5a623;
+        --color: #f5a623;
+        --border-width: 2px;
+        font-weight: 800;
+        margin-top: 10px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+}
+
+.text-russet { color: #1e3d1a; }
+.title-bold { font-weight: 900; }
+
+ion-select::part(icon) {
+    color: #f5a623;
+    opacity: 1;
+}
