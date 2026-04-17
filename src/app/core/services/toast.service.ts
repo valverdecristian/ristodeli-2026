@@ -20,7 +20,7 @@ export class ToastService {
     const toast = await this.toastController.create({
       message: mensaje,
       duration: duracion,
-      position: 'bottom',
+      position: 'top',
       cssClass: 'custom-toast-success',
       icon: 'checkmark-circle-outline' // Icono opcional
     });
@@ -34,7 +34,7 @@ export class ToastService {
     const toast = await this.toastController.create({
       message: mensaje,
       duration: duracion,
-      position: 'bottom',
+      position: 'top',
       cssClass: 'custom-toast-error',
       icon: 'warning-outline'
     });
@@ -48,7 +48,7 @@ export class ToastService {
     const toast = await this.toastController.create({
       message: mensaje,
       duration: duracion,
-      position: 'bottom',
+      position: 'top',
       cssClass: 'custom-toast-warning',
       icon: 'information-circle-outline'
     });

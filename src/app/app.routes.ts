@@ -23,7 +23,7 @@ export const routes: Routes = [
 
   {
     path: 'registro-anonimo',
-    loadComponent: () => import('./shared/components/registro-formulario/registro-formulario.component').then(m => m.RegistroFormularioComponent)
+    loadComponent: () => import('./shared/components/registro-anonimo/registro-anonimo.component').then(m => m.RegistroAnonimoComponent)
   },
 
   /* --- RUTAS PROTEGIDAS --- */
@@ -57,11 +57,11 @@ export const routes: Routes = [
     path: 'home-cantinero',
     loadComponent: () => import('./features/staff/home-cantinero/home-cantinero.page').then(m => m.HomeCantineroPage),
     canActivate: [authGuard, roleGuard],
-    data: { roles: ['bartender'] } // Cambiado a bartender para consistencia
+    data: { roles: ['cantinero'] }
   },
   {
-    path: 'home-metre',
-    loadComponent: () => import('./features/admin/home-metre/home-metre.page').then(m => m.HomeMetrePage),
+    path: 'gestion-salon',
+    loadComponent: () => import('./features/admin/gestion-salon/gestion-salon.page').then(m => m.GestionSalonPage),
     canActivate: [authGuard, roleGuard],
     data: { roles: ['metre'] }
   },
@@ -90,7 +90,7 @@ export const routes: Routes = [
     path: 'alta-producto/:tipo',
     loadComponent: () => import('./features/cocina-bar/alta-producto/alta-producto.page').then(m => m.AltaProductoPage),
     canActivate: [authGuard, roleGuard], 
-    data: { roles: ['cocinero', 'bartender', 'admin', 'supervisor'] }
+    data: { roles: ['cocinero', 'cantinero', 'admin', 'supervisor'] }
   },
   {
     path: 'supervisor',
@@ -98,4 +98,10 @@ export const routes: Routes = [
     canActivate: [authGuard, roleGuard],
     data: { roles: ['supervisor', 'admin'] } 
   },
+  {
+    path: 'home-metre',
+    loadComponent: () => import('./features/admin/home-metre/home-metre.page').then( m => m.HomeMetrePage),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['metre'] }
+  }
 ];

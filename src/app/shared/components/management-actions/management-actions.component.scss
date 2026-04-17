@@ -1,12 +1,30 @@
+.logo-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100px;
+  margin-top: 15px;
+  margin-bottom: 5px;
+}
+
+.spin-logo {
+  width: 90px;
+  height: 90px;
+  object-fit: contain;
+  animation: singleSpin 1s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+@keyframes singleSpin {
+  0% { transform: rotate(0deg) scale(0.5); opacity: 0; }
+  100% { transform: rotate(360deg) scale(1); opacity: 1; }
+}
+
 .actions-grid {
-  /* Usamos "grid" en lugar de "flex" porque queremos estructurar recuadros parejos */
   display: grid;
-  
-  /* Esto hace que las columnas se acomoden solas dependiendo del ancho de la pantalla.
-     Nunca van a medir menos de 130px, y si hay más espacio se estiran (1fr) */
-  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-  gap: 20px;
-  padding: 10px;
+  /* Reducimos un poco el minmax para que las tarjetas puedan inflarse más en el alto */
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 24px;
+  padding: 16px;
 }
 
 .action-card {
@@ -24,12 +42,17 @@
   align-items: center;
   justify-content: center;
   
+  /* Añadimos un aspect-ratio o min-height para que ocupen más pantalla vertical */
+  min-height: 160px;
+  
   /* Sombra inicial suave para darle profundidad (efecto carta) */
   box-shadow: 0 10px 20px rgba(0,0,0,0.15);
   
   /* Le decimos que anime el 'transform' y el 'box-shadow' en 0.3 segundos cuando ocurra algo */
   transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s ease;
-  color: #fff;
+  
+  /* Aplicamos el color russet sugerido para contraste */
+  color: var(--risto-russet);
   cursor: pointer;
   
   /* "padding" es el aire interno de la tarjeta, empujando el contenido al centro */
@@ -54,35 +77,35 @@
   }
 
   .icon-container {
-    /* Un círculo semi-transparente donde va a vivir dentro el icono de ionic */
+    /* Un círculo semi-transparente de fondo oscuro para destacar el ícono oscuro */
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.25);
+    background: rgba(110, 67, 61, 0.15); /* Russet translúcido */
     display: flex;
     align-items: center;
     justify-content: center;
     
     /* Esta sombra interna ("inset") hace que el círculo de fondo se hunda como un cráter */
-    box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.3);
-    margin-bottom: 12px;
-    width: 55px; /* Reducido un poquito (antes 65px) */
-    height: 55px;
+    box-shadow: inset 0 2px 4px rgba(110, 67, 61, 0.1);
+    margin-bottom: 16px;
+    width: 65px; 
+    height: 65px;
 
     ion-icon {
       /* Le subimos el nivel de fuente en lugar de width/height porque los iconos son fuentes */
-      font-size: 28px; /* Reducido un poquito (antes 34px) */
-      color: #fff;
+      font-size: 32px; 
+      color: var(--risto-russet);
     }
   }
 
   .action-title {
     /* Estilizamos el texto copiando el peso moderno de la web (700 es negrita) */
-    font-weight: 700;
-    font-size: 0.95rem;
+    font-weight: 800; /* Lo hacemos más bold todavía */
+    font-size: 1.05rem; /* Un pelo más grande para llenar mejor */
     text-align: center;
-    line-height: 1.2;
+    line-height: 1.25;
     /* 'letter-spacing' aleja un poquitito las letras haciéndolas más legibles (muy iOS/premium) */
     letter-spacing: 0.5px;
-    /* Una sombrita al texto ayuda a contrastar si la carta tiene un fondo muy claro */
-    text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    /* Una sombrita muy sutil blanca evita que el color se pierda en el amarillo */
+    text-shadow: 0 1px 1px rgba(255,255,255,0.4);
   }
 }
