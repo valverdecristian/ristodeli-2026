@@ -10,18 +10,20 @@
   Tiene un borde punteado (dashed) y se centra el contenido usando flexbox.
 */
 .photo-capture-box {
-  background-color: var(--risto-russet);
-  border: 2px dashed var(--risto-saffron);
+  background-color: var(--risto-orange);
+  border: 4px dashed var(--risto-fire-red);
   border-radius: 12px;
   width: 100%;
   height: 250px;
-  display: flex; /* Centrado interno */
+  display: flex;
+  /* Centrado interno */
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  color: var(--risto-vanilla-cream);
+  color: var(--risto-fire-red);
   margin-top: 1rem;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); /* Sombra para dar profundidad */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  /* Sombra para dar profundidad */
   font-family: inherit;
   font-weight: bold;
 }
@@ -33,7 +35,7 @@
 .photo-capture-box ion-icon {
   font-size: 5rem;
   margin-bottom: 15px;
-  color: var(--risto-saffron);
+  color: var(--risto-fire-red);
 }
 
 /* 
@@ -66,7 +68,8 @@
   width: 100%;
   height: 250px;
   border-radius: 12px;
-  object-fit: cover; /* Recorta y adapta la foto sin distorsionarla */
+  object-fit: cover;
+  /* Recorta y adapta la foto sin distorsionarla */
   border: 2px solid var(--risto-saffron);
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 }
@@ -82,6 +85,32 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 5px; /* Separación entre el icono y el texto */
+  gap: 5px;
+  /* Separación entre el icono y el texto */
   opacity: 0.8;
+}
+
+.action-buttons {
+  padding-top: 3.5rem;
+}
+
+.submit-button {
+  height: 3.5rem;
+}
+
+p {
+  font-weight: 700;
+  font-family: 'Playfair Display', serif;
+  letter-spacing: 1.5px;
+  font-size: 1.2rem;
+}
+
+
+
+.input-item {
+  --background: #f6a800e5;
+  border-radius: 2px;
+  color: var(--risto-fire-red);
+  outline: none;
+  text-decoration: none;
 }

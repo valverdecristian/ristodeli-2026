@@ -16,7 +16,7 @@
 
   <form [formGroup]="registroForm" (ngSubmit)="registrarAnonimo()">
     <!-- Campo Nombre -->
-    <ion-item class="input-item" style="--background: var(--risto-russet); border-radius: 8px;">
+    <ion-item class="input-item" lines="none">
       <ion-input label="Tu Nombre" labelPlacement="floating" type="text" formControlName="nombre" placeholder="Ej: Juan"
         [clearInput]="true" color="secondary">
       </ion-input>
@@ -49,7 +49,7 @@
     </div>
 
     <!-- Submit Action -->
-    <div class="action-buttons" style="margin-top: 3rem;">
+    <div class="action-buttons">
       <ion-button type="submit" expand="block" color="warning" shape="round" class="submit-button"
         [disabled]="isSubmitting">
         <strong style="color: var(--risto-russet);">
