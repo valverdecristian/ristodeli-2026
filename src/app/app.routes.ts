@@ -1,4 +1,6 @@
 import { Routes } from '@angular/router';
+import { authGuard } from './core/guards/auth.guard';
+import { roleGuard } from './core/guards/role.guard';
 
 export const routes: Routes = [
   {
@@ -11,60 +13,116 @@ export const routes: Routes = [
     loadComponent: () => import('./features/splash/splash.page').then(m => m.SplashPage)
   },
   {
-    path: 'home',
-    loadComponent: () => import('./home/home.page').then((m) => m.HomePage),
-  },
-  {
     path: 'login',
-    loadComponent: () => import('./features/auth/login/login.page').then( m => m.LoginPage)
+    loadComponent: () => import('./features/auth/login/login.page').then(m => m.LoginPage)
   },
   {
     path: 'registro-cliente',
-    loadComponent: () => import('./features/auth/registro-cliente/registro-cliente.page').then( m => m.RegistroClientePage)
+    loadComponent: () => import('./features/auth/registro-cliente/registro-cliente.page').then(m => m.RegistroClientePage)
   },
   {
+    path: 'registro-anonimo',
+    loadComponent: () => import('./shared/components/registro-anonimo/registro-anonimo.component').then(m => m.RegistroAnonimoComponent)
+  },
+
+  /* --- RUTAS PROTEGIDAS --- */
+
+  // Administración y Supervisión
+  {
     path: 'admin',
-    loadComponent: () => import('./features/admin/dashboard/dashboard.page').then( m => m.DashboardPage)
+    loadComponent: () => import('./features/admin/dashboard/dashboard.page').then(m => m.DashboardPage),
+    canActivate: [authGuard] 
+  },
+  {
+    path: 'supervisor',
+    loadComponent: () => import('./features/admin/supervisor/supervisor.page').then(m => m.SupervisorPage),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['supervisor', 'admin'] } 
   },
   {
     path: 'admin/crear-empleado',
-    loadComponent: () => import('./features/admin/crear-empleado/crear-empleado.page').then( m => m.CrearEmpleadoPage)
+    loadComponent: () => import('./features/admin/crear-empleado/crear-empleado.page').then(m => m.CrearEmpleadoPage),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['admin', 'supervisor'] }
   },
   {
-    path: 'alta-plato',
-    loadComponent: () => import('./features/cocina-bar/alta-plato/alta-plato.page').then( m => m.AltaPlatoPage)
+    path: 'aprobacion-clientes',
+    loadComponent: () => import('./features/admin/aprobacion-clientes/aprobacion-clientes.page').then(m => m.AprobacionClientesPage),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['admin', 'supervisor'] } 
   },
-  {
-    path: 'alta-bebida',
-    loadComponent: () => import('./features/cocina-bar/alta-bebida/alta-bebida.page').then( m => m.AltaBebidaPage)
-  },
+
+  // Gestión de Mesas (TFI Punto 12 y 22)
   {
     path: 'gestion-mesas',
-    loadComponent: () => import('./features/admin/gestion-mesas/gestion-mesas.page').then( m => m.GestionMesasPage)
+    loadComponent: () => import('./features/admin/gestion-mesas/gestion-mesas.page').then(m => m.GestionMesasPage),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['admin', 'supervisor'] }
+  },
+  {
+    path: 'listado-mesas',
+    loadComponent: () => import('./features/admin/listado-mesas/listado-mesas.page').then(m => m.ListadoMesasPage),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['admin', 'supervisor', 'metre'] } 
+  },
+  {
+    path: 'estado-mesas',
+    loadComponent: () => import('./features/admin/estado-mesas/estado-mesas.page').then( m => m.EstadoMesasPage),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['admin', 'supervisor', 'metre'] }
+  },
 
-  },  {
+  // Staff Operativo
+  {
+    path: 'home-metre',
+    loadComponent: () => import('./features/admin/home-metre/home-metre.page').then( m => m.HomeMetrePage),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['metre'] }
+  },
+  {
     path: 'home-cocinero',
-    loadComponent: () => import('./features/staff/home-cocinero/home-cocinero.page').then( m => m.HomeCocineroPage)
+    loadComponent: () => import('./features/staff/home-cocinero/home-cocinero.page').then(m => m.HomeCocineroPage),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['cocinero'] }
   },
   {
     path: 'home-cantinero',
-    loadComponent: () => import('./features/staff/home-cantinero/home-cantinero.page').then( m => m.HomeCantineroPage)
-  },
-  {
-    path: 'home-metre',
-    loadComponent: () => import('./features/admin/home-metre/home-metre.page').then( m => m.HomeMetrePage)
+    loadComponent: () => import('./features/staff/home-cantinero/home-cantinero.page').then(m => m.HomeCantineroPage),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['bartender', 'cantinero'] }
   },
   {
     path: 'home-mozo',
-    loadComponent: () => import('./features/staff/home-mozo/home-mozo.page').then( m => m.HomeMozoPage)
+    loadComponent: () => import('./features/staff/home-mozo/home-mozo.page').then(m => m.HomeMozoPage),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['mozo'] }
+  },
+
+  // Productos y Pedidos (Shared & Features)
+  {
+    path: 'alta-producto/:tipo',
+    loadComponent: () => import('./shared/components/formulario-producto/formulario-producto.page').then(m => m.FormularioProductoComponent),
+    canActivate: [authGuard, roleGuard], 
+    data: { roles: ['cocinero', 'bartender', 'cantinero', 'admin', 'supervisor'] }
   },
   {
-    path: 'home-dueno',
-    loadComponent: () => import('./features/admin/home-dueno/home-dueno.page').then( m => m.HomeDuenoPage)
+    path: 'visualizar-productos/:tipo',
+    loadComponent: () => import('./shared/components/visualizar-productos/visualizar-productos.component').then(m => m.VisualizarProductosComponent),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['cocinero', 'bartender', 'cantinero', 'admin', 'supervisor'] }
   },
+  {
+    path: 'pedidos-pendientes/:sector',
+    loadComponent: () => import('./features/cocina-bar/pedidos-pendientes/pedidos-pendientes.page').then(m => m.PedidosPendientesPage),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['cocinero', 'bartender', 'cantinero', 'admin'] }
+  },
+
+  // Clientes
   {
     path: 'home-cliente',
-    loadComponent: () => import('./features/cliente/home-cliente/home-cliente.page').then( m => m.HomeClientePage)
+    loadComponent: () => import('./features/cliente/home-cliente/home-cliente.page').then(m => m.HomeClientePage),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['cliente_reg', 'anonimo'] }
   }
-
-];
+]

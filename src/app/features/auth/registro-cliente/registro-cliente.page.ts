@@ -8,6 +8,7 @@ import { AuthService } from 'src/app/core/services/auth.service';
 import { ToastService } from 'src/app/core/services/toast.service';
 import { SpinnerService } from 'src/app/core/services/spinner.service';
 import { FotoService } from 'src/app/core/services/foto.service';
+import { NotificacionService } from 'src/app/core/services/notificacion.service';
 import { Router } from '@angular/router';
 
 @Component({
@@ -23,9 +24,14 @@ export class RegistroClientePage {
   private toastService = inject(ToastService);
   private spinnerService = inject(SpinnerService);
   private fotoService = inject(FotoService);
+  private notificacionService = inject(NotificacionService);
   private router = inject(Router);
 
   isSubmitting = false;
+
+  async ionViewWillEnter() {
+    await this.notificacionService.inicializarPushNotifications();
+  }
 
   async onSubmitCliente(datos: DetalleRegistro) {
     this.isSubmitting = true;
@@ -38,9 +44,9 @@ export class RegistroClientePage {
         // Camera plugin DataUrl format: data:image/jpeg;base64,...
         const base64Data = datos.foto_url.split(',')[1];
         const res = await this.authService.supabaseClient.storage
-           .from('avatares')
-           .upload(`cliente_${timestamp}.jpeg`, this.fotoService.b64toBlob(base64Data), { upsert: true, contentType: 'image/jpeg' });
-           
+          .from('avatares')
+          .upload(`cliente_${timestamp}.jpeg`, this.fotoService.b64toBlob(base64Data), { upsert: true, contentType: 'image/jpeg' });
+          
         if (res.data) {
           const { data: { publicUrl } } = this.authService.supabaseClient.storage.from('avatares').getPublicUrl(res.data.path);
           datos.foto_url = publicUrl;
@@ -51,8 +57,8 @@ export class RegistroClientePage {
       await this.authService.registrar(datos.password, datos);
 
       await this.spinnerService.ocultar();
-      this.toastService.mostrarExito('¡Cuenta creada correctamente!');
-      this.router.navigate(['/home']);
+      this.toastService.mostrarExito('¡Cuenta creada exitosamente! Pendiente de aprobación.');
+      this.router.navigate(['/login']);
 
     } catch (error: any) {
       await this.spinnerService.ocultar();

@@ -1,0 +1,91 @@
+/* Toolbar Styles */
+.toolbar-saffron {
+  --background: var(--risto-saffron);
+}
+
+.title-bold {
+  font-weight: bold;
+}
+
+/* Welcome Section */
+.welcome-container {
+  text-align: center;
+  margin-top: 2rem;
+  margin-bottom: 3rem;
+}
+
+.logo-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100px; /* Tamaño del espacio */
+  margin-bottom: 5px;
+}
+
+.spin-logo {
+  width: 90px;
+  height: 90px;
+  object-fit: contain;
+  /* Animación: Gira 1 sola vez en 1 segundo con un efecto de desaceleración agradable */
+  animation: singleSpin 1s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+@keyframes singleSpin {
+  0% { transform: rotate(0deg) scale(0.5); opacity: 0; }
+  100% { transform: rotate(360deg) scale(1); opacity: 1; }
+}
+
+/* Efecto Máquina de Escribir fluida y robusta  */
+.typewriter-text {
+  display: inline-block;
+  /* Clip-path enmascara el texto desde la derecha hacia la izquierda */
+  clip-path: inset(0 100% 0 0);
+  /* "steps(25)" simula el golpe de 25 letras. 1.5s de duración y 0.2s de retardo */
+  animation: typingEffect 1.5s steps(25) 0.5s forwards;
+}
+
+@keyframes typingEffect {
+  from { clip-path: inset(0 100% 0 0); }
+  to { clip-path: inset(0 0 0 0); }
+}
+
+.welcome-title {
+  font-size: 1.8rem;
+  font-weight: 800;
+  margin: 0;
+  letter-spacing: 0.5px;
+}
+
+.welcome-subtitle {
+  font-size: 1.1rem;
+  opacity: 0.8;
+  margin-top: 5px;
+}
+
+/* Actions Section */
+.actions-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem; /* Gap más grande para separar más los dos únicos botones */
+  padding: 0 10px;
+  margin-top: 1rem;
+}
+
+.action-btn {
+  height: 90px; /* Botones más altos y masivos */
+  font-size: 1.25rem; /* El texto crece proporcionalmente */
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  --box-shadow: 0 6px 14px rgba(0, 0, 0, 0.35); /* Sombra un poco más fuerte para el tamaño */
+}
+
+/* Colores específicos para cada botón */
+.chart-btn {
+  --background: var(--risto-purple);
+  --color: var(--risto-russet);
+}
+
+.qr-btn {
+  --background: var(--risto-russet);
+  --color: var(--risto-vanilla-cream);
+}

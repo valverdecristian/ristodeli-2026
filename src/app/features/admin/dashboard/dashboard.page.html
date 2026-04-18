@@ -10,11 +10,9 @@
 </ion-header>
 
 <ion-content [fullscreen]="true" class="dashboard-content">
-  <div class="welcome-section">
-    <h2>Panel de Control</h2>
-    <p>Seleccione una opción para gestionar los recursos del restaurante.</p>
-  </div>
 
-  <app-management-actions (actionClicked)="handleAction($event)"></app-management-actions>
-
+  <app-management-actions 
+    [role]="'admin'" 
+    (actionClicked)="handleAction($event)">
+  </app-management-actions>
 </ion-content>

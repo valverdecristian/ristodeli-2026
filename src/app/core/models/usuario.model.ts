@@ -6,8 +6,9 @@ export type PerfilUsuario =
   | 'cocinero' 
   | 'cantinero' 
   | 'cliente_reg' 
-  | 'cliente_anon';
-
+  | 'cliente_anon'
+  | 'pendiente';
+  
 /**
  * Interfaz para MOSTRAR y TRABAJAR con los datos del usuario en la App.
  */
@@ -20,6 +21,7 @@ export interface UsuarioPerfil {
   cuil: string;
   perfil: PerfilUsuario;
   foto_url?: string | null;
+  push_token?: string | null;
   created_at?: string;
 }
 

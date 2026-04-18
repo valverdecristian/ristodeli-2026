@@ -6,7 +6,6 @@ import { Producto } from '../models/producto.model';
   providedIn: 'root'
 })
 export class ProductoService {
-  // Inyectamos AuthService para acceder al cliente de Supabase y su sesión
   private authService = inject(AuthService);
 
   constructor() {}
@@ -15,16 +14,15 @@ export class ProductoService {
    * Verifica la existencia de un producto en la tabla productos para evitar duplicados.
    * Utiliza una comparación insensible a mayúsculas y minúsculas (ilike).
    */
-  async verificarSiExiste(nombre: string, tipo: 'plato' | 'bebida'): Promise<boolean> {
+
+  async verificarSiExiste(nombre: string, tipo: 'plato' | 'bebida' | 'postre'): Promise<boolean> {
     const supabase = this.authService.supabaseClient;
-    
-    // Normalizamos el nombre para la búsqueda, eliminando espacios extras
     const nombreNormalizado = nombre.trim();
 
     const { data, error } = await supabase
       .from('productos')
       .select('id')
-      .ilike('nombre', nombreNormalizado) // ilike busca coincidencias sin distinguir capitalización
+      .ilike('nombre', nombreNormalizado)
       .eq('tipo', tipo)
       .limit(1);
 
@@ -37,7 +35,7 @@ export class ProductoService {
   }
 
   /**
-    Inserta un nuevo registro de producto en la base de datos.
+    Inserta un nuevo producto. 
    */
   async crearProducto(producto: Producto): Promise<any> {
     const supabase = this.authService.supabaseClient;
@@ -52,5 +50,25 @@ export class ProductoService {
     }
 
     return data;
+  }
+
+  /**
+    Obtiene la lista de productos filtrada por tipo (plato, bebida o postre).
+   */
+  async obtenerPorTipo(tipo: string): Promise<any[]> {
+    const supabase = this.authService.supabaseClient;
+
+    const { data, error } = await supabase
+      .from('productos')
+      .select('*')
+      .eq('tipo', tipo)
+      .order('nombre', { ascending: true });
+
+    if (error) {
+      console.error(`Error al obtener ${tipo}s:`, error);
+      throw error;
+    }
+
+    return data || [];
   }
 }

@@ -2,7 +2,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { IonButton, IonContent, IonInput, IonItem } from '@ionic/angular/standalone';
-import { Router, RouterModule } from '@angular/router';
+import { RouterModule } from '@angular/router';
 import { BotonesAccesoRapidoComponent } from '../../../shared/components/botones-acceso-rapido/botones-acceso-rapido.component';
 import { AuthService } from '../../../core/services/auth.service';
 import { ToastService } from '../../../core/services/toast.service';
@@ -25,7 +25,6 @@ export class LoginPage implements OnInit {
     private authService: AuthService,
     private toastService: ToastService,
     private spinnerService: SpinnerService,
-    private router: Router
   ) { }
 
   ngOnInit() {
@@ -33,6 +32,10 @@ export class LoginPage implements OnInit {
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]]
     });
+  }
+
+  ionViewWillEnter() {
+    this.loginForm?.reset();
   }
 
   get f() {
@@ -65,25 +68,56 @@ export class LoginPage implements OnInit {
       this.toastService.mostrarError('Por favor, revise que los datos ingresados sean correctos.');
       return;
     }
-
-    const value = this.loginForm.value;
-
+  
+    const { email, password } = this.loginForm.value;
+  
     try {
       await this.spinnerService.mostrar('Iniciando sesión...');
-      await this.authService.ingresar(value.email, value.password);
+      await this.authService.ingresar(email, password);
+      const perfilUsuario = await this.authService.obtenerPerfilUsuarioActual();
+  
+      if (!perfilUsuario) {
+        throw new Error('No se pudo recuperar el perfil del usuario.');
+      }
+
+      if (perfilUsuario.perfil === 'pendiente') {
+        await this.authService.supabaseClient.auth.signOut();
+        await this.spinnerService.ocultar();
+        Haptics.impact({ style: ImpactStyle.Medium }).catch(() => {});
+        this.toastService.mostrarAdvertencia('Tu cuenta aún está pendiente de aprobación.');
+        return;
+      }
+
+      if (perfilUsuario.perfil === 'rechazado') {
+        await this.authService.supabaseClient.auth.signOut();
+        await this.spinnerService.ocultar();
+        Haptics.vibrate().catch(() => {}); 
+        this.toastService.mostrarError('Tu solicitud de acceso ha sido rechazada.');
+        return;
+      }
+      
       
       await this.spinnerService.ocultar();
       
       const audio = new Audio('assets/sounds/exito.mp3');
-      audio.play().catch(err => console.log('Error reproduciendo audio:', err));
-
-      this.toastService.mostrarExito('¡Sesión iniciada con éxito!');
+      audio.play().catch(err => console.log('Error audio:', err));
+  
+      this.toastService.mostrarExito(`¡Bienvenido/a ${perfilUsuario.nombres}!`);
+      
+      
       await this.authService.redirigirSegunPerfil();
+  
     } catch (e: any) {
       await this.spinnerService.ocultar();
       Haptics.vibrate().catch(() => {});
-      console.error('Credenciales inválidas o error de red:', e);
-      this.toastService.mostrarError('Credenciales inválidas. Intente nuevamente.');
+      
+      console.error('Error en Login:', e);
+      
+      const msg = e.message?.includes('Invalid login credentials') 
+        ? 'Correo o contraseña incorrectos.' 
+        : 'Error de conexión. Reintente.';
+        
+      this.toastService.mostrarError(msg);
     }
   }
 }

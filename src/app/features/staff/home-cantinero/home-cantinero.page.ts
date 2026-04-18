@@ -1,62 +1,48 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { IonicModule } from '@ionic/angular';
-import { PedidoService, Pedido } from 'src/app/core/services/pedido.service';
+import { Router } from '@angular/router';
+import { 
+  IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonButton, IonIcon 
+} from '@ionic/angular/standalone';
+import { ManagementActionsComponent } from '../../../shared/components/management-actions/management-actions.component';
+import { AuthService } from '../../../core/services/auth.service';
 import { addIcons } from 'ionicons';
-import { logOutOutline } from 'ionicons/icons';
-import { AuthService } from 'src/app/core/services/auth.service';
+import { logOutOutline} from 'ionicons/icons';
 
 @Component({
   selector: 'app-home-cantinero',
   templateUrl: './home-cantinero.page.html',
   styleUrls: ['./home-cantinero.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule, FormsModule]
+  imports: [
+    IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, 
+    IonButton, IonIcon, CommonModule, ManagementActionsComponent,
+  ]
 })
-export class HomeCantineroPage implements OnInit {
-  pedidos: Pedido[] = [];
+export class HomeCantineroPage {
+  private authService = inject(AuthService);
+  private router = inject(Router);
 
-  constructor(
-    private pedidoService: PedidoService,
-    private authService: AuthService
-  ) { 
+  constructor() {
     addIcons({ logOutOutline });
   }
 
-  ngOnInit() {
-    this.cargarPedidos();
-  }
+  handleAction(action: string) {
+    switch (action) {
+      case 'add_bebida': 
+        this.router.navigate(['/alta-producto/bebida']);
+        break;
 
-  async cargarPedidos() {
-    // Solo las bebidas
-    this.pedidos = await this.pedidoService.obtenerPedidosActivos('bebida');
-  }
+      case 'view_orders_bar':
+        this.router.navigate(['/pedidos-pendientes/bar']);
+        break;
 
-  async tomarPedido(pedido: Pedido) {
-    try {
-      await this.pedidoService.cambiarEstado(pedido.id, 'En Preparación');
-      pedido.estado = 'En Preparación';
-    } catch (error) {
-      console.error('Error al actualizar', error);
-    }
-  }
-
-  async terminarPedido(pedido: Pedido) {
-    try {
-      await this.pedidoService.cambiarEstado(pedido.id, 'Listo');
-      this.cargarPedidos(); 
-    } catch (error) {
-      console.error('Error al actualizar', error);
-    }
-  }
-
-  getColorEstado(estado: string): string {
-    switch (estado) {
-      case 'Pendiente': return 'danger';
-      case 'En Preparación': return 'warning';
-      case 'Listo': return 'success';
-      default: return 'medium';
+      case 'view_menu_bebidas':
+        this.router.navigate(['/visualizar-productos/bebida']);
+        break;
+        
+      default:
+        console.warn('Acción no programada:', action);
     }
   }
 

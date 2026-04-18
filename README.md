@@ -20,6 +20,9 @@ Este proyecto consiste en el desarrollo de una aplicación móvil para la gesti�
 
 ## 🚀 Tareas Asignadas
 
+<details>
+<summary>Ver Tareas Asignadas</summary>
+
 De acuerdo a los requerimientos de la cátedra, se detallan las tareas asignadas a cada integrante:
 
 | Apellidos y Nombres | Módulos (Objetivos) | Fecha Inicio | Fecha Fin |
@@ -35,14 +38,68 @@ De acuerdo a los requerimientos de la cátedra, se detallan las tareas asignadas
 | **Chavez, Alejo** | Vista del Menú del Administrador. | 07/04/2026 | pendiente |
 | **Valverde, Cristian Jorge** | Formulario de Cliente y Empleado. | 07/04/2026 | 08/04/2026 |
 | **Trkmic Torres, Ignacio** | Formulario y Vistas: Platos y Bebidas. | 09/04/2026 | 09/04/2026 |
-|  | Configuración de comunicaciones: Email y Push Notifications. |  |  |
+| **Valverde, Cristian Jorge** | Configuración de comunicaciones: Email y Push Notifications. | 12/04/2026 | 15/04/2026 |
 | **Trkmic Torres, Ignacio** | Carga de activos y datos iniciales en Supabase. | 09/04/2026 | 09/04/2026 |
 | **Trkmic Torres, Ignacio** | Gestión de Mesas: Creación y Generación de QR. | 09/04/2026 | 09/04/2026 |
 | **Trkmic Torres, Ignacio** | Dashboards Operativos: Cocinero, Cantinero y Metre. | 09/04/2026 | 10/04/2026 |
-|  | Experiencia del Cliente: Menú y Estado de Cuenta. |  |  |
-|  | Servicio de Notificaciones: Email Automático. |  |  |
+| **Valverde, Cristian Jorge** | Experiencia del Cliente: Menú y Estado de Cuenta. | 12/04/2026 | 12/04/2026 |
+| **Valverde, Cristian Jorge** | Servicio de Notificaciones: Email Automático. | 15/04/2026 | 15/04/2026 |
 | **Chavez, Alejo** | Escaneo de DNI: Lector de código para carga automática de datos. | 09/04/2026 | 09/04/2026 |
-|  | Dashboard: Vista del Menú del Supervisor. |  |  |
+| **Trkmic Torres, Ignacio** | Dashboard: Vista del Menú del Supervisor. | 10/04/2026 | 12/04/2026 |
+| **Valverde, Cristian Jorge** | Sistema de Notificaciones: Asignación de mesa. |  |  |
+| **Valverde, Cristian Jorge** | Validación de QR de Mesa Asignada. |  |  |
+| **Valverde, Cristian Jorge** | Plantillas de Correo: Aceptación/Rechazo. | 15/04/2026 | 15/04/2026 |
+| **Valverde, Cristian Jorge** | Integración de Email Service. | 15/04/2026 | 15/04/2026 |
+| **Trkmic Torres, Ignacio** | Visualización del Menú vía QR. |  |  |
+| **Trkmic Torres, Ignacio** | Actualización Home Cocinero. | 14/04/2026 |  |
+| **Trkmic Torres, Ignacio** | Actualización Home Cantinero. |  |  |
+| **Chavez, Alejo** | Registro de Cliente Anónimo. |  |  |
+| **Chavez, Alejo** | Supabase: Nueva Tabla clientes-anonimos. |  |  |
+| **Trkmic Torres, Ignacio** | Flujo de Entrada: Cliente Anónimo. |  |  |
+| **Chavez, Alejo** | Gestión de Mesas para Admin/Supervisor. |  |  |
+| **Chavez, Alejo** | Botón "Consulta al Mozo" en Home. |  |  |
+
+</details>
+
+<br>
+
+## 🚀 Roadmap de Entregas
+
+| Funcionalidad | Perfiles | Estado | Fecha |
+| :--- | :--- | :--- | :--- |
+| 1. Agregar un empleado | dueño o supervisor | 🚀 Listo para Demo |  |
+| 2. Agregar un nuevo plato | cocinero | 🛠️ En Pruebas |  |
+| 3. Agregar una nueva bebida | cantinero | 🛠️ En Pruebas |  |
+| 4. Agregar una nueva mesa | dueño o supervisor | 🛠️ En Pruebas |  |
+| 5. Crear un cliente registrado | cliente o metre | 🛠️ En Pruebas |  |
+| 6. Verificar ingreso del cliente registrado | dueño o supervisor | 🚀 Listo para Demo |  |
+| 7. Rechazar a un cliente registrado | dueño o supervisor | 🚀 Listo para Demo |  |
+| 8. Aceptar a un cliente registrado | dueño o supervisor | 🚀 Listo para Demo |  |
+| 9. Ingresar al local | cliente anónimo | 🏗️ En Desarrollo |  |
+| 10. Asignar una mesa a un cliente registrado | metre | 🏗️ En Desarrollo |  |
+| 11. Ver el listado de los productos | cliente registrado o anónimo | 🏗️ En Desarrollo |  |
+| 12. Realizar el pedido para todos los comensales de la mesa | cliente registrado o anónimo | ⏳ Próximo |  |
+| 13. Rechazar el pedido, para que el usuario lo modifique | mozo | ⏳ Próximo |  |
+| 14. Confirmar el pedido | mozo | ⏳ Próximo |  |
+| 15. Acceder a los juegos | cliente registrado o anónimo |  |  |
+| 16. Recepción de los productos correspondientes | cocinero |  |  |
+| 17. Recepción de los productos correspondientes | cantinero |  |  |
+| 18. Realizar las tareas correspondientes | cocinero y cantinero |  |  |
+| 19. Entrega del pedido completo | mozo |  |  |
+| 20. Acceder a la encuesta de satisfacción | cliente registrado o anónimo |  |  |
+| 21. Solicitar cuenta al mozo | cliente registrado o anónimo |  |  |
+| 22. Confirmar el pago y liberar mesa | mozo |  |  |
+
+### Estados
+
+🚀 Listo para Demo (testeado y estable) <br>
+🛠️ En Pruebas (terminado, solo requiere validación) <br>
+🏗️ En Desarrollo (lo que se esta haciendo actualmente) <br>
+⏳ Próximo (planificado para la próxima semana) <br>
+
+<br>
+
+## 📱 Códigos QR
 
 <br>
 
@@ -93,14 +150,20 @@ Se utiliza una rama intermedia para asegurar la estabilidad antes de las entrega
 
 * Frontend Framework: Angular v20 utilizando la arquitectura de Standalone Components para optimizar el rendimiento y la carga del bundle.
 * Mobile UI Framework: Ionic v8, permitiendo una experiencia de usuario fluida y consistente con los estándares de diseño móvil actuales.
+
 * Backend & Infraestructura (BaaS): Supabase integrado vía @supabase/supabase-js para la gestión de:
   - Autenticación: Manejo seguro de sesiones y perfiles de usuario.
   - Base de Datos: PostgreSQL para la persistencia de la lógica de negocio (usuarios, pedidos, mesas).
   - Storage: Gestión de archivos multimedia (avatares y fotos de productos) mediante Buckets.
+  - Firebase Cloud Messaging (FCM): Proveedor de mensajería push.
+  - Supabase Edge Functions: Para disparar eventos automáticos (Webhooks) hacia Firebase.
+
 * Capacitor & Hardware Integration (v8):
   - Escaneo de DNI: @capacitor-mlkit/barcode-scanning para la carga automatizada de datos desde el documento nacional de identidad.
   - Cámara: @capacitor/camera para la captura de fotos obligatoria en registros.
   - Feedback Háptico: @capacitor/haptics para notificar errores mediante vibraciones.
+  - Notificaciones Push: @capacitor/push-notifications para notificaciones en tiempo real.
+
 * Utilidades Específicas:
   - QR Generation: angularx-qrcode para la generación dinámica de códigos identificadores de mesas.
   - Iconografía: ionicons v7 para una interfaz visual intuitiva.

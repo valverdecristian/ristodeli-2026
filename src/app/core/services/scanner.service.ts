@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
-import { BarcodeScanner, BarcodeFormat } from '@capacitor-mlkit/barcode-scanning';
+import { BarcodeFormat } from '@capacitor-mlkit/barcode-scanning';
 import { Capacitor } from '@capacitor/core';
+import { BaseScannerService } from './base-scanner.service';
 
 export interface DatosDni {
   nombres: string;
@@ -12,9 +13,7 @@ export interface DatosDni {
 @Injectable({
   providedIn: 'root'
 })
-export class ScannerService {
-
-  constructor() { }
+export class ScannerService extends BaseScannerService {
 
   public async scanDni(): Promise<DatosDni | null> {
     if (!Capacitor.isNativePlatform()) {
@@ -28,29 +27,15 @@ export class ScannerService {
       };
     }
 
-    try {
-      // 1. Pedir permisos
-      const { camera } = await BarcodeScanner.requestPermissions();
-      if (camera !== 'granted' && camera !== 'limited') {
-        return null; // Permiso denegado
-      }
+    const barcodes = await this.ejecutarEscaneoNativo([BarcodeFormat.Pdf417]);
 
-      // 2. Ejecutar escaneo orientado a PDF417 (DNI)
-      const { barcodes } = await BarcodeScanner.scan({
-        formats: [BarcodeFormat.Pdf417],
-      });
-
-      if (barcodes && barcodes.length > 0) {
-        const rawData = barcodes[0].rawValue;
-        if (rawData) {
-           return this.parsearDni(rawData);
-        }
+    if (barcodes && barcodes.length > 0) {
+      const rawData = barcodes[0].rawValue;
+      if (rawData) {
+         return this.parsearDni(rawData);
       }
-      return null;
-    } catch (e) {
-      console.error('Error al ejecutar el scanner:', e);
-      return null;
     }
+    return null;
   }
 
   private parsearDni(rawData: string): DatosDni | null {
