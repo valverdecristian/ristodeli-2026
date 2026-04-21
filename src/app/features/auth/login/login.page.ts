@@ -64,7 +64,8 @@ export class LoginPage implements OnInit {
   async login() {
     if (this.loginForm.invalid) {
       this.loginForm.markAllAsTouched();
-      Haptics.impact({ style: ImpactStyle.Heavy }).catch(() => {});
+
+      Haptics.impact({ style: ImpactStyle.Heavy }).catch(() => {}); 
       this.toastService.mostrarError('Por favor, revise que los datos ingresados sean correctos.');
       return;
     }
@@ -83,6 +84,7 @@ export class LoginPage implements OnInit {
       if (perfilUsuario.perfil === 'pendiente') {
         await this.authService.supabaseClient.auth.signOut();
         await this.spinnerService.ocultar();
+        
         Haptics.impact({ style: ImpactStyle.Medium }).catch(() => {});
         this.toastService.mostrarAdvertencia('Tu cuenta aún está pendiente de aprobación.');
         return;
@@ -91,17 +93,22 @@ export class LoginPage implements OnInit {
       if (perfilUsuario.perfil === 'rechazado') {
         await this.authService.supabaseClient.auth.signOut();
         await this.spinnerService.ocultar();
+        
         Haptics.vibrate().catch(() => {}); 
         this.toastService.mostrarError('Tu solicitud de acceso ha sido rechazada.');
         return;
       }
       
-      
       await this.spinnerService.ocultar();
       
-      const audio = new Audio('assets/sounds/exito.mp3');
-      audio.play().catch(err => console.log('Error audio:', err));
-  
+      
+      try {
+        const audio = new Audio('assets/sounds/exito.mp3');
+        audio.play().catch(err => console.log('Audio no disponible'));
+      } catch (audioErr) {
+        console.warn("Fallo el objeto Audio");
+      }
+
       this.toastService.mostrarExito(`¡Bienvenido/a ${perfilUsuario.nombres}!`);
       
       
@@ -109,6 +116,7 @@ export class LoginPage implements OnInit {
   
     } catch (e: any) {
       await this.spinnerService.ocultar();
+      
       Haptics.vibrate().catch(() => {});
       
       console.error('Error en Login:', e);

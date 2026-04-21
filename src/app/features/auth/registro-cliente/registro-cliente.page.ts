@@ -30,7 +30,11 @@ export class RegistroClientePage {
   isSubmitting = false;
 
   async ionViewWillEnter() {
-    await this.notificacionService.inicializarPushNotifications();
+    try {
+      await this.notificacionService.inicializarPushNotifications();
+    } catch (e) {
+      console.warn("Fallo push en registro, pero seguimos:", e);
+    }
   }
 
   async onSubmitCliente(datos: DetalleRegistro) {

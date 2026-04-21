@@ -19,19 +19,34 @@ export class NotificacionService {
 
   async inicializarPushNotifications(userId?: string) {
     if (this.platform.is('capacitor')) {
-      let permStatus = await PushNotifications.checkPermissions();
+      try {
+        // Chequeo de seguridad: Si no estamos en un dispositivo real con Google Services, 
+        // a veces PushNotifications puede ser undefined o fallar el chequeo de permisos.
+        const permStatus = await PushNotifications.checkPermissions().catch(() => null);
+        
+        if (!permStatus) {
+          console.warn('El plugin de Push no responde. ¿Está configurado Firebase?');
+          return;
+        }
 
-      if (permStatus.receive === 'prompt') {
-        permStatus = await PushNotifications.requestPermissions();
+        let currentStatus = permStatus.receive;
+
+        if (currentStatus === 'prompt') {
+          const request = await PushNotifications.requestPermissions();
+          currentStatus = request.receive;
+        }
+
+        if (currentStatus === 'granted') {
+          // SOLO registramos si el permiso es GRANTED para evitar el crash
+          await PushNotifications.register().catch(err => {
+            console.error("Error crítico al registrar push (posible falta de google-services.json):", err);
+          });
+        }
+        
+        this.escucharNotificacionesEventos(userId);
+      } catch (fatalError) {
+        console.error("Error fatal en inicializarPushNotifications evitó el crash:", fatalError);
       }
-
-      if (permStatus.receive !== 'granted') {
-        console.warn('Permisos de notificaciones push denegados.');
-      } else {
-        await PushNotifications.register();
-      }
-
-      this.escucharNotificacionesEventos(userId);
     }
   }
 
