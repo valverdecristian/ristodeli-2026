@@ -10,6 +10,9 @@
 				"alert"
 			]
 		},
+		"BarcodeScanner": {
+			"installScanningSDK": true
+		},
 		"SplashScreen": {
 			"launchShowDuration": 0,
 			"launchAutoHide": true,

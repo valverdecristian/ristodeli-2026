@@ -40,7 +40,7 @@ export class AuthService {
         .from('usuarios')
         .select('*')
         .eq('id', session.user.id)
-        .single();
+        .maybeSingle();
       
       this.currentUser.set(data as UsuarioPerfil);
     } else {
@@ -66,11 +66,14 @@ export class AuthService {
 
     if (error) throw error;
 
-    // Obtener token y guardarlo si existe
     if (data.user) {
-      const token = await this.notificacionService.obtenerPushToken();
-      if (token) {
-        await this.notificacionService.guardarTokenEnDB(data.user.id, token);
+      try {
+        const token = await this.notificacionService.obtenerPushToken();
+        if (token) {
+          await this.notificacionService.guardarTokenEnDB(data.user.id, token);
+        }
+      } catch (e) {
+        console.warn("Error con push tokens, pero el login sigue:", e);
       }
     }
 
@@ -117,20 +120,23 @@ export class AuthService {
    */
   async cerrarSesion() {
     try {
-      
-      const audio = new Audio('assets/sounds/exito.mp3'); // PUEDE SER CAMBIADO POR UNO ESPECIFICO
-      audio.volume = 0.5;
-      
-      audio.play().catch(err => console.log('Error al reproducir audio de salida:', err));
+      try {
+        const audio = new Audio('assets/sounds/exito.mp3');
+        audio.volume = 0.5;
+        audio.play().catch(err => console.log('Audio ignorado:', err));
+      } catch (audioErr) {
+        console.warn("Error de audio:", audioErr);
+      }
 
       const current = this.currentUser();
       if (current?.id) {
-        await this.notificacionService.eliminarTokenEnDB(current.id);
+        try {
+          await this.notificacionService.eliminarTokenEnDB(current.id);
+        } catch (e) { console.log("Error removiendo token"); }
       }
 
       await this.supabase.auth.signOut();
 
-      // Limpiar los signals 
       this.currentSession.set(null);
       this.currentUser.set(null);
       localStorage.removeItem('anonimo_id');
@@ -139,7 +145,6 @@ export class AuthService {
 
     } catch (error) {
       console.error('Error durante el cierre de sesión:', error);
-      // Igualmente manda al login si algo falla
       this.router.navigate(['/login']);
     }
   }
@@ -202,7 +207,9 @@ export class AuthService {
       throw new Error('No se encontró el perfil del usuario.');
     }
 
-    switch (perfilUsuario.perfil) {
+    const role = perfilUsuario.perfil.trim().toLowerCase();
+
+    switch (role) {
       case 'admin':
         this.router.navigate(['/admin']);
         break;

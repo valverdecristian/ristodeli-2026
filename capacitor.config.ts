@@ -8,6 +8,9 @@ const config: CapacitorConfig = {
     PushNotifications: {
       presentationOptions: ["badge", "sound", "alert"],
     },
+    BarcodeScanner: {
+      installScanningSDK: true
+    },
     SplashScreen: {
       launchShowDuration: 0,
       launchAutoHide: true,

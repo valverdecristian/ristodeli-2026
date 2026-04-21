@@ -26,8 +26,15 @@ export class DashboardPage implements OnInit {
   }
 
   async ionViewWillEnter() {
-    const user = this.authService.currentUser();
-    await this.notificacionService.inicializarPushNotifications(user?.id);
+    
+    try {
+      const user = this.authService.currentUser();
+      if (user?.id) {
+        await this.notificacionService.inicializarPushNotifications(user.id);
+      }
+    } catch (err) {
+      console.warn('Fallo el inicio de notificaciones en Admin:', err);
+    }
   }
 
   handleAction(action: string) {

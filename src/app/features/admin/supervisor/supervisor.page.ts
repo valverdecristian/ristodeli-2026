@@ -27,8 +27,14 @@ export class SupervisorPage {
   }
 
   async ionViewWillEnter() {
-    const user = this.authService.currentUser();
-    await this.notificacionService.inicializarPushNotifications(user?.id);
+    try {
+      const user = this.authService.currentUser();
+      if (user?.id) {
+        await this.notificacionService.inicializarPushNotifications(user.id);
+      }
+    } catch (err) {
+      console.warn('Error no crítico en Push Notifications:', err);
+    }
   }
 
   handleAction(action: string) {
