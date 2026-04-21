@@ -21,7 +21,7 @@ export class BotonesAccesoRapidoComponent implements OnInit {
     { name: 'Mozo', perfil: 'mozo', icon: 'man', email: 'mozo1@ristodeli.com' },
     { name: 'Metre', perfil: 'metre', icon: 'notifications-outline', email: 'metre@ristodeli.com' },
     { name: 'Supervisor', perfil: 'supervisor', icon: 'clipboard-outline', email: 'supervisor@ristodeli.com' },
-    { name: 'Cocinero', perfil: 'cocinero', icon: 'flame-outline', email: 'cocinero@ristodeli.com' },
+    { name: 'Cocinero', perfil: 'cocinero', icon: 'flame-outline', email: 'cocinero1@ristodeli.com' },
     { name: 'Cantinero', perfil: 'cantinero', icon: 'wine-outline', email: 'cantinero1@ristodeli.com' } // Corregido el perfil
   ];
 

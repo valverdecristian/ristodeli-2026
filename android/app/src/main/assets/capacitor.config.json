@@ -1,6 +1,6 @@
 {
 	"appId": "com.ristodeli.app",
-	"appName": "RistoDeli App",
+	"appName": "Ristodeli App",
 	"webDir": "www",
 	"plugins": {
 		"PushNotifications": {

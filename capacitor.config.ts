@@ -2,7 +2,7 @@ import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'com.ristodeli.app',
-  appName: 'RistoDeli App',
+  appName: 'Ristodeli App',
   webDir: 'www',
   plugins: {
     PushNotifications: {
