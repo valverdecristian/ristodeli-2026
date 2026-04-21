@@ -124,5 +124,9 @@ export const routes: Routes = [
     loadComponent: () => import('./features/cliente/home-cliente/home-cliente.page').then(m => m.HomeClientePage),
     canActivate: [authGuard, roleGuard],
     data: { roles: ['cliente_reg', 'anonimo'] }
+  },  {
+    path: 'espera-anonimo',
+    loadComponent: () => import('./features/cliente/espera-anonimo/espera-anonimo.page').then( m => m.EsperaAnonimoPage)
   }
+
 ]
