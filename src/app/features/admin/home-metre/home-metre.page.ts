@@ -52,7 +52,7 @@ export class HomeMetrePage {
         this.router.navigate(['/estado-mesas']); 
         break;
       case 'view_waiting_list':
-        this.toastService.mostrarAdvertencia('La lista de espera se habilitará en la próxima entrega.');
+        this.router.navigate(['/lista-espera']);
         break;
       case 'register_client':
         this.router.navigate(['/registro-cliente']);

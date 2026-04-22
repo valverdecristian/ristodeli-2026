@@ -71,6 +71,12 @@ export const routes: Routes = [
     canActivate: [authGuard, roleGuard],
     data: { roles: ['admin', 'supervisor', 'metre'] }
   },
+  {
+    path: 'lista-espera',
+    loadComponent: () => import('./features/admin/lista-espera/lista-espera.page').then( m => m.ListaEsperaPage),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['admin', 'supervisor', 'metre'] }
+  },
 
   // Staff Operativo
   {
@@ -124,5 +130,9 @@ export const routes: Routes = [
     loadComponent: () => import('./features/cliente/home-cliente/home-cliente.page').then(m => m.HomeClientePage),
     canActivate: [authGuard, roleGuard],
     data: { roles: ['cliente_reg', 'anonimo'] }
+  },  {
+    path: 'espera-anonimo',
+    loadComponent: () => import('./features/cliente/espera-anonimo/espera-anonimo.page').then( m => m.EsperaAnonimoPage)
   }
+
 ]

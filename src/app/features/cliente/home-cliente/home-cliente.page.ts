@@ -1,3 +1,4 @@
+import { Router } from '@angular/router';
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -25,6 +26,7 @@ export class HomeClientePage {
   private notificacionService = inject(NotificacionService);
   private qrScannerService = inject(QrScannerService);
   private toastService = inject(ToastService);
+  private router = inject(Router);
 
   nombreCliente: string = 'Cargando...';
 
@@ -65,11 +67,18 @@ export class HomeClientePage {
   }
 
   async escanearQr() {
+
     const qrText = await this.qrScannerService.scanQr();
+    
     if (qrText) {
-      this.toastService.mostrarExito('QR detectado: ' + qrText);
+      if (qrText === 'RISTODELI_ENTRADA') {
+        this.toastService.mostrarExito('¡Bienvenido! Redirigiendo a lista de espera...');
+        this.router.navigate(['/espera-anonimo']); 
+      } else {
+        this.toastService.mostrarError('El código QR no corresponde al ingreso del local.');
+      }
     } else {
-      this.toastService.mostrarError('Escaneo de QR cancelado o fallido');
+      this.toastService.mostrarError('Escaneo de QR cancelado o fallido.');
     }
   }
 

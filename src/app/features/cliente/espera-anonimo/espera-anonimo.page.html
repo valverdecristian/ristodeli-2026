@@ -1,0 +1,51 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="toolbar-saffron">
+    <ion-title class="text-russet title-bold">
+      Lista de Espera
+    </ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/home-cliente" color="dark"></ion-back-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding bg-green">
+  
+  <div class="welcome-container fade-in">
+    <div class="logo-wrapper">
+      <img src="assets/icon/favicon.ico" class="spin-logo" alt="Logo Ristodeli" />
+    </div>
+    <h1 class="text-cream welcome-title typewriter-text">Estás en el Local</h1>
+    @if (!solicitudEnviada) {
+      <p class="text-cream welcome-subtitle">Anótate para recibir una mesa</p>
+    } @else {
+      <p class="text-cream welcome-subtitle">Esperando confirmación del Metre...</p>
+    }
+  </div>
+
+  <div class="actions-container fade-in">
+    
+    @if (!solicitudEnviada) {
+      <ion-button expand="block" shape="round" 
+                  class="action-btn qr-btn" 
+                  (click)="solicitarMesa()">
+        <ion-icon slot="start" name="hand-right-outline"></ion-icon>
+        Solicitar Mesa
+      </ion-button>
+    } @else {
+      <div class="tarjeta-estado-espera" style="text-align: center;">
+        <ion-spinner name="crescent" color="warning"></ion-spinner>
+        <p class="text-cream">Procesando solicitud...</p>
+      </div>
+    }
+
+    <ion-button expand="block" shape="round" 
+                class="action-btn chart-btn" 
+                (click)="irAGrafico('torta')">
+      <ion-icon slot="start" name="bar-chart-outline"></ion-icon>
+      Ver Encuestas
+    </ion-button>
+
+  </div>
+
+</ion-content>

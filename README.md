@@ -46,7 +46,7 @@ De acuerdo a los requerimientos de la cátedra, se detallan las tareas asignadas
 | **Valverde, Cristian Jorge** | Servicio de Notificaciones: Email Automático. | 15/04/2026 | 15/04/2026 |
 | **Chavez, Alejo** | Escaneo de DNI: Lector de código para carga automática de datos. | 09/04/2026 | 09/04/2026 |
 | **Trkmic Torres, Ignacio** | Dashboard: Vista del Menú del Supervisor. | 10/04/2026 | 12/04/2026 |
-| **Valverde, Cristian Jorge** | Sistema de Notificaciones: Asignación de mesa. |  |  |
+| **Valverde, Cristian Jorge** | Sistema de Notificaciones: Asignación de mesa. | 22/04/2026 | 22/04/2026 |
 | **Valverde, Cristian Jorge** | Validación de QR de Mesa Asignada. |  |  |
 | **Valverde, Cristian Jorge** | Plantillas de Correo: Aceptación/Rechazo. | 15/04/2026 | 15/04/2026 |
 | **Valverde, Cristian Jorge** | Integración de Email Service. | 15/04/2026 | 15/04/2026 |
@@ -62,7 +62,7 @@ De acuerdo a los requerimientos de la cátedra, se detallan las tareas asignadas
 | **Chavez, Alejo** | Componente de Chat Reutilizable. |  |  |
 | **Chavez, Alejo** | Vista de Consultas y Chat del Mozo. |  |  |
 | **Chavez, Alejo** | Gestión de Pedidos: Confirmar/Rechazar. |  |  |
-| **Valverde, Cristian Jorge** | Notificación de solicitud de mesa al Metre. |  |  |
+| **Valverde, Cristian Jorge** | Notificación de solicitud de mesa al Metre. | 22/04/2026 | 22/04/2026 |
 | **Valverde, Cristian Jorge** | Vista de Detalle de Producto y Cantidad. |  |  |
 | **Valverde, Cristian Jorge** | Carrito de Compra e Importe Total. |  |  |
 | **Valverde, Cristian Jorge** | Confirmación de Pedido y Aviso al Mozo. |  |  |
@@ -111,6 +111,12 @@ De acuerdo a los requerimientos de la cátedra, se detallan las tareas asignadas
 <br>
 
 ## 📱 Códigos QR
+
+<p align="center">QR de Entrada</p>
+
+<p align="center">
+  <img src="assets/qr/qr_entrada.jpeg" alt="QR Entrada" width="300">
+</p>
 
 <br>
 
