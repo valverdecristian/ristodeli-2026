@@ -32,8 +32,22 @@ export class EsperaAnonimoPage {
     
     await this.spinner.mostrar('Registrando en lista de espera...');
 
-    const nombre = localStorage.getItem('anonimo_nombre') || 'Cliente Anónimo';
-    const foto = localStorage.getItem('anonimo_foto') || '';
+    let nombre = 'Cliente Anónimo';
+    let foto = '';
+    const anonimoId = localStorage.getItem('anonimo_id');
+    
+    if (anonimoId) {
+      const { data } = await this.authService.supabaseClient
+        .from('anonimos')
+        .select('nombre, foto')
+        .eq('id', anonimoId)
+        .single();
+        
+      if (data) {
+        nombre = data.nombre || nombre;
+        foto = data.foto || foto;
+      }
+    }
 
     const { error } = await this.authService.supabaseClient
       .from('lista_espera')
@@ -41,7 +55,8 @@ export class EsperaAnonimoPage {
         nombre: nombre, 
         foto: foto, 
         estado: 'pendiente', 
-        tipo: 'anonimo' 
+        tipo: 'anonimo',
+        cliente_id: anonimoId
       }]);
 
     await this.spinner.ocultar();
@@ -52,6 +67,11 @@ export class EsperaAnonimoPage {
     } else {
       this.solicitudEnviada = true;
       this.toast.mostrarExito('¡Solicitud enviada! El metre te asignará una mesa.');
+      
+      // Notify the Metre
+      this.authService.supabaseClient.functions.invoke('notify-metre', {
+        body: { nombreCliente: nombre }
+      }).catch(err => console.error('Error al invocar push al metre:', err));
     }
   }
 

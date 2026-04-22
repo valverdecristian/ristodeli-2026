@@ -1,0 +1,45 @@
+<ion-header>
+  <ion-toolbar color="warning">
+    <ion-title>Lista de Espera</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/home-metre" color="dark"></ion-back-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="risto-background ion-padding">
+  
+  <div class="header-section fade-in">
+    <h2 class="section-title text-saffron">Clientes Esperando</h2>
+    <p class="section-subtitle text-cream">Administre las solicitudes de mesa agendadas.</p>
+  </div>
+
+  @if (clientesEsperando.length === 0) {
+    <div class="empty-state text-center fade-in">
+      <ion-icon name="time-outline" color="medium" class="empty-icon"></ion-icon>
+      <h3 class="text-cream mt-3" style="margin-top: 1rem;">No hay clientes en espera</h3>
+      <p class="text-medium">Todo listo para recibir nuevas solicitudes.</p>
+    </div>
+  } @else {
+    <ion-list class="transparent-list fade-in">
+      @for (cliente of clientesEsperando; track cliente.id) {
+        <ion-item class="premium-item mb-3" style="margin-bottom: 1rem;">
+          <ion-avatar slot="start" class="avatar-border">
+            <img [src]="cliente.foto || 'assets/icon/favicon.ico'" />
+          </ion-avatar>
+          <ion-label>
+            <h2 class="text-cream item-title">{{ cliente.nombre }}</h2>
+            <p class="text-saffron item-subtitle">
+              <ion-badge color="warning">Pendiente</ion-badge>
+            </p>
+          </ion-label>
+          <ion-button slot="end" color="success" shape="round" class="assign-btn" (click)="asignarMesa(cliente)">
+            <ion-icon slot="start" name="restaurant-outline"></ion-icon>
+            Asignar
+          </ion-button>
+        </ion-item>
+      }
+    </ion-list>
+  }
+
+</ion-content>
