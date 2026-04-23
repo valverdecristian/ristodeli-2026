@@ -1,0 +1,27 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="toolbar-saffron">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/espera-anonimo" color="dark"></ion-back-button>
+    </ion-buttons>
+    <ion-title class="text-russet title-bold">
+      {{ tipoGrafico === 'bar' ? 'Gráfico de Barras' : 'Gráfico de Torta' }}
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding bg-green">
+  <div *ngIf="cargando" class="welcome-container">
+    <ion-spinner name="crescent" color="warning"></ion-spinner>
+    <p class="text-cream">Cargando estadísticas de Supabase...</p>
+  </div>
+
+  <div [hidden]="cargando" class="chart-container" style="height: 60vh; width: 100%;">
+    <canvas #chartCanvas></canvas>
+  </div>
+
+  <div class="welcome-container" *ngIf="!cargando">
+    <p class="text-cream welcome-subtitle">
+      Resultados basados en {{ tipoGrafico === 'bar' ? 'limpieza' : 'satisfacción general' }}.
+    </p>
+  </div>
+</ion-content>

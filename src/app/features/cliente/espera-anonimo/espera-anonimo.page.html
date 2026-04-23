@@ -15,8 +15,8 @@
     <div class="logo-wrapper">
       <img src="assets/icon/favicon.ico" class="spin-logo" alt="Logo Ristodeli" />
     </div>
-    <h1 class="text-cream welcome-title typewriter-text">Estás en el Local</h1>
-    <p class="text-cream welcome-subtitle" *ngIf="!solicitudEnviada">Anótate para recibir una mesa</p>
+    <h1 class="text-cream welcome-title typewriter-text"> </h1>
+    <p class="text-cream welcome-subtitle" *ngIf="!solicitudEnviada">Ristodeli: Menos fila, más sabor</p>
     <p class="text-cream welcome-subtitle" *ngIf="solicitudEnviada">Esperando confirmación del Metre...</p>
   </div>
 
@@ -36,10 +36,10 @@
     </div>
 
     <ion-button expand="block" shape="round" 
-                class="action-btn chart-btn" 
-                (click)="irAGrafico('torta')">
-      <ion-icon slot="start" name="bar-chart-outline"></ion-icon>
-      Ver Gráfico Encuestas
+    class="action-btn chart-btn" 
+    (click)="irAMenuEncuestas()">
+    <ion-icon slot="start" name="bar-chart-outline"></ion-icon>
+    Ver Gráfico Encuestas
     </ion-button>
 
   </div>

@@ -1,0 +1,22 @@
+.bg-green { 
+    --background: #2d5a27; 
+}
+
+.chart-container {
+    background: transparent; 
+    border-radius: 20px;
+    padding: 10px;
+    height: 60vh; 
+    margin: 10px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.welcome-container { 
+    text-align: center; 
+    margin-top: 1rem; 
+}
+.text-cream { 
+    color: #f5ead5; 
+}
