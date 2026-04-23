@@ -27,10 +27,7 @@ export class EsperaAnonimoPage {
   private spinner = inject(SpinnerService);
   private toast = inject(ToastService);
 
-<<<<<<< Updated upstream
-=======
   public idSolicitud: string | null = null;
->>>>>>> Stashed changes
   public solicitudEnviada: boolean = false;
 
   constructor() {
@@ -38,19 +35,13 @@ export class EsperaAnonimoPage {
   }
 
   async solicitarMesa() {
-    
     await this.spinner.mostrar('Registrando en lista de espera...');
 
-<<<<<<< Updated upstream
-    const nombre = localStorage.getItem('anonimo_nombre') || 'Cliente Anónimo';
-    const foto = localStorage.getItem('anonimo_foto') || '';
-
-    const { error } = await this.authService.supabaseClient
-=======
     let nombre = 'Cliente Anónimo';
     let foto = '';
     const anonimoId = localStorage.getItem('anonimo_id');
     
+    // Obtenemos los datos actualizados del anónimo desde la DB
     if (anonimoId) {
       const { data: dataAnon } = await this.authService.supabaseClient
         .from('anonimos')
@@ -64,43 +55,30 @@ export class EsperaAnonimoPage {
       }
     }
 
-    // Insertamos la solicitud y obtenemos el ID generado para el seguimiento
+    // Insertamos la solicitud vinculando el cliente_id para el flujo Gamma
     const { data, error } = await this.authService.supabaseClient
->>>>>>> Stashed changes
       .from('lista_espera')
       .insert([{ 
         nombre: nombre, 
         foto: foto, 
         estado: 'pendiente', 
-<<<<<<< Updated upstream
-        tipo: 'anonimo' 
-      }]);
-=======
         tipo: 'anonimo',
         cliente_id: anonimoId
       }])
       .select();
->>>>>>> Stashed changes
 
     await this.spinner.ocultar();
 
     if (error) {
-<<<<<<< Updated upstream
-      
-      this.toast.mostrarError('Error: ' + error.message);
-    } else {
-=======
-      await this.vibrar(); 
       this.toast.mostrarError('Error: ' + error.message);
     } else {
       if (data && data.length > 0) {
         this.idSolicitud = data[0].id;
       }
->>>>>>> Stashed changes
       this.solicitudEnviada = true;
       this.toast.mostrarExito('¡Solicitud enviada! El metre te asignará una mesa.');
       
-      // Invocamos la Push Notification al Metre (Nueva funcionalidad)
+      // Invocamos la Push Notification al Metre
       this.authService.supabaseClient.functions.invoke('notify-metre', {
         body: { nombreCliente: nombre }
       }).catch(err => console.error('Error al invocar push al metre:', err));
@@ -108,7 +86,6 @@ export class EsperaAnonimoPage {
   }
 
   irAGrafico(tipo: string) {
-    
     this.router.navigate(['/graficos-encuestas', { tipoGrafico: tipo }]);
   }
 }
