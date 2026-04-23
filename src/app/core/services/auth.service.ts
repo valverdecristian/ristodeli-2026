@@ -120,26 +120,28 @@ export class AuthService {
    */
   async cerrarSesion() {
     try {
+      // Punto 52: Audio de éxito
       try {
         const audio = new Audio('assets/sounds/exito.mp3');
         audio.volume = 0.5;
-        audio.play().catch(err => console.log('Audio ignorado:', err));
-      } catch (audioErr) {
-        console.warn("Error de audio:", audioErr);
-      }
+        audio.play().catch(() => {});
+      } catch (e) {}
 
       const current = this.currentUser();
       if (current?.id) {
         try {
           await this.notificacionService.eliminarTokenEnDB(current.id);
-        } catch (e) { console.log("Error removiendo token"); }
+        } catch (e) {}
       }
 
       await this.supabase.auth.signOut();
 
       this.currentSession.set(null);
       this.currentUser.set(null);
+      
       localStorage.removeItem('anonimo_id');
+      localStorage.removeItem('anonimo_nombre');
+      localStorage.removeItem('anonimo_foto');
 
       this.router.navigate(['/login'], { replaceUrl: true });
 
@@ -153,30 +155,42 @@ export class AuthService {
    * Obtener detalles del perfil del usuario actual (tabla public.usuarios)
    */
   async obtenerPerfilUsuarioActual() {
-    // 1. Intentamos obtenerlo del signal
+    
     let userId = this.currentUser()?.id;
-  
-    // 2. Si el signal aún no se actualizó, lo buscamos en la sesión activa
     if (!userId) {
       const { data: { session } } = await this.supabase.auth.getSession();
       userId = session?.user?.id;
     }
   
-    if (!userId) return null;
-  
-    // 3. Buscamos en la tabla usuarios
-    const { data, error } = await this.supabase
-      .from('usuarios')
-      .select('*')
-      .eq('id', userId)
-      .single();
-  
-    if (error) {
-      console.error('Error al obtener perfil:', error.message);
-      return null;
+    if (userId) {
+      const { data } = await this.supabase
+        .from('usuarios')
+        .select('*')
+        .eq('id', userId)
+        .single();
+      return data;
+    } 
+
+    
+    const anonimoId = localStorage.getItem('anonimo_id');
+    if (anonimoId) {
+      const { data } = await this.supabase
+        .from('anonimos')
+        .select('*')
+        .eq('id', anonimoId)
+        .single();
+      
+      if (data) {
+        return { 
+          nombres: data.nombre, 
+          perfil: 'anonimo', 
+          id: data.id,
+          foto_url: data.foto 
+        };
+      }
     }
   
-    return data;
+    return null;
   }
 
   /**
@@ -213,15 +227,15 @@ export class AuthService {
       case 'admin':
         this.router.navigate(['/admin']);
         break;
-
       case 'supervisor':
         this.router.navigate(['/supervisor']); 
         break;
-
       case 'cliente_reg':
         this.router.navigate(['/home-cliente']);
         break;
-
+      case 'anonimo': 
+        this.router.navigate(['/home-cliente']); 
+        break;
       case 'mozo':
         this.router.navigate(['/home-mozo']);
         break;

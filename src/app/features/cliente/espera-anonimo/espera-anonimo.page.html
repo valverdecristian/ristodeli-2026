@@ -16,28 +16,42 @@
       <img src="assets/icon/favicon.ico" class="spin-logo" alt="Logo Ristodeli" />
     </div>
     <h1 class="text-cream welcome-title typewriter-text">Estás en el Local</h1>
+<<<<<<< Updated upstream
     <p class="text-cream welcome-subtitle" *ngIf="!solicitudEnviada">Anótate para recibir una mesa</p>
     <p class="text-cream welcome-subtitle" *ngIf="solicitudEnviada">Esperando confirmación del Metre...</p>
+=======
+    
+    @if (!solicitudEnviada) {
+      <p class="text-cream welcome-subtitle">Ristodeli: Menos fila, más sabor</p>
+    } @else {
+      <p class="text-cream welcome-subtitle">Esperando confirmación del Metre...</p>
+    }
+>>>>>>> Stashed changes
   </div>
 
   <div class="actions-container fade-in">
     
-    <ion-button *ngIf="!solicitudEnviada" 
-                expand="block" shape="round" 
-                class="action-btn qr-btn" 
-                (click)="solicitarMesa()">
-      <ion-icon slot="start" name="hand-right-outline"></ion-icon>
-      Solicitar Mesa
-    </ion-button>
-
-    <div class="tarjeta-estado-espera" *ngIf="solicitudEnviada" style="text-align: center;">
-      <ion-spinner name="crescent" color="warning"></ion-spinner>
-      <p class="text-cream">Procesando solicitud...</p>
-    </div>
+    @if (!solicitudEnviada) {
+      <ion-button expand="block" shape="round" 
+                  class="action-btn qr-btn" 
+                  (click)="solicitarMesa()">
+        <ion-icon slot="start" name="hand-right-outline"></ion-icon>
+        Solicitar Mesa
+      </ion-button>
+    } @else {
+      <div class="tarjeta-estado-espera" style="text-align: center;">
+        <ion-spinner name="crescent" color="warning"></ion-spinner>
+        <p class="text-cream">Procesando solicitud...</p>
+      </div>
+    }
 
     <ion-button expand="block" shape="round" 
                 class="action-btn chart-btn" 
+<<<<<<< Updated upstream
                 (click)="irAGrafico('torta')">
+=======
+                (click)="irAMenuEncuestas()">
+>>>>>>> Stashed changes
       <ion-icon slot="start" name="bar-chart-outline"></ion-icon>
       Ver Gráfico Encuestas
     </ion-button>

@@ -35,7 +35,7 @@ De acuerdo a los requerimientos de la cátedra, se detallan las tareas asignadas
 | **Valverde, Cristian Jorge** | Toast Service y Sppiner. | 07/04/2026 | 07/04/2026 |
 | **Trkmic Torres, Ignacio** | Sonidos y Vibraciones. | 08/04/2026 | 09/04/2026 |
 | **Chavez, Alejo** | Accesos Rápidos en Login para Testing. | 07/04/2026 | 07/04/2026 |
-| **Chavez, Alejo** | Vista del Menú del Administrador. | 07/04/2026 | pendiente |
+| **Chavez, Alejo** | Vista del Menú del Administrador. | 07/04/2026 | 16/04/2026 |
 | **Valverde, Cristian Jorge** | Formulario de Cliente y Empleado. | 07/04/2026 | 08/04/2026 |
 | **Trkmic Torres, Ignacio** | Formulario y Vistas: Platos y Bebidas. | 09/04/2026 | 09/04/2026 |
 | **Valverde, Cristian Jorge** | Configuración de comunicaciones: Email y Push Notifications. | 12/04/2026 | 15/04/2026 |
@@ -46,18 +46,29 @@ De acuerdo a los requerimientos de la cátedra, se detallan las tareas asignadas
 | **Valverde, Cristian Jorge** | Servicio de Notificaciones: Email Automático. | 15/04/2026 | 15/04/2026 |
 | **Chavez, Alejo** | Escaneo de DNI: Lector de código para carga automática de datos. | 09/04/2026 | 09/04/2026 |
 | **Trkmic Torres, Ignacio** | Dashboard: Vista del Menú del Supervisor. | 10/04/2026 | 12/04/2026 |
-| **Valverde, Cristian Jorge** | Sistema de Notificaciones: Asignación de mesa. |  |  |
+| **Valverde, Cristian Jorge** | Sistema de Notificaciones: Asignación de mesa. | 22/04/2026 | 22/04/2026 |
 | **Valverde, Cristian Jorge** | Validación de QR de Mesa Asignada. |  |  |
 | **Valverde, Cristian Jorge** | Plantillas de Correo: Aceptación/Rechazo. | 15/04/2026 | 15/04/2026 |
 | **Valverde, Cristian Jorge** | Integración de Email Service. | 15/04/2026 | 15/04/2026 |
-| **Trkmic Torres, Ignacio** | Visualización del Menú vía QR. |  |  |
-| **Trkmic Torres, Ignacio** | Actualización Home Cocinero. | 14/04/2026 |  |
-| **Trkmic Torres, Ignacio** | Actualización Home Cantinero. |  |  |
-| **Chavez, Alejo** | Registro de Cliente Anónimo. |  |  |
-| **Chavez, Alejo** | Supabase: Nueva Tabla clientes-anonimos. |  |  |
-| **Trkmic Torres, Ignacio** | Flujo de Entrada: Cliente Anónimo. |  |  |
-| **Chavez, Alejo** | Gestión de Mesas para Admin/Supervisor. |  |  |
+| **Trkmic Torres, Ignacio** | Visualización del Menú vía QR. | 17/04/2026 | 17/04/2026 |
+| **Trkmic Torres, Ignacio** | Actualización Home Cocinero. | 14/04/2026 | 17/04/2026 |
+| **Trkmic Torres, Ignacio** | Actualización Home Cantinero. | 15/04/2026 | 17/04/2026 |
+| **Chavez, Alejo** | Registro de Cliente Anónimo. | 16/04/2026 | 16/04/2026 |
+| **Chavez, Alejo** | Supabase: Nueva Tabla clientes-anonimos. | 16/04/2026 | 16/04/2026 |
+| **Trkmic Torres, Ignacio** | Flujo de Entrada: Cliente Anónimo. | 17/04/2026 | 21/04/2026 |
+| **Chavez, Alejo** | Gestión de Mesas para Admin/Supervisor. | 17/04/2026 | 17/04/2026|
 | **Chavez, Alejo** | Botón "Consulta al Mozo" en Home. |  |  |
+| **Chavez, Alejo** | Notificación masiva de consulta a mozos. |  |  |
+| **Chavez, Alejo** | Componente de Chat Reutilizable. |  |  |
+| **Chavez, Alejo** | Vista de Consultas y Chat del Mozo. |  |  |
+| **Chavez, Alejo** | Gestión de Pedidos: Confirmar/Rechazar. |  |  |
+| **Valverde, Cristian Jorge** | Notificación de solicitud de mesa al Metre. | 22/04/2026 | 22/04/2026 |
+| **Valverde, Cristian Jorge** | Vista de Detalle de Producto y Cantidad. |  |  |
+| **Valverde, Cristian Jorge** | Carrito de Compra e Importe Total. |  |  |
+| **Valverde, Cristian Jorge** | Confirmación de Pedido y Aviso al Mozo. |  |  |
+| **Trkmic Torres, Ignacio** | Lógica de acceso por QR de Mesa. |  |  |
+| **Trkmic Torres, Ignacio** | Sistema de Flags para re-escaneo de QR. |  |  |
+| **Trkmic Torres, Ignacio** | Visualización de Encuestas con Gráficos. |  |  |
 
 </details>
 
@@ -70,18 +81,18 @@ De acuerdo a los requerimientos de la cátedra, se detallan las tareas asignadas
 | 1. Agregar un empleado | dueño o supervisor | 🚀 Listo para Demo |  |
 | 2. Agregar un nuevo plato | cocinero | 🛠️ En Pruebas |  |
 | 3. Agregar una nueva bebida | cantinero | 🛠️ En Pruebas |  |
-| 4. Agregar una nueva mesa | dueño o supervisor | 🛠️ En Pruebas |  |
-| 5. Crear un cliente registrado | cliente o metre | 🛠️ En Pruebas |  |
+| 4. Agregar una nueva mesa | dueño o supervisor | 🚀 Listo para Demo |  |
+| 5. Crear un cliente registrado | cliente o metre | 🚀 Listo para Demo |  |
 | 6. Verificar ingreso del cliente registrado | dueño o supervisor | 🚀 Listo para Demo |  |
 | 7. Rechazar a un cliente registrado | dueño o supervisor | 🚀 Listo para Demo |  |
 | 8. Aceptar a un cliente registrado | dueño o supervisor | 🚀 Listo para Demo |  |
 | 9. Ingresar al local | cliente anónimo | 🏗️ En Desarrollo |  |
 | 10. Asignar una mesa a un cliente registrado | metre | 🏗️ En Desarrollo |  |
 | 11. Ver el listado de los productos | cliente registrado o anónimo | 🏗️ En Desarrollo |  |
-| 12. Realizar el pedido para todos los comensales de la mesa | cliente registrado o anónimo | ⏳ Próximo |  |
+| 12. Realizar el pedido para todos los comensales de la mesa | cliente registrado o anónimo | 🏗️ En Desarrollo |  |
 | 13. Rechazar el pedido, para que el usuario lo modifique | mozo | ⏳ Próximo |  |
 | 14. Confirmar el pedido | mozo | ⏳ Próximo |  |
-| 15. Acceder a los juegos | cliente registrado o anónimo |  |  |
+| 15. Acceder a los juegos | cliente registrado o anónimo | ⏳ Próximo |  |
 | 16. Recepción de los productos correspondientes | cocinero |  |  |
 | 17. Recepción de los productos correspondientes | cantinero |  |  |
 | 18. Realizar las tareas correspondientes | cocinero y cantinero |  |  |
@@ -100,6 +111,12 @@ De acuerdo a los requerimientos de la cátedra, se detallan las tareas asignadas
 <br>
 
 ## 📱 Códigos QR
+
+<p align="center">QR de Entrada</p>
+
+<p align="center">
+  <img src="assets/qr/qr_entrada.jpeg" alt="QR Entrada" width="300">
+</p>
 
 <br>
 
