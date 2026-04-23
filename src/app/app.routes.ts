@@ -51,6 +51,21 @@ export const routes: Routes = [
     canActivate: [authGuard, roleGuard],
     data: { roles: ['admin', 'supervisor'] } 
   },
+  {
+    path: 'consultas',
+    loadComponent: () =>
+    import('./features/staff/consultas/consultas.page').then(m => m.ConsultasPage),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['mozo']}
+  },
+  {
+    path: 'chat/:mesaId',
+    loadComponent: () =>
+      import('./features/chat/chat/chat.page')
+        .then(m => m.ChatPage),
+        canActivate: [authGuard, roleGuard],
+        data: { roles: ['mozo', 'cliente_reg', 'anonimo']}
+  },
 
   // Gestión de Mesas y Lista de Espera
   {

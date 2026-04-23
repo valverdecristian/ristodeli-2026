@@ -1,0 +1,38 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/home-mozo"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Consultas</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+  @if (chats.length === 0) {
+  <div style="text-align:center; margin-top:20px; color: #666;">
+    <ion-icon name="chatbubbles-outline" style="font-size: 3rem;"></ion-icon>
+    <p>No hay consultas recientes</p>
+  </div>
+  }
+
+  <ion-list>
+    @for (c of chats; track c.mesa_id) {
+    <ion-item button (click)="abrirChat(c.mesa_id)" detail="true">
+      <ion-avatar slot="start">
+        <div style="background-color: var(--ion-color-primary); color: white; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; border-radius: 50%; font-weight: bold;">
+          {{ c.mesa_id }}
+        </div>
+      </ion-avatar>
+      <ion-label>
+        <h2>Mesa {{ c.mesa_id }} - {{ c.cliente_nombre }}</h2>
+        <p>{{ c.ultimo_mensaje }}</p>
+      </ion-label>
+      <ion-note slot="end" style="font-size: 0.8rem;">
+        {{ c.fecha | date: 'HH:mm' }}
+      </ion-note>
+    </ion-item>
+    }
+  </ion-list>
+
+</ion-content>

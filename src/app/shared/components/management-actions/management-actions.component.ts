@@ -40,7 +40,9 @@ export class ManagementActionsComponent implements OnInit {
     { title: 'Lista de Espera', icon: 'list-outline', color: '#f5a623', action: 'view_waiting_list', roles: ['metre'] },
     { title: 'Ver Mesas', icon: 'grid-outline', color: '#1e3d1a', action: 'view_tables', roles: ['admin', 'supervisor', 'metre'] },
     { title: 'Estado Mesas', icon: 'swap-horizontal-outline', color: '#f5a623', action: 'manage_status', roles: ['metre'] },
-    { title: 'Crear Cliente', icon: 'person-add-outline', color: '#3880ff', action: 'register_client', roles: ['metre'] }
+    { title: 'Crear Cliente', icon: 'person-add-outline', color: '#3880ff', action: 'register_client', roles: ['metre'] },
+    // Acciones de Mozo
+    { title: 'Consultas', icon: 'chatbubble-ellipses-outline', color: '#f5a623', action: 'view_consultas', roles: ['mozo']}
   ];
 
   visibleActions: any[] = [];

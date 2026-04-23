@@ -15,4 +15,6 @@
       <ion-title size="large"> Mozo </ion-title>
     </ion-toolbar>
   </ion-header>
+  <app-management-actions [role]="'mozo'" (actionClicked)="onAction($event)">
+  </app-management-actions>
 </ion-content>

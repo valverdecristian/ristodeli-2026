@@ -11,13 +11,17 @@ import { ScannerService } from 'src/app/core/services/scanner.service';
 import { ToastService } from 'src/app/core/services/toast.service';
 import { SpinnerService } from 'src/app/core/services/spinner.service';
 import { BarcodeScanner } from '@capacitor-mlkit/barcode-scanning';
+import { NotificacionService } from 'src/app/core/services/notificacion.service';
+import { BotonConsultaMozoComponent } from '../../../shared/components/boton-consulta-mozo/boton-consulta-mozo.component';
+import { addIcons } from 'ionicons';
+import { logOutOutline, restaurantOutline, barChartOutline, qrCodeOutline } from 'ionicons/icons';
 
 @Component({
   selector: 'app-home-cliente',
   templateUrl: './home-cliente.page.html',
   styleUrls: ['./home-cliente.page.scss'],
   standalone: true,
-  imports: [IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonButton, IonIcon, CommonModule, FormsModule]
+  imports: [IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonButton, IonIcon, CommonModule, FormsModule, BotonConsultaMozoComponent]
 })
 export class HomeClientePage implements OnInit {
   private authService = inject(AuthService);
@@ -27,6 +31,10 @@ export class HomeClientePage implements OnInit {
   private spinner = inject(SpinnerService);
 
   public nombreCliente: string = '';
+
+  constructor() {
+    addIcons({ logOutOutline, restaurantOutline, barChartOutline, qrCodeOutline });
+  }
 
   async ngOnInit() {
     // Usamos el método que SI existe en tu auth.service.ts
