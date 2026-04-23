@@ -11,13 +11,14 @@ import { logOutOutline, restaurantOutline, barChartOutline, qrCodeOutline } from
 
 import { QrScannerService } from '../../../core/services/qr-scanner.service';
 import { ToastService } from '../../../core/services/toast.service';
+import { BotonConsultaMozoComponent } from '../../../shared/components/boton-consulta-mozo/boton-consulta-mozo.component';
 
 @Component({
   selector: 'app-home-cliente',
   templateUrl: './home-cliente.page.html',
   styleUrls: ['./home-cliente.page.scss'],
   standalone: true,
-  imports: [IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonButton, IonIcon, CommonModule, FormsModule]
+  imports: [IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonButton, IonIcon, CommonModule, FormsModule, BotonConsultaMozoComponent]
 })
 
 export class HomeClientePage {

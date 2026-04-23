@@ -93,6 +93,7 @@ export class ListaEsperaPage implements OnInit {
             handler: (mesaSeleccionada: any) => {
               if (mesaSeleccionada) {
                 this.confirmarAsignacion(cliente, mesaSeleccionada);
+                return true;
               } else {
                 this.toastService.mostrarError('Debes seleccionar una mesa');
                 return false;
