@@ -66,7 +66,8 @@ export const routes: Routes = [
         canActivate: [authGuard, roleGuard],
         data: { roles: ['mozo', 'cliente_reg', 'anonimo']}
   },
-  // Gestión de Mesas (TFI Punto 12 y 22)
+
+  // Gestión de Mesas y Lista de Espera
   {
     path: 'gestion-mesas',
     loadComponent: () => import('./features/admin/gestion-mesas/gestion-mesas.page').then(m => m.GestionMesasPage),
@@ -118,7 +119,7 @@ export const routes: Routes = [
     data: { roles: ['mozo'] }
   },
 
-  // Productos y Pedidos (Shared & Features)
+  // Productos y Pedidos
   {
     path: 'alta-producto/:tipo',
     loadComponent: () => import('./shared/components/formulario-producto/formulario-producto.page').then(m => m.FormularioProductoComponent),
@@ -138,15 +139,32 @@ export const routes: Routes = [
     data: { roles: ['cocinero', 'bartender', 'cantinero', 'admin'] }
   },
 
-  // Clientes
+  // Clientes y Flujo Gamma
   {
     path: 'home-cliente',
     loadComponent: () => import('./features/cliente/home-cliente/home-cliente.page').then(m => m.HomeClientePage),
     canActivate: [authGuard, roleGuard],
     data: { roles: ['cliente_reg', 'anonimo'] }
-  },  {
+  },
+  {
     path: 'espera-anonimo',
     loadComponent: () => import('./features/cliente/espera-anonimo/espera-anonimo.page').then( m => m.EsperaAnonimoPage)
   },
+  {
+    path: 'graficos-encuestas',
+    loadComponent: () => import('./features/cliente/graficos-encuestas/graficos-encuestas.page').then( m => m.GraficosEncuestasPage)
+  },
+  {
+    path: 'menu-encuestas',
+    loadComponent: () => import('./features/cliente/menu-encuestas/menu-encuestas.page').then( m => m.MenuEncuestasPage)
+  },
+  {
+    path: 'dashboard-gestion',
+    loadComponent: () => import('./features/cliente/dashboard-gestion/dashboard-gestion.page').then( m => m.DashboardGestionPage)
+  },
+  {
+    path: 'dashboard-recreativo',
+    loadComponent: () => import('./features/cliente/dashboard-recreativo/dashboard-recreativo.page').then( m => m.DashboardRecreativoPage)
+  },
 
-]
+];

@@ -1,17 +1,20 @@
-import { Router } from '@angular/router';
-import { Component, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonButton, IonIcon, } from '@ionic/angular/standalone';
-import { AuthService } from '../../../core/services/auth.service';
-import { SpinnerService } from '../../../core/services/spinner.service';
-import { NotificacionService } from '../../../core/services/notificacion.service';
+import { Router } from '@angular/router';
+import { 
+  IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, 
+  IonButton, IonIcon 
+} from '@ionic/angular/standalone';
+import { AuthService } from 'src/app/core/services/auth.service';
+import { ScannerService } from 'src/app/core/services/scanner.service';
+import { ToastService } from 'src/app/core/services/toast.service';
+import { SpinnerService } from 'src/app/core/services/spinner.service';
+import { BarcodeScanner } from '@capacitor-mlkit/barcode-scanning';
+import { NotificacionService } from 'src/app/core/services/notificacion.service';
+import { BotonConsultaMozoComponent } from '../../../shared/components/boton-consulta-mozo/boton-consulta-mozo.component';
 import { addIcons } from 'ionicons';
 import { logOutOutline, restaurantOutline, barChartOutline, qrCodeOutline } from 'ionicons/icons';
-
-import { QrScannerService } from '../../../core/services/qr-scanner.service';
-import { ToastService } from '../../../core/services/toast.service';
-import { BotonConsultaMozoComponent } from '../../../shared/components/boton-consulta-mozo/boton-consulta-mozo.component';
 
 @Component({
   selector: 'app-home-cliente',
@@ -20,72 +23,81 @@ import { BotonConsultaMozoComponent } from '../../../shared/components/boton-con
   standalone: true,
   imports: [IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonButton, IonIcon, CommonModule, FormsModule, BotonConsultaMozoComponent]
 })
-
-export class HomeClientePage {
+export class HomeClientePage implements OnInit {
   private authService = inject(AuthService);
-  private spinnerService = inject(SpinnerService);
-  private notificacionService = inject(NotificacionService);
-  private qrScannerService = inject(QrScannerService);
-  private toastService = inject(ToastService);
+  private scanner = inject(ScannerService);
   private router = inject(Router);
+  private toast = inject(ToastService);
+  private spinner = inject(SpinnerService);
 
-  nombreCliente: string = 'Cargando...';
+  public nombreCliente: string = '';
 
   constructor() {
     addIcons({ logOutOutline, restaurantOutline, barChartOutline, qrCodeOutline });
   }
 
-  async ionViewWillEnter() {
+  async ngOnInit() {
+    // Usamos el método que SI existe en tu auth.service.ts
     const perfil = await this.authService.obtenerPerfilUsuarioActual();
-    if (perfil) {
-      this.nombreCliente = perfil.nombres;
-    } else {
-      const anonimoId = localStorage.getItem('anonimo_id');
-      if (anonimoId) {
-        const { data } = await this.authService.supabaseClient
-          .from('anonimos')
-          .select('nombre')
-          .eq('id', anonimoId)
-          .single();
-        if (data && data.nombre) {
-          this.nombreCliente = data.nombre;
-        } else {
-          this.nombreCliente = 'Invitado';
-        }
-      } else {
-        this.nombreCliente = 'Cliente';
-      }
-    }
-    
-    // Inicializar Push Notifications
-    await this.notificacionService.inicializarPushNotifications();
-  }
-
-  async cerrarSesion() {
-    await this.spinnerService.mostrar('Cerrando sesión...');
-    await this.authService.cerrarSesion();
-    await this.spinnerService.ocultar();
+    this.nombreCliente = perfil?.nombres || 'Cliente';
   }
 
   async escanearQr() {
-
-    const qrText = await this.qrScannerService.scanQr();
+    // Como tu ScannerService no tiene .scan(), usamos el plugin directamente
+    // o podés agregar el método .scan() a tu servicio después.
+    const { barcodes } = await BarcodeScanner.scan();
     
-    if (qrText) {
-      if (qrText === 'RISTODELI_ENTRADA') {
-        this.toastService.mostrarExito('¡Bienvenido! Redirigiendo a lista de espera...');
-        this.router.navigate(['/espera-anonimo']); 
-      } else {
-        this.toastService.mostrarError('El código QR no corresponde al ingreso del local.');
-      }
-    } else {
-      this.toastService.mostrarError('Escaneo de QR cancelado o fallido.');
+    if (barcodes.length > 0) {
+      const data = barcodes[0].displayValue;
+      await this.manejarEscaneo(data);
     }
   }
 
-  ionViewWillLeave() {
-    // Si el usuario sale de la app repentinamente o vuelve atrás, destruimos instancia activa.
-    this.qrScannerService.detenerEscaneo();
+  private async manejarEscaneo(data: string) {
+    await this.spinner.mostrar('Validando código...');
+    
+    if (data === 'RISTODELI_ENTRADA') {
+      this.router.navigate(['/espera-anonimo']);
+    } else if (data.startsWith('MESA_')) {
+      await this.validarAccesoMesa(data);
+    } else {
+      this.toast.mostrarError('Código QR no reconocido');
+    }
+    
+    await this.spinner.ocultar();
   }
 
+  private async validarAccesoMesa(mesaCodigo: string) {
+    const anonimoId = localStorage.getItem('anonimo_id');
+    
+    const { data: solicitud } = await this.authService.supabaseClient
+      .from('lista_espera')
+      .select('*')
+      .eq('cliente_id', anonimoId)
+      .eq('mesa_asignada', mesaCodigo)
+      .single();
+
+    if (solicitud) {
+      if (!solicitud.qr_mesa_escaneado) {
+        await this.authService.supabaseClient
+          .from('lista_espera')
+          .update({ qr_mesa_escaneado: true })
+          .eq('id', solicitud.id);
+        this.router.navigate(['/dashboard-gestion']);
+      } else {
+        this.router.navigate(['/dashboard-recreativo']);
+      }
+    } else {
+      this.toast.mostrarError('Esta no es la mesa que tenés asignada.');
+    }
+  }
+
+  irAMenuEncuestas() {
+    this.router.navigate(['/menu-encuestas']);
+  }
+
+  async cerrarSesion() {
+    // Usamos el método que SI existe en tu auth.service.ts
+    await this.authService.cerrarSesion();
+  }
 }

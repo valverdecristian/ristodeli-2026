@@ -1,0 +1,27 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="toolbar-saffron">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/home-cliente"></ion-back-button>
+    </ion-buttons>
+    <ion-title class="title-bold">Entretenimiento</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding bg-green">
+  <div class="logo-header fade-in">
+    <img src="assets/icon/logo.png" alt="Ristodeli Logo" class="dashboard-logo">
+    <p class="welcome-text">¡Disfrutá mientras esperás!</p>
+  </div>
+
+  <div class="actions-container fade-in">
+    <ion-button expand="block" class="action-btn" (click)="verEstadoPedido()">
+      <ion-icon slot="start" name="time-outline"></ion-icon>
+      Estado del Pedido
+    </ion-button>
+
+    <ion-button expand="block" class="action-btn" (click)="irAJuegos()">
+      <ion-icon slot="start" name="game-controller-outline"></ion-icon>
+      Juegos y Descuentos
+    </ion-button>
+  </div>
+</ion-content>
