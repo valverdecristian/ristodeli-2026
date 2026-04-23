@@ -1,9 +1,14 @@
-import { Component, ElementRef, ViewChild, inject, OnInit } from '@angular/core';
+import { Component, ElementRef, ViewChild, inject, AfterViewInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Chart, registerables } from 'chart.js';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { CommonModule } from '@angular/common';
-import { IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonBackButton, IonSpinner } from '@ionic/angular/standalone';
+import { 
+  IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, 
+  IonBackButton, IonItem, IonIcon, IonLabel, IonBadge 
+} from '@ionic/angular/standalone';
+import { addIcons } from 'ionicons';
+import { informationCircleOutline, statsChartOutline, pieChart, barChart } from 'ionicons/icons';
 
 Chart.register(...registerables);
 
@@ -12,11 +17,14 @@ Chart.register(...registerables);
   templateUrl: './graficos-encuestas.page.html',
   styleUrls: ['./graficos-encuestas.page.scss'],
   standalone: true,
-  imports: [CommonModule, IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonBackButton, IonSpinner]
+  imports: [
+    CommonModule, IonContent, IonHeader, IonTitle, IonToolbar, 
+    IonButtons, IonBackButton, IonItem, IonIcon, IonLabel, IonBadge
+  ]
 })
-
-export class GraficosEncuestasPage implements OnInit {
-  @ViewChild('chartCanvas') private chartCanvas!: ElementRef;
+export class GraficosEncuestasPage implements AfterViewInit {
+  // Aseguramos que el nombre coincida con el # del HTML (usamos canvasElement como en el diseño anterior)
+  @ViewChild('canvasElement') private chartCanvas!: ElementRef;
   
   private route = inject(ActivatedRoute);
   private authService = inject(AuthService);
@@ -24,13 +32,23 @@ export class GraficosEncuestasPage implements OnInit {
   public chart: any; 
   public tipoGrafico: string = 'bar';
   public cargando: boolean = true;
+  public hayDatos: boolean = true;
 
-  ngOnInit() {
-    this.tipoGrafico = this.route.snapshot.paramMap.get('tipo') || 'bar';
+  constructor() {
+    // Registramos todos los íconos necesarios para evitar errores de URL inválida
+    addIcons({ informationCircleOutline, statsChartOutline, pieChart, barChart });
   }
 
-  ionViewDidEnter() {
-    this.cargarDatosYGraficar();
+  // Usamos AfterViewInit para garantizar que el canvas esté disponible
+  ngAfterViewInit() {
+    // Obtenemos el tipo de gráfico de los parámetros de la URL
+    const tipoRecibido = this.route.snapshot.paramMap.get('tipoGrafico');
+    this.tipoGrafico = tipoRecibido === 'torta' ? 'pie' : 'bar';
+    
+    // Pequeño delay para asegurar el renderizado de la vista de Ionic
+    setTimeout(() => {
+      this.cargarDatosYGraficar();
+    }, 400);
   }
 
   async cargarDatosYGraficar() {
@@ -40,8 +58,9 @@ export class GraficosEncuestasPage implements OnInit {
       .from('encuestas')
       .select('limpieza, satisfaccion');
 
-    if (error) {
-      console.error("Error cargando encuestas:", error);
+    if (error || !data || data.length === 0) {
+      console.error("Error o sin datos:", error);
+      this.hayDatos = false;
       this.cargando = false;
       return;
     }
@@ -49,13 +68,11 @@ export class GraficosEncuestasPage implements OnInit {
     let labels: string[] = [];
     let valores: number[] = [];
 
-    // Lógica para separar gráficos en pantallas distintas según el tipo
     if (this.tipoGrafico === 'bar') {
       const categorias = ['Excelente', 'Bueno', 'Regular', 'Malo'];
       labels = categorias;
       valores = categorias.map(cat => data.filter(d => d.limpieza === cat).length);
     } else {
-      // Agrupación para gráfico de torta (satisfacción)
       labels = ['Baja (1-4)', 'Media (5-7)', 'Alta (8-10)'];
       valores = [
         data.filter(d => d.satisfaccion <= 4).length,
@@ -69,7 +86,13 @@ export class GraficosEncuestasPage implements OnInit {
   }
 
   renderChart(labels: string[], valores: number[]) {
-    const ctx = this.chartCanvas.nativeElement;
+    // Verificación de seguridad para evitar el error de nativeElement undefined
+    if (!this.chartCanvas || !this.chartCanvas.nativeElement) {
+      console.error("No se encontró el canvas para graficar");
+      return;
+    }
+
+    const ctx = this.chartCanvas.nativeElement.getContext('2d');
     
     if (this.chart) { 
       this.chart.destroy(); 
@@ -83,15 +106,14 @@ export class GraficosEncuestasPage implements OnInit {
           label: 'Cantidad de Votos',
           data: valores,
           backgroundColor: [
-            '#FFD700', 
-            '#00FA9A', 
-            '#00BFFF', 
-            '#FF6347', 
-            '#EE82EE'  
+            '#e9c46a', // Saffron
+            '#a0522d', // Russet
+            '#2a9d8f', 
+            '#e76f51', 
+            '#264653'  
           ],
-          borderColor: '#ffffff',
-          borderWidth: 2,
-          borderRadius: this.tipoGrafico === 'bar' ? 8 : 0,
+          borderColor: this.tipoGrafico === 'pie' ? '#ffffff' : 'transparent',
+          borderWidth: 2
         }]
       },
       options: {
@@ -102,21 +124,11 @@ export class GraficosEncuestasPage implements OnInit {
             display: true,
             position: 'bottom',
             labels: { 
-              color: '#ffffff', 
-              font: { size: 14, weight: 'bold' } 
+              color: '#333333', 
+              font: { size: 12, weight: 'bold' } 
             }
           }
-        },
-        scales: this.tipoGrafico === 'bar' ? {
-          y: { 
-            beginAtZero: true, 
-            ticks: { color: '#ffffff' },
-            grid: { color: 'rgba(255, 255, 255, 0.1)' } 
-          },
-          x: { 
-            ticks: { color: '#ffffff' } 
-          }
-        } : {} 
+        }
       }
     });
   }

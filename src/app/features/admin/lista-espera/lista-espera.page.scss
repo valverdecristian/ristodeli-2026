@@ -1,0 +1,96 @@
+.risto-background {
+    --background: var(--risto-dark-green);
+    --background-blend-mode: overlay;
+}
+
+.text-saffron { color: var(--risto-saffron) !important; }
+.text-russet { color: var(--risto-russet) !important; }
+.text-cream { color: var(--risto-vanilla-cream) !important; }
+.text-medium { color: var(--ion-color-medium) !important; }
+
+.section-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0.2rem;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+}
+
+.section-subtitle {
+    font-size: 0.95rem;
+    margin-bottom: 1.5rem;
+}
+
+.empty-state {
+    margin-top: 3rem;
+    padding: 2rem;
+    background: rgba(49, 96, 61, 0.5);
+    border-radius: 16px;
+    border: 1px dashed var(--risto-saffron);
+}
+
+.empty-icon {
+    font-size: 4rem;
+    opacity: 0.7;
+}
+
+.transparent-list {
+    background: transparent !important;
+}
+
+.premium-item {
+    --background: rgba(49, 96, 61, 0.7);
+    --border-radius: 15px;
+    --padding-start: 10px;
+    --inner-padding-end: 10px;
+    border-left: 4px solid var(--risto-saffron);
+    border-right: 1px solid rgba(244, 162, 97, 0.2); // Sutil borde lateral
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    margin-bottom: 1rem;
+}
+
+.avatar-border {
+    border: 2px solid var(--risto-saffron);
+    padding: 2px;
+    background: white;
+}
+
+.item-title {
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.assign-btn {
+    font-weight: bold;
+    --box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
+
+// Estilos para el selector de mesa (Reemplazo del Alert)
+.asignacion-selector {
+    background: var(--risto-saffron, #e9c46a); 
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    margin-left: 10px;
+    
+    .select-item-inner {
+        --background: transparent;
+        --color: #4a2c2a;
+        font-weight: 800;
+        font-size: 0.85rem;
+        --padding-start: 10px;
+        
+        ion-select {
+            width: 100%;
+            text-transform: uppercase;
+        }
+    }
+}
+
+// Animaciones
+.fade-in {
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
