@@ -1,9 +1,9 @@
-<ion-header>
-  <ion-toolbar color="warning">
-    <ion-title>Lista de Espera</ion-title>
+<ion-header class="ion-no-border">
+  <ion-toolbar class="toolbar-saffron">
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/home-metre" color="dark"></ion-back-button>
     </ion-buttons>
+    <ion-title class="text-russet title-bold">LISTA DE ESPERA</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -17,7 +17,7 @@
   @if (clientesEsperando.length === 0) {
     <div class="empty-state text-center fade-in">
       <ion-icon name="time-outline" color="medium" class="empty-icon"></ion-icon>
-      <h3 class="text-cream mt-3" style="margin-top: 1rem;">No hay clientes en espera</h3>
+      <h3 class="text-cream" style="margin-top: 1rem;">No hay clientes en espera</h3>
       <p class="text-medium">Todo listo para recibir nuevas solicitudes.</p>
     </div>
   } @else {
@@ -25,21 +25,33 @@
       @for (cliente of clientesEsperando; track cliente.id) {
         <ion-item class="premium-item mb-3" style="margin-bottom: 1rem;">
           <ion-avatar slot="start" class="avatar-border">
-            <img [src]="cliente.foto || 'assets/icon/favicon.ico'" />
+            <img [src]="cliente.foto || 'assets/img/default-user.png'" />
           </ion-avatar>
+          
           <ion-label>
             <h2 class="text-cream item-title">{{ cliente.nombre }}</h2>
             <p class="text-saffron item-subtitle">
               <ion-badge color="warning">Pendiente</ion-badge>
             </p>
           </ion-label>
-          <ion-button slot="end" color="success" shape="round" class="assign-btn" (click)="asignarMesa(cliente)">
-            <ion-icon slot="start" name="restaurant-outline"></ion-icon>
-            Asignar
-          </ion-button>
+
+          <div slot="end" class="asignacion-selector">
+            <ion-item lines="none" class="select-item-inner">
+              <ion-select 
+                placeholder="ASIGNAR" 
+                interface="popover"
+                toggleIcon="restaurant-outline"
+                (ionChange)="onMesaSelected($event, cliente)">
+                @for (mesa of mesasLibres; track mesa.id) {
+                  <ion-select-option [value]="mesa">
+                    Mesa {{ mesa.numero }} ({{ mesa.tipo }})
+                  </ion-select-option>
+                }
+              </ion-select>
+            </ion-item>
+          </div>
         </ion-item>
       }
     </ion-list>
   }
-
 </ion-content>

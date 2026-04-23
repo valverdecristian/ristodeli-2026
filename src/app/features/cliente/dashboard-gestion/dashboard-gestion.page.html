@@ -1,0 +1,32 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="toolbar-saffron">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/home-cliente"></ion-back-button>
+    </ion-buttons>
+    <ion-title class="title-bold">Gestión de Mesa</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding bg-green">
+  <div class="logo-header fade-in">
+    <img src="assets/icon/logo.png" alt="Ristodeli Logo" class="dashboard-logo">
+    <p class="welcome-text">¡Hola! ¿Qué vamos a pedir hoy?</p>
+  </div>
+
+  <div class="actions-container fade-in">
+    <ion-button expand="block" class="action-btn" (click)="irAMenu()">
+      <ion-icon slot="start" name="restaurant-outline"></ion-icon>
+      Hacer Pedido / Menú
+    </ion-button>
+
+    <ion-button expand="block" class="action-btn" (click)="irAEncuestas()">
+      <ion-icon slot="start" name="bar-chart-outline"></ion-icon>
+      Ver Encuestas
+    </ion-button>
+
+    <ion-button expand="block" class="action-btn" (click)="consultarMozo()">
+      <ion-icon slot="start" name="chatbubbles-outline"></ion-icon>
+      Consultar Mozo
+    </ion-button>
+  </div>
+</ion-content>

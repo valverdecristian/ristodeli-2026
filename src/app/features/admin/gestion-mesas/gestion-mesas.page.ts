@@ -56,43 +56,42 @@ export class GestionMesasPage {
       this.toastService.mostrarError('El número de mesa y comensales debe ser mayor a 0');
       return;
     }
-
+  
     try {
       await this.spinnerService.mostrar('Guardando mesa y generando QR...');
-
+  
       const existe = await this.mesaService.verificarSiExiste(this.nuevaMesa.numero);
       if (existe) {
         await this.spinnerService.ocultar();
         await Haptics.impact({ style: ImpactStyle.Heavy });
-        this.toastService.mostrarError(`La Mesa N° ${this.nuevaMesa.numero} ya existe en el sistema.`);
+        this.toastService.mostrarError(`La Mesa N° ${this.nuevaMesa.numero} ya existe.`);
         return;
       }
-
-      const datosQR = {
-        numeroMesa: this.nuevaMesa.numero,
-        tipo: this.nuevaMesa.tipo
-      };
-      this.nuevaMesa.qr_data = JSON.stringify(datosQR);
-
+  
+      // --- CAMBIO CLAVE PARA EL FLUJO GAMMA ---
+      // En lugar de JSON, guardamos el identificador que el cliente escanea.
+      this.nuevaMesa.qr_data = `MESA_${this.nuevaMesa.numero}`; 
+  
       const mesaFinal = {
         numero: this.nuevaMesa.numero,
         comensales: this.nuevaMesa.comensales,
         tipo: this.nuevaMesa.tipo,
-        qr_data: this.nuevaMesa.qr_data,
+        qr_data: this.nuevaMesa.qr_data, // Ahora dice "MESA_1"
         foto: this.nuevaMesa.foto_url, 
         estado: 'Libre'
       };
-
+  
       await this.mesaService.crearMesa(mesaFinal);
-
+      // ---------------------------------------
+  
       this.qrGenerado = true;
       await this.spinnerService.ocultar();
       
       const audio = new Audio('assets/sounds/exito.mp3');
       audio.play().catch(err => console.log('Error de audio', err));
-
+  
       this.toastService.mostrarExito('¡Mesa guardada exitosamente!');
-
+  
     } catch (error) {
       await this.spinnerService.ocultar();
       await Haptics.vibrate();

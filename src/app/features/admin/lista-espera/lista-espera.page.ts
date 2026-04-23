@@ -1,6 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { ToastService } from 'src/app/core/services/toast.service';
 import { SpinnerService } from 'src/app/core/services/spinner.service';
@@ -10,7 +11,7 @@ import { restaurantOutline, checkmarkCircleOutline, timeOutline } from 'ionicons
 import { 
   IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, 
   IonBackButton, IonList, IonItem, IonLabel, IonAvatar, 
-  IonButton, IonIcon, IonBadge, AlertController
+  IonIcon, IonBadge, IonSelect, IonSelectOption 
 } from '@ionic/angular/standalone';
 
 @Component({
@@ -19,9 +20,9 @@ import {
   styleUrls: ['./lista-espera.page.scss'],
   standalone: true,
   imports: [
-    CommonModule, IonContent, IonHeader, IonTitle, IonToolbar, 
+    CommonModule, FormsModule, IonContent, IonHeader, IonTitle, IonToolbar, 
     IonButtons, IonBackButton, IonList, IonItem, IonLabel, 
-    IonAvatar, IonButton, IonIcon, IonBadge
+    IonAvatar, IonIcon, IonBadge, IonSelect, IonSelectOption
   ]
 })
 export class ListaEsperaPage implements OnInit {
@@ -29,120 +30,97 @@ export class ListaEsperaPage implements OnInit {
   private toastService = inject(ToastService);
   private spinner = inject(SpinnerService);
   private mesaService = inject(MesaService);
-  private alertController = inject(AlertController);
-  
+
   public clientesEsperando: any[] = [];
+  public mesasLibres: any[] = [];
 
   constructor() {
     addIcons({ restaurantOutline, checkmarkCircleOutline, timeOutline });
   }
 
-  ngOnInit() {
-    this.cargarListaEspera();
+  async ngOnInit() {
+    await this.cargarListaEspera();
+    await this.cargarMesasLibres();
   }
 
   async cargarListaEspera() {
-    await this.spinner.mostrar('Cargando lista de espera...');
-    const { data, error } = await this.authService.supabaseClient
-      .from('lista_espera')
-      .select('*')
-      .eq('estado', 'pendiente')
-      .order('created_at', { ascending: true });
+    try {
+      const { data, error } = await this.authService.supabaseClient
+        .from('lista_espera')
+        .select('*')
+        .eq('estado', 'pendiente')
+        .order('created_at', { ascending: true });
 
-    await this.spinner.ocultar();
-
-    if (error) {
-      console.error(error);
-      this.toastService.mostrarError('Error al cargar la lista de espera');
-    } else {
+      if (error) throw error;
       this.clientesEsperando = data || [];
+    } catch (error) {
+      this.toastService.mostrarError('Error al cargar lista de espera');
     }
   }
 
-  async asignarMesa(cliente: any) {
-    await this.spinner.mostrar('Buscando mesas libres...');
+  async cargarMesasLibres() {
     try {
       const mesas = await this.mesaService.obtenerMesas();
-      const mesasLibres = mesas.filter(m => m.estado === 'Libre');
-      
-      await this.spinner.ocultar();
-
-      if (mesasLibres.length === 0) {
-        this.toastService.mostrarAdvertencia('No hay mesas libres actualmente.');
-        return;
-      }
-
-      const inputs: any[] = mesasLibres.map(mesa => ({
-        type: 'radio',
-        label: `Mesa ${mesa.numero} (${mesa.comensales} personas)`,
-        value: mesa,
-        handler: () => {}
-      }));
-
-      const alert = await this.alertController.create({
-        header: 'Asignar Mesa',
-        message: `Selecciona una mesa disponible para ${cliente.nombre}`,
-        inputs: inputs,
-        buttons: [
-          {
-            text: 'Cancelar',
-            role: 'cancel'
-          },
-          {
-            text: 'Asignar',
-            handler: (mesaSeleccionada: any) => {
-              if (mesaSeleccionada) {
-                this.confirmarAsignacion(cliente, mesaSeleccionada);
-              } else {
-                this.toastService.mostrarError('Debes seleccionar una mesa');
-                return false;
-              }
-            }
-          }
-        ]
-      });
-
-      await alert.present();
-
+      this.mesasLibres = mesas.filter(m => m.estado === 'Libre');
     } catch (error) {
-      await this.spinner.ocultar();
-      console.error(error);
-      this.toastService.mostrarError('No se pudieron obtener las mesas.');
+      console.error('Error cargando mesas', error);
+    }
+  }
+
+  async onMesaSelected(event: any, cliente: any) {
+    const mesaElegida = event.detail.value;
+    if (mesaElegida) {
+      await this.confirmarAsignacion(cliente, mesaElegida);
+      
+      // Refrescamos las listas para actualizar la vista
+      await this.cargarListaEspera();
+      await this.cargarMesasLibres();
+      
+      // Limpiamos el valor del selector
+      event.target.value = null;
     }
   }
 
   private async confirmarAsignacion(cliente: any, mesa: any) {
     await this.spinner.mostrar('Asignando mesa...');
     try {
-      // 1. Actualizar mesa a 'Ocupada'
-      if (mesa.id) { // mesa should have an id according to Mesa interface
-        await this.mesaService.actualizarEstado(mesa.id, 'Ocupada');
-      }
+      // 1. Actualizar estado de la mesa a 'Ocupada'
+      await this.mesaService.actualizarEstado(mesa.id, 'Ocupada');
 
-      // 2. Actualizar cliente en lista_espera a 'asignada'
+      // 2. Actualizar lista_espera con el formato de texto para el QR
       const { error: errLista } = await this.authService.supabaseClient
         .from('lista_espera')
-        .update({ estado: 'asignada' })
+        .update({ 
+          estado: 'asignado', 
+          mesa_asignada: `MESA_${mesa.numero}` 
+        })
         .eq('id', cliente.id);
 
-      if (errLista) throw errLista;
+      if (errLista) {
+        // Reversión en caso de error
+        await this.mesaService.actualizarEstado(mesa.id, 'Libre');
+        throw errLista;
+      }
 
-      // 3. Notificar al cliente via Edge Function
+      // 3. Notificar al cliente vía Edge Function (Push Notification)
       this.authService.supabaseClient.functions.invoke('notify-cliente-mesa', {
         body: { 
           cliente_id: cliente.cliente_id, 
           tipo: cliente.tipo, 
           numero_mesa: mesa.numero
         }
-      }).catch(err => console.error('Error enviando push de mesa al cliente:', err));
+      }).catch(err => console.error('Error enviando push al cliente:', err));
 
       await this.spinner.ocultar();
       this.toastService.mostrarExito(`Mesa ${mesa.numero} asignada a ${cliente.nombre}`);
-      this.cargarListaEspera();
+      
+      this.clientesEsperando = this.clientesEsperando.filter(c => c.id !== cliente.id);
+
     } catch (error) {
       await this.spinner.ocultar();
-      this.toastService.mostrarError('Ocurrió un error al asignar la mesa.');
-      console.error(error);
+      this.toastService.mostrarError('Error al procesar la asignación.');
+      console.error("Error detallado:", error);
+      await this.cargarMesasLibres();
     }
   }
 }
