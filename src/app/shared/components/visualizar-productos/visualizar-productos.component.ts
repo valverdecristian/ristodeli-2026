@@ -8,7 +8,7 @@ import {
 } from '@ionic/angular/standalone';
 import { ProductoService } from 'src/app/core/services/producto.service';
 import { addIcons } from 'ionicons';
-import { timeOutline } from 'ionicons/icons';
+import { timeOutline, chevronUpOutline } from 'ionicons/icons';
 import { AuthService } from '../../../core/services/auth.service';
 import { SupabaseClient } from '@supabase/supabase-js';
 
@@ -35,7 +35,7 @@ export class VisualizarProductosComponent implements OnInit {
   cargando: boolean = false;
 
   constructor() {
-    addIcons({ timeOutline });
+    addIcons({timeOutline,chevronUpOutline});
   }
 
   ngOnInit() {
