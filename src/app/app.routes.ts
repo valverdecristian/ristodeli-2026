@@ -129,8 +129,16 @@ export const routes: Routes = [
   {
     path: 'visualizar-productos/:tipo',
     loadComponent: () => import('./shared/components/visualizar-productos/visualizar-productos.component').then(m => m.VisualizarProductosComponent),
-    canActivate: [authGuard, roleGuard],
-    data: { roles: ['cocinero', 'bartender', 'cantinero', 'admin', 'supervisor'] }
+    // canActivate: [authGuard, roleGuard],
+    // data: { roles: ['cocinero', 'bartender', 'cantinero', 'admin', 'supervisor', 'cliente_reg', 'anonimo'] }
+  },
+  {
+    path: 'detalle-producto/:id',
+    loadComponent: () => import('./shared/components/detalle-producto/detalle-producto.page').then(m => m.DetalleProductoPage)
+  },
+  {
+    path: 'resumen-carrito',
+    loadComponent: () => import('./shared/components/resumen-carrito/resumen-carrito.page').then(m => m.ResumenCarritoPage)
   },
   {
     path: 'pedidos-pendientes/:sector',

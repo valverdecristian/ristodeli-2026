@@ -71,4 +71,24 @@ export class ProductoService {
 
     return data || [];
   }
+
+  /**
+    Obtiene un producto por su ID.
+   */
+  async obtenerPorId(id: string): Promise<any> {
+    const supabase = this.authService.supabaseClient;
+
+    const { data, error } = await supabase
+      .from('productos')
+      .select('*')
+      .eq('id', id)
+      .single();
+
+    if (error) {
+      console.error(`Error al obtener producto por ID (${id}):`, error);
+      throw error;
+    }
+
+    return data;
+  }
 }

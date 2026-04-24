@@ -25,7 +25,7 @@ export class DashboardGestionPage {
   }
 
   irAMenu() {
-    this.router.navigate(['/visualizar-productos/comida']);
+    this.router.navigate(['/visualizar-productos/todos']);
   }
 
   irAEncuestas() {

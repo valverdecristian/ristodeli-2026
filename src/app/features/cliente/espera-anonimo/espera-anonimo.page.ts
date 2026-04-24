@@ -37,22 +37,27 @@ export class EsperaAnonimoPage {
   async solicitarMesa() {
     await this.spinner.mostrar('Registrando en lista de espera...');
 
-    let nombre = 'Cliente Anónimo';
+    let nombre = 'Cliente';
     let foto = '';
-    const anonimoId = localStorage.getItem('anonimo_id');
+    let clienteId: string | null = null;
+    let tipo = 'anonimo';
+
+    const perfil = await this.authService.obtenerPerfilUsuarioActual();
     
-    // Obtenemos los datos actualizados del anónimo desde la DB
-    if (anonimoId) {
-      const { data: dataAnon } = await this.authService.supabaseClient
-        .from('anonimos')
-        .select('nombre, foto')
-        .eq('id', anonimoId)
-        .single();
-        
-      if (dataAnon) {
-        nombre = dataAnon.nombre || nombre;
-        foto = dataAnon.foto || foto;
+    if (perfil) {
+      nombre = perfil.nombres;
+      if ((perfil as any).apellidos) {
+        nombre += ' ' + (perfil as any).apellidos;
       }
+      foto = perfil.foto_url || '';
+      clienteId = perfil.id || null;
+      tipo = perfil.perfil === 'anonimo' ? 'anonimo' : 'registrado';
+    }
+
+    if (!clienteId) {
+      await this.spinner.ocultar();
+      this.toast.mostrarError('No se pudo identificar al usuario.');
+      return;
     }
 
     // Insertamos la solicitud vinculando el cliente_id para el flujo Gamma
@@ -62,8 +67,8 @@ export class EsperaAnonimoPage {
         nombre: nombre, 
         foto: foto, 
         estado: 'pendiente', 
-        tipo: 'anonimo',
-        cliente_id: anonimoId
+        tipo: tipo,
+        cliente_id: clienteId
       }])
       .select();
 

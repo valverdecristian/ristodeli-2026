@@ -2,23 +2,10 @@
     --background: #2d5a27; 
 }
 
-.toolbar-saffron {
-    --background: #f4a261;
-    --color: #4a2c2a;
-}
-
 .title-bold {
     font-weight: 800;
     letter-spacing: 1px;
     text-transform: uppercase;
-}
-
-.actions-container {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: 20px;
-    height: 100%;
 }
 
 .action-btn {
@@ -62,12 +49,6 @@
         font-weight: 600;
         font-style: italic;
     }
-}
-
-.actions-container {
-    display: flex;
-    flex-direction: column;
-    gap: 15px; 
 }
 
 .action-btn {

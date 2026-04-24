@@ -45,7 +45,7 @@
   /* Core brand palette */
   --risto-retro-green: #31603D;
   --risto-vanilla-cream: #F8EECB;
-  --risto-fire-red: #D23D2D;
+  --risto-fire-red: #af3123;
   --risto-saffron: #F5C065;
   --risto-russet: #6E433D;
   --risto-orange: #f6a700;
@@ -199,3 +199,18 @@ ion-loading.custom-spinner-logo {
 .text-vanilla {
   color: var(--risto-vanilla-cream) !important;
 }
+
+/* Botones de dashboard - MANTENERLOS ASÍ */
+.actions-container { 
+    display: flex; 
+    flex-direction: column; 
+    gap: 2.5rem; 
+    padding: 0 10px; 
+    margin-top: 1rem; 
+}
+
+.toolbar-saffron {
+    --background: var(--risto-orange); 
+    --color: #000;
+}
+

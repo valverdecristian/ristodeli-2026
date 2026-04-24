@@ -17,9 +17,12 @@ export class SpinnerService {
    */
   async mostrar(mensaje: string = 'Aguarde un momento...') {
     // Si ya hay uno mostrándose o en proceso de creación, omitimos.
-    if (this.currentLoading || this.isCreating) {
+    if (this.currentLoading) {
+      this.currentLoading.message = mensaje;
       return;
     }
+
+    if (this.isCreating) return;
 
     this.isCreating = true;
     this.showTimestamp = Date.now();

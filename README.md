@@ -47,7 +47,7 @@ De acuerdo a los requerimientos de la cátedra, se detallan las tareas asignadas
 | **Chavez, Alejo** | Escaneo de DNI: Lector de código para carga automática de datos. | 09/04/2026 | 09/04/2026 |
 | **Trkmic Torres, Ignacio** | Dashboard: Vista del Menú del Supervisor. | 10/04/2026 | 12/04/2026 |
 | **Valverde, Cristian Jorge** | Sistema de Notificaciones: Asignación de mesa. | 22/04/2026 | 22/04/2026 |
-| **Valverde, Cristian Jorge** | Validación de QR de Mesa Asignada. |  |  |
+| **Valverde, Cristian Jorge** | Validación de QR de Mesa Asignada. | 16/04/2026 | 24/04/2026 |
 | **Valverde, Cristian Jorge** | Plantillas de Correo: Aceptación/Rechazo. | 15/04/2026 | 15/04/2026 |
 | **Valverde, Cristian Jorge** | Integración de Email Service. | 15/04/2026 | 15/04/2026 |
 | **Trkmic Torres, Ignacio** | Visualización del Menú vía QR. | 17/04/2026 | 17/04/2026 |
@@ -57,18 +57,18 @@ De acuerdo a los requerimientos de la cátedra, se detallan las tareas asignadas
 | **Chavez, Alejo** | Supabase: Nueva Tabla clientes-anonimos. | 16/04/2026 | 16/04/2026 |
 | **Trkmic Torres, Ignacio** | Flujo de Entrada: Cliente Anónimo. | 17/04/2026 | 21/04/2026 |
 | **Chavez, Alejo** | Gestión de Mesas para Admin/Supervisor. | 17/04/2026 | 17/04/2026|
-| **Chavez, Alejo** | Botón "Consulta al Mozo" en Home. |  |  |
-| **Chavez, Alejo** | Notificación masiva de consulta a mozos. |  |  |
-| **Chavez, Alejo** | Componente de Chat Reutilizable. |  |  |
-| **Chavez, Alejo** | Vista de Consultas y Chat del Mozo. |  |  |
-| **Chavez, Alejo** | Gestión de Pedidos: Confirmar/Rechazar. |  |  |
+| **Chavez, Alejo** | Botón "Consulta al Mozo" en Home. | 16/04/2026 | 23/04/2026 |
+| **Chavez, Alejo** | Notificación masiva de consulta a mozos. | 22/04/2026 | ⏳ pendiente |
+| **Chavez, Alejo** | Componente de Chat Reutilizable. | 22/04/2026 | 23/04/2026 |
+| **Chavez, Alejo** | Vista de Consultas y Chat del Mozo. | 23/04/2026 | ⏳ pendiente |
+| **Chavez, Alejo** | Gestión de Pedidos: Confirmar/Rechazar. | ⏳ pendiente | ⏳ pendiente |
 | **Valverde, Cristian Jorge** | Notificación de solicitud de mesa al Metre. | 22/04/2026 | 22/04/2026 |
-| **Valverde, Cristian Jorge** | Vista de Detalle de Producto y Cantidad. |  |  |
-| **Valverde, Cristian Jorge** | Carrito de Compra e Importe Total. |  |  |
-| **Valverde, Cristian Jorge** | Confirmación de Pedido y Aviso al Mozo. |  |  |
-| **Trkmic Torres, Ignacio** | Lógica de acceso por QR de Mesa. |  |  |
-| **Trkmic Torres, Ignacio** | Sistema de Flags para re-escaneo de QR. |  |  |
-| **Trkmic Torres, Ignacio** | Visualización de Encuestas con Gráficos. |  |  |
+| **Valverde, Cristian Jorge** | Vista de Detalle de Producto y Cantidad. | 24/04/2026 | 24/04/2026 |
+| **Valverde, Cristian Jorge** | Carrito de Compra e Importe Total. | 24/04/2026 | 24/04/2026 |
+| **Valverde, Cristian Jorge** | Confirmación de Pedido y Aviso al Mozo. | ⏳ pendiente | ⏳ pendiente |
+| **Trkmic Torres, Ignacio** | Lógica de acceso por QR de Mesa. | 23/04/2026 | 23/04/2026 |
+| **Trkmic Torres, Ignacio** | Sistema de Flags para re-escaneo de QR. | 23/04/2026 | 23/04/2026 |
+| **Trkmic Torres, Ignacio** | Visualización de Encuestas con Gráficos. | 22/04/2026 | 23/04/2026 |
 
 </details>
 
@@ -107,6 +107,17 @@ De acuerdo a los requerimientos de la cátedra, se detallan las tareas asignadas
 🛠️ En Pruebas (terminado, solo requiere validación) <br>
 🏗️ En Desarrollo (lo que se esta haciendo actualmente) <br>
 ⏳ Próximo (planificado para la próxima semana) <br>
+
+<br>
+
+## 🎨 Ver Capturas de Pantalla
+
+<details>
+<summary>Capturas de Pantalla</summary>
+    <img src="assets/capturas/icono.jpeg" alt="icono" width="300">
+    <img src="assets/capturas/splash.jpeg" alt="splash" width="300">
+    <img src="assets/capturas/login.jpeg" alt="login" width="300">
+</details>
 
 <br>
 
@@ -173,7 +184,8 @@ Se utiliza una rama intermedia para asegurar la estabilidad antes de las entrega
   - Base de Datos: PostgreSQL para la persistencia de la lógica de negocio (usuarios, pedidos, mesas).
   - Storage: Gestión de archivos multimedia (avatares y fotos de productos) mediante Buckets.
   - Firebase Cloud Messaging (FCM): Proveedor de mensajería push.
-  - Supabase Edge Functions: Para disparar eventos automáticos (Webhooks) hacia Firebase.
+  - Supabase Edge Functions: Para disparar eventos automáticos (Webhooks) hacia Firebase y procesamiento backend.
+  - Brevo (anteriormente Sendinblue): Servicio transaccional utilizado vía API para el envío de correos electrónicos automáticos (ej. aceptación o rechazo de clientes).
 
 * Capacitor & Hardware Integration (v8):
   - Escaneo de DNI: @capacitor-mlkit/barcode-scanning para la carga automatizada de datos desde el documento nacional de identidad.

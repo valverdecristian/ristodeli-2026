@@ -10,7 +10,6 @@ import {
 import { QRCodeComponent } from 'angularx-qrcode';
 import { Mesa } from '../../../core/models/mesa.model';
 import { ToastService } from '../../../core/services/toast.service';
-import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { MesaService } from '../../../core/services/mesa.service';
 import { SpinnerService } from '../../../core/services/spinner.service';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
@@ -52,7 +51,6 @@ export class GestionMesasPage {
 
   async generarMesa() {
     if (this.nuevaMesa.numero <= 0 || this.nuevaMesa.comensales <= 0) {
-      await Haptics.impact({ style: ImpactStyle.Heavy });
       this.toastService.mostrarError('El número de mesa y comensales debe ser mayor a 0');
       return;
     }
@@ -63,7 +61,6 @@ export class GestionMesasPage {
       const existe = await this.mesaService.verificarSiExiste(this.nuevaMesa.numero);
       if (existe) {
         await this.spinnerService.ocultar();
-        await Haptics.impact({ style: ImpactStyle.Heavy });
         this.toastService.mostrarError(`La Mesa N° ${this.nuevaMesa.numero} ya existe.`);
         return;
       }
@@ -72,7 +69,7 @@ export class GestionMesasPage {
       // En lugar de JSON, guardamos el identificador que el cliente escanea.
       this.nuevaMesa.qr_data = `MESA_${this.nuevaMesa.numero}`; 
   
-      const mesaFinal = {
+      const mesaFinal: Mesa = {
         numero: this.nuevaMesa.numero,
         comensales: this.nuevaMesa.comensales,
         tipo: this.nuevaMesa.tipo,
@@ -94,7 +91,6 @@ export class GestionMesasPage {
   
     } catch (error) {
       await this.spinnerService.ocultar();
-      await Haptics.vibrate();
       this.toastService.mostrarError('Ocurrió un error al guardar la mesa.');
       console.error(error);
     }
