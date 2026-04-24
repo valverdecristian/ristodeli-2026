@@ -1,0 +1,63 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar color="warning">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/visualizar-productos/todos" color="dark"></ion-back-button>
+    </ion-buttons>
+    <ion-title class="text-russet title-bold">Tu Pedido</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="risto-background">
+  @if (items.length === 0 && !procesando) {
+    <div class="empty-state">
+      <p>Tu carrito está vacío.</p>
+      <ion-button routerLink="/visualizar-productos/todos" class="btn-volver">Volver al Menú</ion-button>
+    </div>
+  } @else if (items.length > 0) {
+    <div class="carrito-container">
+      <div class="lista-items">
+        @for (item of items; track item.producto.id) {
+          <ion-card class="item-card">
+            <div class="item-content">
+              <div class="item-info">
+                <span class="cantidad">{{ item.cantidad }}x</span>
+                <div class="detalles">
+                  <h3>{{ item.producto.nombre }}</h3>
+                  <p class="categoria-label">{{ item.producto.tipo | uppercase }}</p>
+                </div>
+              </div>
+              <div class="item-actions">
+                <span class="precio-subtotal">${{ item.producto.precio * item.cantidad }}</span>
+                <ion-button fill="clear" color="danger" (click)="eliminarItem(item.producto.id)">
+                  <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+                </ion-button>
+              </div>
+            </div>
+          </ion-card>
+        }
+      </div>
+
+      <div class="footer-resumen">
+        <div class="tiempo-row">
+          <span><ion-icon name="time-outline"></ion-icon> TIEMPO ESTIMADO</span>
+          <span class="tiempo-valor">{{ tiempoTotal }} MIN</span>
+        </div>
+        <div class="total-row">
+          <span>TOTAL</span>
+          <span class="total-precio">${{ total }}</span>
+        </div>
+        <ion-button 
+          expand="block" 
+          class="btn-confirmar" 
+          (click)="confirmarPedido()" 
+          [disabled]="procesando">
+          @if (procesando) {
+            Enviando a cocina...
+          } @else {
+            CONFIRMAR PEDIDO
+          }
+        </ion-button>
+      </div>
+    </div>
+  }
+</ion-content>
