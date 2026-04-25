@@ -16,22 +16,22 @@
     width: 100%;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
     scroll-snap-align: center;
     scroll-snap-stop: always;
     margin: 0;
-    padding: 10px 0;
+    padding: 20px 0 20px 0;
     box-sizing: border-box;
 }
 
 .categoria-titulo {
-    color: #fdfaf0;
+    color: var(--risto-vanilla-cream);
     font-size: 2rem;
     font-weight: 900;
     margin: 0 0 15px 20px;
     letter-spacing: 1px;
     text-transform: uppercase;
-    border-bottom: 2px solid #f5a623;
+    border-bottom: 2px solid var(--risto-saffron);
     display: inline-block;
     padding-bottom: 5px;
     align-self: flex-start;
@@ -57,20 +57,20 @@
 
 .producto-card {
     width: 100%;
-    height: 480px; 
-    --background: #fdfaf0; 
+    height: 68vh; 
+    --background: var(--risto-vanilla-cream); 
     border-radius: 30px;
     margin: 0;
     display: flex;
     flex-direction: column;
     box-shadow: 0 10px 20px rgba(0,0,0,0.3);
-    border: 2px solid #f5a623; 
+    border: 2px solid var(--risto-saffron); 
 }
 
 .carrusel-fotos {
   height: 50%;
   position: relative;
-  border-bottom: 3px solid #f5a623; 
+  border-bottom: 3px solid var(--risto-saffron); 
   border-top-left-radius: 25px;
   border-top-right-radius: 25px;
   overflow: hidden; 
@@ -149,7 +149,7 @@
 
 .descripcion {
     color: #3d3d3d; 
-    font-size: 0.9rem;
+    font-size: 1.2rem;
     line-height: 1.3;
     font-style: italic;
     margin-top: 10px;
@@ -164,7 +164,7 @@
     gap: 5px;
     color: #1e3d1a;
     font-weight: bold;
-    font-size: 0.7rem;
+    font-size: 1rem;
     padding-top: 10px;
     margin-top: auto;
     animation: bounce-horizontal 2s infinite;

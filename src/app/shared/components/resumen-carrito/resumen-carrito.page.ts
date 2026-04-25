@@ -18,7 +18,7 @@ import { trashOutline, checkmarkCircleOutline, timeOutline } from 'ionicons/icon
   standalone: true,
   imports: [
     IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, 
-    IonBackButton, IonIcon, IonButton, IonItem, IonLabel, IonList, CommonModule, IonCard
+    IonBackButton, IonIcon, IonButton, CommonModule, IonCard
   ]
 })
 export class ResumenCarritoPage implements OnInit {
