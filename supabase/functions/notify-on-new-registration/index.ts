@@ -54,8 +54,8 @@ serve(async (req) => {
   const payload = await req.json();
   console.log("Payload recibido:", JSON.stringify(payload));
   
-  // 1. Mandar correo al cliente registrado
-  if (payload.record?.email) {
+  // 1. Mandar correo al cliente registrado (solo si es cliente_reg)
+  if (payload.record?.email && payload.record?.perfil === 'cliente_reg') {
     const htmlAvisoPendiente = `
     <div style="font-family: Tahoma, sans-serif; max-width: 600px; margin: 0 auto; background-color: #F8EECB; border-radius: 12px; overflow: hidden; border: 1px solid #31603D;">
       <div style="background-color: #31603D; padding: 25px; text-align: center;">
@@ -96,6 +96,11 @@ serve(async (req) => {
 
   if (!admins || admins.length === 0) {
     return new Response(JSON.stringify({ message: "No admins to notify" }), { headers: { "Content-Type": "application/json" } });
+  }
+
+  // Si no es un cliente registrado, no notificamos a los administradores por push
+  if (payload.record?.perfil !== 'cliente_reg') {
+    return new Response(JSON.stringify({ message: "No es cliente_reg, no se requiere aprobación ni notificación push." }), { headers: { "Content-Type": "application/json" } });
   }
 
   // extract tokens and filter nulls or empties

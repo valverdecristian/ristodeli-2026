@@ -1,6 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { createClient, SupabaseClient } from '@supabase/supabase-js'; 
-import { environment } from 'src/environments/environment';
+import { AuthService } from './auth.service';
 import { ToastService } from './toast.service'; 
 import { Haptics, ImpactStyle } from '@capacitor/haptics'; 
 
@@ -18,12 +17,14 @@ export interface Pedido {
   providedIn: 'root'
 })
 export class PedidoService {
-  private supabase: SupabaseClient;
+  private authService = inject(AuthService);
   private toastService = inject(ToastService);
 
-  constructor() {
-    this.supabase = createClient(environment.supabaseUrl, environment.supabaseKey);
+  private get supabase() {
+    return this.authService.supabaseClient;
   }
+
+  constructor() {}
 
   async obtenerPedidosPorSectores(categorias: string[]) {
     const { data, error } = await this.supabase
