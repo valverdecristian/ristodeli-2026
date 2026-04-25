@@ -81,7 +81,7 @@ export class AuthService {
   }
 
   /**
-   * Registra un nuevo usuario en la autenticación de Supabase y luego inserta sus datos extendidos en la tabla `usuarios`.
+   * Registra un nuevo usuario (Cliente) en la autenticación de Supabase.
    */
   async registrar(password: string, detalles: DetalleRegistro) {
     // 1. Crear el usuario en auth.users
@@ -104,6 +104,44 @@ export class AuthService {
       perfil: detalles.perfil,
       foto_url: detalles.foto_url || null,
       push_token: await this.notificacionService.obtenerPushToken() || null
+    };
+
+    const { data: profileData, error: profileError } = await this.supabase
+      .from('usuarios')
+      .insert([nuevoPerfil]);
+
+    if (profileError) throw profileError;
+
+    return { authData, profileData };
+  }
+
+  /**
+   * Registra un nuevo Empleado por parte de un Admin/Supervisor.
+   * Usa un cliente temporal para no sobreescribir la sesión activa del creador.
+   */
+  async registrarEmpleado(password: string, detalles: DetalleRegistro) {
+    const tempSupabase = createClient(environment.supabaseUrl, environment.supabaseKey, {
+      auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false }
+    });
+
+    const { data: authData, error: authError } = await tempSupabase.auth.signUp({
+      email: detalles.email,
+      password: password,
+    });
+
+    if (authError) throw authError;
+    if (!authData.user) throw new Error('No se devolvió un usuario tras el registro.');
+
+    const nuevoPerfil = {
+      id: authData.user.id,
+      email: detalles.email,
+      nombres: detalles.nombres,
+      apellidos: detalles.apellidos,
+      dni: detalles.dni,
+      cuil: detalles.cuil,
+      perfil: detalles.perfil,
+      foto_url: detalles.foto_url || null,
+      push_token: null // Importante: el empleado aún no tiene token (el token actual es del admin)
     };
 
     const { data: profileData, error: profileError } = await this.supabase

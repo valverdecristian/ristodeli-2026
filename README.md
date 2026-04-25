@@ -86,7 +86,7 @@ De acuerdo a los requerimientos de la cátedra, se detallan las tareas asignadas
 | 6. Verificar ingreso del cliente registrado | dueño o supervisor | 🚀 Listo para Demo |  |
 | 7. Rechazar a un cliente registrado | dueño o supervisor | 🚀 Listo para Demo |  |
 | 8. Aceptar a un cliente registrado | dueño o supervisor | 🚀 Listo para Demo |  |
-| 9. Ingresar al local | cliente anónimo | 🏗️ En Desarrollo |  |
+| 9. Ingresar al local | cliente anónimo | 🚀 Listo para Demo |  |
 | 10. Asignar una mesa a un cliente registrado | metre | 🏗️ En Desarrollo |  |
 | 11. Ver el listado de los productos | cliente registrado o anónimo | 🏗️ En Desarrollo |  |
 | 12. Realizar el pedido para todos los comensales de la mesa | cliente registrado o anónimo | 🏗️ En Desarrollo |  |

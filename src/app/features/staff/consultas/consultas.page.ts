@@ -1,9 +1,9 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { Router } from '@angular/router';
-import { environment } from 'src/environments/environment';
+import { AuthService } from 'src/app/core/services/auth.service';
+import { SupabaseClient } from '@supabase/supabase-js';
 
 interface ChatResumen {
   mesa_id: string;
@@ -21,14 +21,13 @@ interface ChatResumen {
 })
 export class ConsultasPage implements OnInit {
 
-  private supabase: SupabaseClient;
+  private authService = inject(AuthService);
+  private supabase: SupabaseClient = this.authService.supabaseClient;
   private router = inject(Router);
 
   chats: ChatResumen[] = [];
 
-  constructor() {
-    this.supabase = createClient(environment.supabaseUrl, environment.supabaseKey);
-  }
+  constructor() {}
 
   ngOnInit() {
     this.cargarConsultas();

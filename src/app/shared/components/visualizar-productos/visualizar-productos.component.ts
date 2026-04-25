@@ -48,9 +48,24 @@ export class VisualizarProductosComponent implements OnInit {
     this.cargarProductos();
   }
 
+  defaultHref: string = '/home-cliente';
+
   async cargarProductos() {
     this.cargando = true;
     try {
+      const currentUser = this.authService.currentUser();
+      const perfil = currentUser?.perfil || 'anonimo';
+
+      switch (perfil) {
+        case 'cocinero': this.defaultHref = '/home-cocinero'; break;
+        case 'cantinero': this.defaultHref = '/home-cantinero'; break;
+        case 'cliente_reg':
+        case 'anonimo': this.defaultHref = '/home-cliente'; break;
+        case 'admin': this.defaultHref = '/admin'; break;
+        case 'supervisor': this.defaultHref = '/supervisor'; break;
+        default: this.defaultHref = '/login'; break;
+      }
+
       const { data: result, error } = await this.supabase
         .from('productos')
         .select('*')
@@ -61,6 +76,14 @@ export class VisualizarProductosComponent implements OnInit {
       this.categorias[0].productos = allProducts.filter(p => p.tipo === 'plato');
       this.categorias[1].productos = allProducts.filter(p => p.tipo === 'bebida');
       this.categorias[2].productos = allProducts.filter(p => p.tipo === 'postre');
+
+      if (perfil === 'cantinero') {
+        this.categorias = this.categorias.filter(c => c.tipo === 'bebida');
+        this.titulo = 'Carta de Bebidas';
+      } else if (perfil === 'cocinero') {
+        this.categorias = this.categorias.filter(c => c.tipo !== 'bebida');
+        this.titulo = 'Carta de Platos y Postres';
+      }
 
     } catch (error) {
       console.error(error);
