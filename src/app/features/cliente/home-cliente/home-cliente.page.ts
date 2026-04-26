@@ -68,12 +68,18 @@ export class HomeClientePage implements OnInit {
   }
 
   private async validarAccesoMesa(mesaCodigo: string) {
-    const anonimoId = localStorage.getItem('anonimo_id');
-    
+    const perfil = await this.authService.obtenerPerfilUsuarioActual();
+    const clienteId = perfil?.id;
+
+    if (!clienteId) {
+      this.toast.mostrarError('No se pudo identificar al usuario.');
+      return;
+    }
+
     const { data: solicitud } = await this.authService.supabaseClient
       .from('lista_espera')
       .select('*')
-      .eq('cliente_id', anonimoId)
+      .eq('cliente_id', clienteId)
       .eq('mesa_asignada', mesaCodigo)
       .single();
 

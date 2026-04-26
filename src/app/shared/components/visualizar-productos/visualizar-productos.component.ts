@@ -1,14 +1,15 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { 
   IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, 
   IonBackButton, IonCard, IonCardHeader,  
-  IonCardContent,IonIcon
+  IonCardContent,IonIcon, IonFab, IonFabButton
 } from '@ionic/angular/standalone';
 import { ProductoService } from 'src/app/core/services/producto.service';
+import { CarritoService } from 'src/app/core/services/carrito.service';
 import { addIcons } from 'ionicons';
-import { timeOutline } from 'ionicons/icons';
+import { timeOutline, chevronForwardOutline, cartOutline } from 'ionicons/icons';
 import { AuthService } from '../../../core/services/auth.service';
 import { SupabaseClient } from '@supabase/supabase-js';
 
@@ -20,53 +21,70 @@ import { SupabaseClient } from '@supabase/supabase-js';
   imports: [
     IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, 
     IonBackButton, IonCard, IonCardHeader, IonCardContent,
-    CommonModule, IonIcon
+    CommonModule, IonIcon, IonFab, IonFabButton, RouterModule
   ]
 })
 export class VisualizarProductosComponent implements OnInit {
   private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  public carritoService = inject(CarritoService);
   private productoService = inject(ProductoService);
   private authService = inject(AuthService);
   private supabase: SupabaseClient = this.authService.supabaseClient;
 
-  productos: any[] = [];
-  tipo: string = '';
-  titulo: string = '';
+  categorias = [
+    { tipo: 'plato', titulo: 'Platos', productos: [] as any[] },
+    { tipo: 'bebida', titulo: 'Bebidas', productos: [] as any[] },
+    { tipo: 'postre', titulo: 'Postres', productos: [] as any[] }
+  ];
+  titulo: string = 'Carta Completa';
   cargando: boolean = false;
 
   constructor() {
-    addIcons({ timeOutline });
+    addIcons({timeOutline,chevronForwardOutline,cartOutline});
   }
 
   ngOnInit() {
-    // Capturamos el tipo de la URL: /visualizar-productos/plato
-    this.tipo = this.route.snapshot.paramMap.get('tipo') || 'plato';
-    
-    const titulos: any = {
-      plato: 'Menú de Platos',
-      postre: 'Menú de Postres',
-      bebida: 'Menú de Bebidas'
-    };
-    this.titulo = titulos[this.tipo] || 'Productos';
-    
     this.cargarProductos();
   }
+
+  defaultHref: string = '/home-cliente';
 
   async cargarProductos() {
     this.cargando = true;
     try {
-      let data;
-      if (this.tipo === 'todos') {
+      const currentUser = this.authService.currentUser();
+      const perfil = currentUser?.perfil || 'anonimo';
 
-        const { data: result, error } = await this.supabase
-          .from('productos')
-          .select('*')
-          .eq('estado', 'disponible'); 
-        data = result;
-      } else {
-        data = await this.productoService.obtenerPorTipo(this.tipo);
+      switch (perfil) {
+        case 'cocinero': this.defaultHref = '/home-cocinero'; break;
+        case 'cantinero': this.defaultHref = '/home-cantinero'; break;
+        case 'cliente_reg':
+        case 'anonimo': this.defaultHref = '/home-cliente'; break;
+        case 'admin': this.defaultHref = '/admin'; break;
+        case 'supervisor': this.defaultHref = '/supervisor'; break;
+        default: this.defaultHref = '/login'; break;
       }
-      this.productos = data || [];
+
+      const { data: result, error } = await this.supabase
+        .from('productos')
+        .select('*')
+        .eq('estado', 'disponible'); 
+      
+      const allProducts = result || [];
+      
+      this.categorias[0].productos = allProducts.filter(p => p.tipo === 'plato');
+      this.categorias[1].productos = allProducts.filter(p => p.tipo === 'bebida');
+      this.categorias[2].productos = allProducts.filter(p => p.tipo === 'postre');
+
+      if (perfil === 'cantinero') {
+        this.categorias = this.categorias.filter(c => c.tipo === 'bebida');
+        this.titulo = 'Carta de Bebidas';
+      } else if (perfil === 'cocinero') {
+        this.categorias = this.categorias.filter(c => c.tipo !== 'bebida');
+        this.titulo = 'Carta de Platos y Postres';
+      }
+
     } catch (error) {
       console.error(error);
     } finally {
@@ -74,4 +92,7 @@ export class VisualizarProductosComponent implements OnInit {
     }
   }
 
+  irADetalle(id: string) {
+    this.router.navigate(['/detalle-producto', id]);
+  }
 }

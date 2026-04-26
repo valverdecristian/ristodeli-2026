@@ -28,7 +28,8 @@ export class ManagementActionsComponent implements OnInit {
     
     // Acciones de Cocina 
     { title: 'Agregar Plato', icon: 'fast-food-outline', color: '#3880ff', action: 'add_plato', roles: ['cocinero'] },
-    { title: 'Menú de Platos', icon: 'restaurant-outline', color: '#3880ff', action: 'view_menu_platos', roles: ['cocinero'] },
+    { title: 'Agregar Postre', icon: 'ice-cream-outline', color: '#3880ff', action: 'add_postre', roles: ['cocinero'] },
+    { title: 'Menú de Platos y Postres', icon: 'restaurant-outline', color: '#3880ff', action: 'view_menu_platos', roles: ['cocinero'] },
     { title: 'Pedidos Pendientes', icon: 'clipboard-outline', color: '#2dd36f', action: 'view_orders', roles: ['cocinero'] },
     
     // Acciones de Bar 

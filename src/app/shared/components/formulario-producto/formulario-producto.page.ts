@@ -11,7 +11,7 @@ import { FotoService } from '../../../core/services/foto.service';
 import { ProductoService } from '../../../core/services/producto.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { SpinnerService } from '../../../core/services/spinner.service';
-import { Haptics, ImpactStyle } from '@capacitor/haptics';
+
 import { cameraOutline, trashOutline, cameraReverseOutline, addCircleOutline } from 'ionicons/icons';
 import { addIcons } from 'ionicons';
 
@@ -101,7 +101,6 @@ export class FormularioProductoComponent implements OnInit {
 
     // Validación de campos y requisito de 3 fotos (Punto 11)
     if (this.productoForm.invalid || this.fotosPreview.length !== 3) {
-      await Haptics.impact({ style: ImpactStyle.Heavy }); 
       this.toastService.mostrarError('Debe completar todos los campos y las 3 fotos obligatorias.');
       return;
     }
@@ -135,7 +134,6 @@ export class FormularioProductoComponent implements OnInit {
 
     } catch (e) {
       await this.spinnerService.ocultar();
-      await Haptics.vibrate();
       this.toastService.mostrarError('Error al guardar el producto.');
     }
   }
