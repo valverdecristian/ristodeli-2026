@@ -1,9 +1,19 @@
-<div class="quick-access-container">
-  @for (profile of profiles; track profile.perfil) {
+<div class="fab-wrapper" [class.open]="open">
+
+  <!-- Botón principal -->
+  <ion-button class="main-fab" (click)="toggleMenu()" color="warning">
+    <ion-icon [name]="open ? 'close-circle' : 'chevron-down-circle-outline'"></ion-icon>
+  </ion-button>
+
+  <!-- Botones -->
+  <div class="profiles-grid">
+    @for (profile of profiles; track profile.perfil) {
     <div class="profile-item" (click)="selectProfile(profile)">
       <ion-button color="warning" class="circular-button">
         <ion-icon [name]="profile.icon" slot="icon-only"></ion-icon>
       </ion-button>
     </div>
-  }
+    }
+  </div>
+
 </div>

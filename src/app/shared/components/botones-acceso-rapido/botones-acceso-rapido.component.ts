@@ -2,8 +2,9 @@ import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonButton, IonIcon } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { shieldOutline, shirtOutline, notificationsOutline, flameOutline, wineOutline, clipboardOutline, man } from 'ionicons/icons';
+import { shieldOutline, shirtOutline, notificationsOutline, flameOutline, wineOutline, clipboardOutline, man, chevronDownCircleOutline, closeCircle } from 'ionicons/icons';
 import { AuthService } from '../../../core/services/auth.service';
+
 
 @Component({
   selector: 'app-botones-acceso-rapido',
@@ -14,6 +15,7 @@ import { AuthService } from '../../../core/services/auth.service';
 })
 export class BotonesAccesoRapidoComponent implements OnInit {
 
+  open = false;
   @Output() credentialsSelected = new EventEmitter<{ email: string, password: string }>();
 
   profiles = [ //ver en el futuro posibles cambios de iconos por unos mejores (diseñados por ALEJO (IA))
@@ -26,10 +28,14 @@ export class BotonesAccesoRapidoComponent implements OnInit {
   ];
 
   constructor(private supabaseService: AuthService) {
-    addIcons({ shieldOutline, shirtOutline, notificationsOutline, clipboardOutline, flameOutline, wineOutline, man });
+    addIcons({ shieldOutline, shirtOutline, notificationsOutline, clipboardOutline, flameOutline, wineOutline, man, chevronDownCircleOutline, closeCircle });
   }
 
   ngOnInit() { }
+
+  toggleMenu() {
+    this.open = !this.open;
+  }
 
   async selectProfile(profile: any) {
     try {
@@ -42,6 +48,7 @@ export class BotonesAccesoRapidoComponent implements OnInit {
 
       if (email) {
         this.credentialsSelected.emit({ email, password: '12345678' });
+        this.open = false;
       } else {
         console.warn(`No se encontró un correo para el perfil: ${profile.perfil}`);
       }
