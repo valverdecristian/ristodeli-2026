@@ -36,7 +36,11 @@
           Registrarse como anónimo
         </ion-button>
       </form>
-      <app-botones-acceso-rapido (credentialsSelected)="onCredentialsSelected($event)"></app-botones-acceso-rapido>
+
+      <div class="quick-access-container">
+        <app-botones-acceso-rapido (credentialsSelected)="onCredentialsSelected($event)"></app-botones-acceso-rapido>
+      </div>
+
     </div>
 
   </div>
