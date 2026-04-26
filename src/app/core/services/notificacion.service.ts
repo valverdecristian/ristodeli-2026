@@ -1,21 +1,20 @@
-import { inject, Injectable } from '@angular/core';
+import { inject, Injectable, Injector } from '@angular/core';
 import { PushNotifications, Token, ActionPerformed, PushNotificationSchema } from '@capacitor/push-notifications';
 import { Platform } from '@ionic/angular/standalone';
-import { ToastService } from './toast.service';
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import { environment } from 'src/environments/environment';
+import { AuthService } from './auth.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class NotificacionService {
   private platform = inject(Platform);
-  private toastService = inject(ToastService);
-  private supabase: SupabaseClient;
+  private injector = inject(Injector);
 
-  constructor() {
-    this.supabase = createClient(environment.supabaseUrl, environment.supabaseKey);
+  private get supabase() {
+    return this.injector.get(AuthService).supabaseClient;
   }
+
+  constructor() {}
 
   async inicializarPushNotifications(userId?: string) {
     if (this.platform.is('capacitor')) {

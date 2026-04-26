@@ -7,7 +7,7 @@ import { BotonesAccesoRapidoComponent } from '../../../shared/components/botones
 import { AuthService } from '../../../core/services/auth.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { SpinnerService } from '../../../core/services/spinner.service';
-import { Haptics, ImpactStyle } from '@capacitor/haptics';
+
 
 @Component({
   selector: 'app-login',
@@ -64,8 +64,6 @@ export class LoginPage implements OnInit {
   async login() {
     if (this.loginForm.invalid) {
       this.loginForm.markAllAsTouched();
-
-      Haptics.impact({ style: ImpactStyle.Heavy }).catch(() => {}); 
       this.toastService.mostrarError('Por favor, revise que los datos ingresados sean correctos.');
       return;
     }
@@ -84,8 +82,6 @@ export class LoginPage implements OnInit {
       if (perfilUsuario.perfil === 'pendiente') {
         await this.authService.supabaseClient.auth.signOut();
         await this.spinnerService.ocultar();
-        
-        Haptics.impact({ style: ImpactStyle.Medium }).catch(() => {});
         this.toastService.mostrarAdvertencia('Tu cuenta aún está pendiente de aprobación.');
         return;
       }
@@ -93,8 +89,6 @@ export class LoginPage implements OnInit {
       if (perfilUsuario.perfil === 'rechazado') {
         await this.authService.supabaseClient.auth.signOut();
         await this.spinnerService.ocultar();
-        
-        Haptics.vibrate().catch(() => {}); 
         this.toastService.mostrarError('Tu solicitud de acceso ha sido rechazada.');
         return;
       }
@@ -116,8 +110,6 @@ export class LoginPage implements OnInit {
   
     } catch (e: any) {
       await this.spinnerService.ocultar();
-      
-      Haptics.vibrate().catch(() => {});
       
       console.error('Error en Login:', e);
       

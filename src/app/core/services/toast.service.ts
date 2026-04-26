@@ -2,6 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { ToastController } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { checkmarkCircleOutline, warningOutline, informationCircleOutline } from 'ionicons/icons';
+import { Haptics } from '@capacitor/haptics';
 
 @Injectable({
   providedIn: 'root'
@@ -31,6 +32,7 @@ export class ToastService {
    * Muestra un toast de error en la parte superior.
    */
   async mostrarError(mensaje: string, duracion: number = 3000) {
+    Haptics.vibrate().catch(() => {});
     const toast = await this.toastController.create({
       message: mensaje,
       duration: duracion,
@@ -45,6 +47,7 @@ export class ToastService {
    * Muestra un toast de advertencia/información en la parte superior.
    */
   async mostrarAdvertencia(mensaje: string, duracion: number = 3000) {
+    Haptics.vibrate().catch(() => {});
     const toast = await this.toastController.create({
       message: mensaje,
       duration: duracion,

@@ -1,5 +1,5 @@
 <ion-header class="ion-no-border">
-  <ion-toolbar class="toolbar-saffron">
+  <ion-toolbar color="warning">
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/home-cliente"></ion-back-button>
     </ion-buttons>
@@ -8,11 +8,12 @@
 </ion-header>
 
 <ion-content class="ion-padding bg-green">
-  <div class="logo-header fade-in">
-    <img src="assets/icon/logo.png" alt="Ristodeli Logo" class="dashboard-logo">
-    <p class="welcome-text">¡Hola! ¿Qué vamos a pedir hoy?</p>
+  <div class="welcome-container fade-in">
+    <div class="logo-wrapper">
+      <img src="assets/icon/favicon.ico" class="spin-logo" alt="Logo Ristodeli" />
+    </div>
+    <h1 class="text-cream welcome-title typewriter-text">¡Hola! ¿Qué vamos a pedir hoy?</h1>
   </div>
-
   <div class="actions-container fade-in">
     <ion-button expand="block" class="action-btn" (click)="irAMenu()">
       <ion-icon slot="start" name="restaurant-outline"></ion-icon>

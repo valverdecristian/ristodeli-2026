@@ -46,12 +46,19 @@ export class CrearEmpleadoPage {
         }
       }
 
-      // 2. Usar Auth Service para guardar
-      await this.authService.registrar(datos.password, datos);
+      // 2. Usar Auth Service para guardar sin afectar sesión actual
+      await this.authService.registrarEmpleado(datos.password, datos);
 
       await this.spinnerService.ocultar();
       this.toastService.mostrarExito('¡Empleado creado correctamente!');
-      this.router.navigate(['/admin']);
+      
+      // 3. Volver al home de quien lo creó (admin o supervisor)
+      const currentUser = this.authService.currentUser();
+      if (currentUser?.perfil === 'supervisor') {
+        this.router.navigate(['/supervisor']);
+      } else {
+        this.router.navigate(['/admin']);
+      }
 
     } catch (error: any) {
       await this.spinnerService.ocultar();
