@@ -3,13 +3,9 @@ import { ActivatedRoute } from '@angular/router';
 import { Chart, registerables } from 'chart.js';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { CommonModule } from '@angular/common';
-<<<<<<< HEAD
-import { IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonBackButton, IonSpinner } from '@ionic/angular/standalone';
-=======
 import { 
   IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, 
   IonBackButton, IonSpinner } from '@ionic/angular/standalone';
->>>>>>> 7cd9b6c06c74bb8f88f6675fc2627cfdbd9509ce
 import { addIcons } from 'ionicons';
 import { informationCircleOutline, statsChartOutline, pieChart, barChart } from 'ionicons/icons';
 
@@ -22,11 +18,7 @@ Chart.register(...registerables);
   standalone: true,
   imports: [IonSpinner, 
     CommonModule, IonContent, IonHeader, IonTitle, IonToolbar, 
-<<<<<<< HEAD
-    IonButtons, IonBackButton, IonSpinner
-=======
     IonButtons, IonBackButton
->>>>>>> 7cd9b6c06c74bb8f88f6675fc2627cfdbd9509ce
   ]
 })
 export class GraficosEncuestasPage implements AfterViewInit {
