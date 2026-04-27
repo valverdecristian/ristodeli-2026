@@ -62,62 +62,63 @@ export class LoginPage implements OnInit {
   }
 
   async login() {
-    if (this.loginForm.invalid) {
-      this.loginForm.markAllAsTouched();
-      this.toastService.mostrarError('Por favor, revise que los datos ingresados sean correctos.');
+  if (this.loginForm.invalid) {
+    this.loginForm.markAllAsTouched();
+    this.toastService.mostrarError('Por favor, revise que los datos ingresados sean correctos.');
+    return;
+  }
+
+  const { email, password } = this.loginForm.value;
+
+  this.spinnerService.mostrar('Iniciando sesión...');
+
+  try {
+    await this.authService.ingresar(email, password);
+
+    const perfilUsuario = await this.authService.obtenerPerfilUsuarioActual();
+
+    if (!perfilUsuario) {
+      throw new Error('No se pudo recuperar el perfil del usuario.');
+    }
+
+    //pendiente
+    if (perfilUsuario.perfil === 'pendiente') {
+      await this.authService.supabaseClient.auth.signOut();
+      this.toastService.mostrarAdvertencia('Tu cuenta aún está pendiente de aprobación.');
       return;
     }
-  
-    const { email, password } = this.loginForm.value;
-  
-    try {
-      await this.spinnerService.mostrar('Iniciando sesión...');
-      await this.authService.ingresar(email, password);
-      const perfilUsuario = await this.authService.obtenerPerfilUsuarioActual();
-  
-      if (!perfilUsuario) {
-        throw new Error('No se pudo recuperar el perfil del usuario.');
-      }
 
-      if (perfilUsuario.perfil === 'pendiente') {
-        await this.authService.supabaseClient.auth.signOut();
-        await this.spinnerService.ocultar();
-        this.toastService.mostrarAdvertencia('Tu cuenta aún está pendiente de aprobación.');
-        return;
-      }
-
-      if (perfilUsuario.perfil === 'rechazado') {
-        await this.authService.supabaseClient.auth.signOut();
-        await this.spinnerService.ocultar();
-        this.toastService.mostrarError('Tu solicitud de acceso ha sido rechazada.');
-        return;
-      }
-      
-      await this.spinnerService.ocultar();
-      
-      
-      try {
-        const audio = new Audio('assets/sounds/exito.mp3');
-        audio.play().catch(err => console.log('Audio no disponible'));
-      } catch (audioErr) {
-        console.warn("Fallo el objeto Audio");
-      }
-
-      this.toastService.mostrarExito(`¡Bienvenido/a ${perfilUsuario.nombres}!`);
-      
-      
-      await this.authService.redirigirSegunPerfil();
-  
-    } catch (e: any) {
-      await this.spinnerService.ocultar();
-      
-      console.error('Error en Login:', e);
-      
-      const msg = e.message?.includes('Invalid login credentials') 
-        ? 'Correo o contraseña incorrectos.' 
-        : 'Error de conexión. Reintente.';
-        
-      this.toastService.mostrarError(msg);
+    //rechazado
+    if (perfilUsuario.perfil === 'rechazado') {
+      await this.authService.supabaseClient.auth.signOut();
+      this.toastService.mostrarError('Tu solicitud de acceso ha sido rechazada.');
+      return;
     }
+
+    //cerrar spinner ANTES de UI final
+    await this.spinnerService.ocultar();
+
+    //éxito
+    this.toastService.mostrarExito(`¡Bienvenido/a ${perfilUsuario.nombres}!`);
+
+    //sonido
+    const audio = new Audio('assets/sounds/exito.mp3');
+    audio.play().catch(() => {});
+
+    //navegación
+    await this.authService.redirigirSegunPerfil();
+
+  } catch (e: any) {
+    console.error('Error en Login:', e);
+
+    this.toastService.mostrarError(
+      e?.message?.includes('Invalid login credentials')
+        ? 'Correo o contraseña incorrectos.'
+        : 'Error de conexión. Reintente.'
+    );
+
+  } finally {
+    await this.spinnerService.ocultar(); //siempre se ejecuta
   }
+}
 }

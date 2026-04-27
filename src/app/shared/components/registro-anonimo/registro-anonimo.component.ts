@@ -47,8 +47,8 @@ export class RegistroAnonimoComponent {
 
   async tomarFotografia() {
     const foto = await this.fotoService.sacarFoto();
-    if (foto && foto.dataUrl) {
-      this.fotoUrlTemporal = foto.dataUrl;
+    if (foto && foto.webPath) {
+      this.fotoUrlTemporal = foto.webPath;
       this.cdr.detectChanges();
     }
   }
@@ -69,23 +69,33 @@ export class RegistroAnonimoComponent {
     await this.spinnerService.mostrar('Ingresando como anónimo...');
 
     try {
-      const nombre = this.registroForm.get('nombre')?.value;
-      let fotoUrlDefinitiva = null;
+  const nombre = this.registroForm.get('nombre')?.value;
+  let fotoUrlDefinitiva = null;
 
-      // 1. Subir foto al Storage
-      if (this.fotoUrlTemporal) {
-        const timestamp = new Date().getTime();
-        const base64Data = this.fotoUrlTemporal.split(',')[1];
-        const res = await this.authService.supabaseClient.storage
+  // 1. Subir foto al Storage
+  if (this.fotoUrlTemporal) {
+    const timestamp = new Date().getTime();
+
+    //convertir webPath a blob
+    const response = await fetch(this.fotoUrlTemporal);
+    const blob = await response.blob();
+
+    const res = await this.authService.supabaseClient.storage
+      .from('avatares')
+      .upload(`anonimo_${timestamp}.jpeg`, blob, {
+        upsert: true,
+        contentType: 'image/jpeg'
+      });
+
+    if (res.data) {
+      const { data: { publicUrl } } =
+        this.authService.supabaseClient.storage
           .from('avatares')
-          .upload(`anonimo_${timestamp}.jpeg`, this.fotoService.b64toBlob(base64Data), { upsert: true, contentType: 'image/jpeg' });
-          
-        if (res.data) {
-          const { data: { publicUrl } } = this.authService.supabaseClient.storage.from('avatares').getPublicUrl(res.data.path);
-          fotoUrlDefinitiva = publicUrl;
-        }
-      }
+          .getPublicUrl(res.data.path);
 
+      fotoUrlDefinitiva = publicUrl;
+    }
+  }
       // 2. Obtener Push Token del dispositivo
       const token = await this.notificacionService.obtenerPushToken();
 

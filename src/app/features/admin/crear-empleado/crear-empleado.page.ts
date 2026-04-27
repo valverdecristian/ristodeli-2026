@@ -30,22 +30,30 @@ export class CrearEmpleadoPage {
   async onSubmitEmpleado(datos: DetalleRegistro) {
     this.isSubmitting = true;
     await this.spinnerService.mostrar('Registrando empleado...');
-
+//////////////////////////////////////////////////
     try {
-      // 1. Subir la imagen al bucket 'avatares' si es necesario (ejercicio estándar)
-      if (datos.foto_url) {
-        const timestamp = new Date().getTime();
-        const base64Data = datos.foto_url.split(',')[1];
-        const res = await this.authService.supabaseClient.storage
-           .from('avatares')
-           .upload(`empleado_${timestamp}.jpeg`, this.fotoService.b64toBlob(base64Data), { upsert: true, contentType: 'image/jpeg' });
-           
-        if (res.data) {
-          const { data: { publicUrl } } = this.authService.supabaseClient.storage.from('avatares').getPublicUrl(res.data.path);
-          datos.foto_url = publicUrl;
-        }
-      }
+  // 1. Subir imagen si existe
+  if (datos.foto_url) {
+    const timestamp = new Date().getTime();
+    const response = await fetch(datos.foto_url);
+    const blob = await response.blob();
 
+    const res = await this.authService.supabaseClient.storage
+      .from('avatares')
+      .upload(`empleado_${timestamp}.jpeg`, blob, {
+        upsert: true,
+        contentType: 'image/jpeg'
+      });
+
+    if (res.data) {
+      const { data: { publicUrl } } =
+        this.authService.supabaseClient.storage
+          .from('avatares')
+          .getPublicUrl(res.data.path);
+
+      datos.foto_url = publicUrl;
+    }
+  }
       // 2. Usar Auth Service para guardar sin afectar sesión actual
       await this.authService.registrarEmpleado(datos.password, datos);
 
@@ -68,3 +76,4 @@ export class CrearEmpleadoPage {
     }
   }
 }
+//////////////
