@@ -6,6 +6,7 @@ import { shieldOutline, shirtOutline, notificationsOutline, flameOutline, wineOu
 import { AuthService } from '../../../core/services/auth.service';
 
 
+
 @Component({
   selector: 'app-botones-acceso-rapido',
   templateUrl: './botones-acceso-rapido.component.html',
@@ -27,16 +28,17 @@ export class BotonesAccesoRapidoComponent implements OnInit {
     { name: 'Cantinero', perfil: 'cantinero', icon: 'wine-outline', email: 'cantinero1@ristodeli.com' } // Corregido el perfil
   ];
 
+   bottomInset = 0;
+
   constructor(private supabaseService: AuthService) {
     addIcons({ shieldOutline, shirtOutline, notificationsOutline, clipboardOutline, flameOutline, wineOutline, man, chevronDownCircleOutline, closeCircle });
   }
 
   ngOnInit() { }
-
+     
   toggleMenu() {
     this.open = !this.open;
   }
-
   async selectProfile(profile: any) {
     try {
       // Si el perfil ya tiene un email definido (hardcodeado para las pruebas rápido), usar ese.
@@ -57,4 +59,9 @@ export class BotonesAccesoRapidoComponent implements OnInit {
     }
   }
 
+}
+let bottomInset = 0;
+
+if (window.visualViewport) {
+  bottomInset = window.innerHeight - window.visualViewport.height;
 }

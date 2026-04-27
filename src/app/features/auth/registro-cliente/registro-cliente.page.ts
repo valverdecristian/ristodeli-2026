@@ -42,20 +42,29 @@ export class RegistroClientePage {
     await this.spinnerService.mostrar('Creando cuenta...');
 
     try {
-      // 1. Subir la imagen al bucket 'avatares'
-      if (datos.foto_url) {
-        const timestamp = new Date().getTime();
-        // Camera plugin DataUrl format: data:image/jpeg;base64,...
-        const base64Data = datos.foto_url.split(',')[1];
-        const res = await this.authService.supabaseClient.storage
+  // 1. Subir imagen si existe
+  if (datos.foto_url) {
+    const timestamp = new Date().getTime();
+    const response = await fetch(datos.foto_url);
+    const blob = await response.blob();
+
+    const res = await this.authService.supabaseClient.storage
+      .from('avatares')
+      .upload(`empleado_${timestamp}.jpeg`, blob, {
+        upsert: true,
+        contentType: 'image/jpeg'
+      });
+
+    if (res.data) {
+      const { data: { publicUrl } } =
+        this.authService.supabaseClient.storage
           .from('avatares')
-          .upload(`cliente_${timestamp}.jpeg`, this.fotoService.b64toBlob(base64Data), { upsert: true, contentType: 'image/jpeg' });
-          
-        if (res.data) {
-          const { data: { publicUrl } } = this.authService.supabaseClient.storage.from('avatares').getPublicUrl(res.data.path);
-          datos.foto_url = publicUrl;
-        }
-      }
+          .getPublicUrl(res.data.path);
+
+      datos.foto_url = publicUrl;
+    }
+  }
+
 
       // 2. Usar Auth Service para guardar
       await this.authService.registrar(datos.password, datos);

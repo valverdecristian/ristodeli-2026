@@ -1,5 +1,7 @@
 <div class="fab-wrapper" [class.open]="open">
-
+  @if(!open){
+  <p>Acceso Rápido</p>
+  }
   <!-- Botón principal -->
   <ion-button class="main-fab" (click)="toggleMenu()" color="warning">
     <ion-icon [name]="open ? 'close-circle' : 'chevron-down-circle-outline'"></ion-icon>

@@ -6,11 +6,12 @@
 .fab-wrapper {
   position: relative;
   width: 100%;
-  height: 238px; // mueve el contenedor de los botones, ojo puede atravesar el login
+  height: 170px; // mueve el contenedor de los botones, ojo puede atravesar el login
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+
 }
 
 .main-fab {
@@ -33,25 +34,24 @@
 }
 
 .fab-wrapper.open .main-fab {
-  width: 67px;
-  height: 67px;
-  top: 0;
-  transform: translate(-50%, -38px);
+  width: 50px; //tamaño del boton cuando está abierto
+  height: 50px;
+  top: calc(env(safe-area-inset-top) + 10px);
+  transform: translate(-50%, -82px);
 
   ion-icon {
     font-size: 40px;
   }
 }
 
-
 .profiles-grid {
   position: absolute;
-  top: 42px; //distancia entre el boton y los perfiles
+  top: 20px; //distancia entre el boton y los perfiles
   left: 50%;
   transform: translate(-50%, 50px);
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 15px;
+  gap: 13px;
   width: 100%;
   max-width: 260px;
   opacity: 0;
@@ -80,11 +80,25 @@
   --border-radius: 50%;
   --padding-start: 0;
   --padding-end: 0;
-  width: 75px;
-  height: 75px;
+  width: 62px;
+  height: 62px;
   margin: 0;
 
   ion-icon {
-    font-size: 55px;
+    font-size: 45px;
   }
+}
+
+.fab-wrapper p {
+  position: absolute;
+  top: -40px;
+  left: 50%;
+  font-family: 'Roboto', sans-serif;
+  transform: translateX(-50%);
+  width: 100%;
+  text-align: center;
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--vanilla-cream);
+  margin-top: 32px;
 }

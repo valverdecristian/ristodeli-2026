@@ -16,9 +16,11 @@ export class FotoService {
   public async sacarFoto(): Promise<Photo | undefined> {
     try {
       const fotoCapturada = await Camera.getPhoto({
-        resultType: CameraResultType.DataUrl,
+        resultType: CameraResultType.Uri,
         source: CameraSource.Camera,
-        quality: 50,
+        quality: 10,
+        width: 600,
+        height: 600,
         allowEditing: false,
         saveToGallery: false
       });
@@ -30,9 +32,9 @@ export class FotoService {
     }
   }
 
-  /**
-   * Convierte una cadena Base64 pura a un objeto Blob
-   */
+  /*
+    Convierte una cadena Base64 pura a un objeto Blob
+   
   public b64toBlob(b64Data: string, contentType = 'image/jpeg') {
     const byteCharacters = atob(b64Data);
     const byteArrays = [];
@@ -45,5 +47,6 @@ export class FotoService {
       byteArrays.push(new Uint8Array(byteNumbers));
     }
     return new Blob(byteArrays, { type: contentType });
-  }
-}
+  } */
+} 
+  

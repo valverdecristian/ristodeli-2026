@@ -41,6 +41,19 @@
  * RISTODELI GLOBAL VARIABLES & PALETTE
  * ============================================================
  */
+/* Padding global para todas las páginas */
+ion-app,
+.ion-page,
+body,
+html {
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+
+  box-sizing: border-box;
+}
+
 :root {
   /* Core brand palette */
   --risto-retro-green: #31603D;
@@ -62,9 +75,10 @@
   --ion-color-warning: var(--risto-saffron);
   --ion-color-danger: var(--risto-fire-red);
   --ion-color-dark: var(--risto-russet);
-  
+
   /* Component-specific assignments */
-  --ion-card-background: var(--risto-russet); /* Las tarjetas por defecto seran color russet */
+  --ion-card-background: var(--risto-russet);
+  /* Las tarjetas por defecto seran color russet */
   --ion-item-background: var(--risto-retro-green);
 }
 
@@ -89,16 +103,38 @@
 }
 
 /* Modificadores de color de texto */
-.text-cream { color: var(--risto-vanilla-cream); }
-.text-saffron { color: var(--risto-saffron); }
-.text-red { color: var(--risto-fire-red); }
-.text-green { color: var(--risto-retro-green); }
-.text-russet { color: var(--risto-russet); }
+.text-cream {
+  color: var(--risto-vanilla-cream);
+}
+
+.text-saffron {
+  color: var(--risto-saffron);
+}
+
+.text-red {
+  color: var(--risto-fire-red);
+}
+
+.text-green {
+  color: var(--risto-retro-green);
+}
+
+.text-russet {
+  color: var(--risto-russet);
+}
 
 /* Fondos útiles */
-.bg-russet { background-color: var(--risto-russet) !important; }
-.bg-cream { background-color: var(--risto-vanilla-cream) !important; }
-.bg-green { background-color: var(--risto-retro-green) !important; }
+.bg-russet {
+  background-color: var(--risto-russet) !important;
+}
+
+.bg-cream {
+  background-color: var(--risto-vanilla-cream) !important;
+}
+
+.bg-green {
+  background-color: var(--risto-retro-green) !important;
+}
 
 /* 
  * ============================================================
@@ -141,25 +177,30 @@ ion-toast.custom-toast-warning {
 
 /* Animación rotatoria infinita */
 @keyframes risto-spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 /* Modificamos la caja interna del loading de Ionic */
 ion-loading.custom-spinner-logo {
   --background: var(--risto-retro-green);
-  --spinner-color: transparent; 
-  --backdrop-opacity: 0.7; 
-  
+  --spinner-color: transparent;
+  --backdrop-opacity: 0.7;
+
   .loading-wrapper {
     border-radius: 16px;
     padding: 24px 32px;
-    box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    
+
     /* Inyectamos la imagen mediante pseudo-elemento ::before */
     &::before {
       content: '';
@@ -183,12 +224,14 @@ ion-loading.custom-spinner-logo {
     text-align: center;
   }
 }
+
 /* Popover override class for custom Select elements */
 .orange-popover {
   --ion-background-color: var(--risto-orange) !important;
   --ion-text-color: var(--risto-russet) !important;
-  --max-width: 90vw !important; /* Ensuring popover doesn't look cut off horizontally */
-  
+  --max-width: 90vw !important;
+  /* Ensuring popover doesn't look cut off horizontally */
+
   ion-item {
     --background: var(--risto-orange) !important;
     --color: var(--risto-russet) !important;
@@ -201,16 +244,15 @@ ion-loading.custom-spinner-logo {
 }
 
 /* Botones de dashboard - MANTENERLOS ASÍ */
-.actions-container { 
-    display: flex; 
-    flex-direction: column; 
-    gap: 2.5rem; 
-    padding: 0 10px; 
-    margin-top: 1rem; 
+.actions-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+  padding: 0 10px;
+  margin-top: 1rem;
 }
 
 .toolbar-saffron {
-    --background: var(--risto-orange); 
-    --color: #000;
+  --background: var(--risto-orange);
+  --color: #000;
 }
-

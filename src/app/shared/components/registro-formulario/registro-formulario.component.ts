@@ -80,8 +80,8 @@ export class RegistroFormularioComponent implements OnInit, OnDestroy {
 
   async tomarFotografia() {
     const foto = await this.fotoService.sacarFoto();
-    if (foto && foto.dataUrl) {
-      this.fotoUrlTemporal = foto.dataUrl;
+    if (foto && foto.webPath) {
+      this.fotoUrlTemporal = foto.webPath;
       this.cdr.detectChanges();
     }
   }
