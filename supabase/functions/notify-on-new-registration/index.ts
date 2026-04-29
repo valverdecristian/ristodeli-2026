@@ -99,8 +99,10 @@ serve(async (req) => {
   }
 
   // Si no es un cliente registrado, no notificamos a los administradores por push
-  if (payload.record?.perfil !== 'cliente_reg') {
-    return new Response(JSON.stringify({ message: "No es cliente_reg, no se requiere aprobación ni notificación push." }), { headers: { "Content-Type": "application/json" } });
+  const perfilesValidos = ['pendiente', 'cliente_reg', 'rechazado'];
+  // Si no es un cliente registrado, no notificamos a los administradores por push
+  if (!perfilesValidos.includes(payload.record?.perfil)) {
+    return new Response(JSON.stringify({ message: "El perfil no requiere aprobación ni notificación push." }), { headers: { "Content-Type": "application/json" } });
   }
 
   // extract tokens and filter nulls or empties

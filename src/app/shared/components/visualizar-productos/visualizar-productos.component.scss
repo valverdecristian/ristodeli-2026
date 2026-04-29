@@ -68,38 +68,38 @@
 }
 
 .carrusel-fotos {
-  height: 50%;
-  position: relative;
-  border-bottom: 3px solid var(--risto-saffron); 
-  border-top-left-radius: 25px;
-  border-top-right-radius: 25px;
-  overflow: hidden; 
+    height: 50%;
+    position: relative;
+    border-bottom: 3px solid var(--risto-saffron); 
+    border-top-left-radius: 25px;
+    border-top-right-radius: 25px;
+    overflow: hidden; 
 
-  .carrusel-scroll-horizontal {
-    display: flex;
-    height: 100%;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory; 
-    &::-webkit-scrollbar { display: none; }
-
-    .slide-foto {
-      min-width: 100%;
-      height: 100%;   
-      scroll-snap-align: center; 
-      
-      display: flex;
-      align-items: center;   
-      justify-content: center;
-      background: #fdfaf0;    
-
-      img {
-        width: 100%;
+    .carrusel-scroll-horizontal {
+        display: flex;
         height: 100%;
-        object-fit: cover; 
-        object-position: center; 
-      }
+        overflow-x: auto;
+        scroll-snap-type: x mandatory; 
+        &::-webkit-scrollbar { display: none; }
+
+        .slide-foto {
+        min-width: 100%;
+        height: 100%;   
+        scroll-snap-align: center; 
+        
+        display: flex;
+        align-items: center;   
+        justify-content: center;
+        background: #fdfaf0;    
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; 
+            object-position: center; 
+        }
+        }
     }
-  }
 }
 
 .categoria-overlay {
@@ -133,7 +133,7 @@
         padding: 4px 10px;
         border-radius: 12px;
         font-weight: 800;
-        font-size: 1rem;
+        font-size: 1.5rem;
     }
 }
 
@@ -141,10 +141,10 @@
     display: flex;
     align-items: center;
     gap: 5px;
-    color: #f5a623; 
+    color: black; 
     font-weight: bold;
-    font-size: 0.8rem;
-    margin-top: 5px;
+    font-size: 1.2rem;
+    margin-top: 15px;
 }
 
 .descripcion {

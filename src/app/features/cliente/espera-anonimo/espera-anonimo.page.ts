@@ -6,7 +6,7 @@ import { ToastService } from 'src/app/core/services/toast.service';
 import { CommonModule } from '@angular/common';
 import { 
   IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, 
-  IonButton, IonIcon, IonSpinner, IonBackButton 
+  IonButton, IonIcon, IonBackButton 
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { handRightOutline, barChartOutline, logOutOutline } from 'ionicons/icons';
@@ -18,7 +18,7 @@ import { handRightOutline, barChartOutline, logOutOutline } from 'ionicons/icons
   standalone: true,
   imports: [
     CommonModule, IonContent, IonHeader, IonTitle, IonToolbar, 
-    IonButtons, IonButton, IonIcon, IonSpinner, IonBackButton
+    IonButtons, IonButton, IonIcon,  IonBackButton
   ]
 })
 export class EsperaAnonimoPage {
@@ -35,6 +35,7 @@ export class EsperaAnonimoPage {
   }
 
   async solicitarMesa() {
+    // 1. Iniciamos el spinner institucional
     await this.spinner.mostrar('Registrando en lista de espera...');
 
     let nombre = 'Cliente';
@@ -60,7 +61,7 @@ export class EsperaAnonimoPage {
       return;
     }
 
-    // Insertamos la solicitud vinculando el cliente_id para el flujo Gamma
+    // 2. Realizamos la inserción en Supabase
     const { data, error } = await this.authService.supabaseClient
       .from('lista_espera')
       .insert([{ 
@@ -72,22 +73,27 @@ export class EsperaAnonimoPage {
       }])
       .select();
 
-    await this.spinner.ocultar();
-
     if (error) {
+      await this.spinner.ocultar();
       this.toast.mostrarError('Error: ' + error.message);
-    } else {
-      if (data && data.length > 0) {
-        this.idSolicitud = data[0].id;
-      }
-      this.solicitudEnviada = true;
-      this.toast.mostrarExito('¡Solicitud enviada! El metre te asignará una mesa.');
-      
-      // Invocamos la Push Notification al Metre
-      this.authService.supabaseClient.functions.invoke('notify-metre', {
-        body: { nombreCliente: nombre }
-      }).catch(err => console.error('Error al invocar push al metre:', err));
+      return;
     }
+
+    // 3. TIEMPO PRUDENTE: Esperamos 2.5 segundos para que se vea la transición
+    await new Promise(resolve => setTimeout(resolve, 2500));
+
+    // 4. Cerramos spinner y navegamos al home
+    await this.spinner.ocultar();
+    
+    this.toast.mostrarExito('¡Solicitud enviada! El metre te asignará una mesa.');
+    
+    // Notificación en segundo plano
+    this.authService.supabaseClient.functions.invoke('notify-metre', {
+      body: { nombreCliente: nombre }
+    }).catch(err => console.error('Error al invocar push al metre:', err));
+
+    // Redirección final
+    this.router.navigate(['/home-cliente']);
   }
 
   irAGrafico(tipo: string) {

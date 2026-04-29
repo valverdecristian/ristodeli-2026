@@ -7,39 +7,91 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="risto-background">
-  <ion-grid class="ion-padding">
-    <ion-row>
+<ion-content class="risto-background" [scrollY]="false">
+  <div class="logo-wrapper">
+    <img src="assets/icon/favicon.ico" class="spin-logo" alt="Logo Ristodeli" />
+  </div>
+  <div class="vertical-center-wrapper">
+    <h2 class="seccion-titulo">Distribución de Mesas</h2>
+    
+    <div class="horizontal-slider">
       @for (mesa of mesas; track mesa.id) {
-        <ion-col size="12">
+        <div class="mesa-slide">
           <ion-card class="mesa-card">
             <div class="foto-mesa">
               <img [src]="mesa.foto || 'assets/icon/favicon.ico'" alt="Mesa">
-              <div class="estado-badge" [ngClass]="mesa.estado?.toLowerCase() || 'libre'">
+              <div class="estado-overlay" [ngClass]="mesa.estado?.toLowerCase() || 'libre'">
                 {{ mesa.estado || 'LIBRE' }}
               </div>
             </div>
 
             <ion-card-header>
-              <ion-card-title class="numero">MESA {{ mesa.numero }}</ion-card-title>
-              <ion-card-subtitle class="pax">
-                <ion-icon name="people-outline"></ion-icon>
-                {{ mesa.comensales }} PERSONAS
-              </ion-card-subtitle>
+              <div class="header-row">
+                <h2 class="numero">MESA {{ mesa.numero }}</h2>
+                <div class="pax-tag">
+                  <ion-icon name="people-outline"></ion-icon>
+                  <span>{{ mesa.comensales }}</span>
+                </div>
+              </div>
             </ion-card-header>
 
             <ion-card-content class="ion-text-center">
-              <div class="qr-container-listado">
-                <qrcode 
-                [qrdata]="mesa.qr_data || ''" 
-                [width]="120" 
-                [errorCorrectionLevel]="'M'">
-              </qrcode>
+              <p class="descripcion-mesa">Estado actual del sector de salón.</p>
+              
+              <ion-button 
+                expand="block" 
+                class="btn-ver-qr" 
+                (click)="abrirModalQR(mesa)">
+                <ion-icon name="qr-code-outline" slot="start"></ion-icon>
+                VER QR MESA
+              </ion-button>
+
+              <div class="swipe-hint">
+                <ion-icon name="chevron-forward-outline"></ion-icon>
+                <span>Desliza para ver otra</span>
               </div>
             </ion-card-content>
           </ion-card>
-        </ion-col>
+        </div>
       }
-    </ion-row>
-  </ion-grid>
+    </div>
+  </div>
+
+  <ion-modal 
+  [isOpen]="isModalOpen" 
+  (didDismiss)="cerrarModal()" 
+  [breakpoints]="[0, 0.6, 0.9]" 
+  [initialBreakpoint]="0.6"
+  class="qr-modal-custom">
+  
+  <ng-template>
+    <ion-content class="modal-main-content">
+      <div class="qr-wrapper-flex">
+        
+        <div class="qr-card-premium">
+          <div class="qr-border-dashed">
+            <qrcode 
+              [qrdata]="'MESA:' + mesaSeleccionada?.id" 
+              [width]="220" 
+              [errorCorrectionLevel]="'H'"
+              [margin]="1"
+              [colorDark]="'#1e3d1a'" 
+              [colorLight]="'#ffffff'">
+            </qrcode>
+          </div>
+          
+          <div class="qr-info">
+            <h2 class="mesa-titulo">MESA {{ mesaSeleccionada?.numero }}</h2>
+            <p class="mesa-sub">Escaneá para comenzar</p>
+          </div>
+        </div>
+
+        <ion-button fill="clear" (click)="cerrarModal()" class="btn-cerrar-modal">
+          CERRAR VENTANA
+        </ion-button>
+        
+      </div>
+    </ion-content>
+  </ng-template>
+</ion-modal>
 </ion-content>

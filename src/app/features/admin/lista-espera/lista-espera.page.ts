@@ -10,7 +10,7 @@ import { addIcons } from 'ionicons';
 import { restaurantOutline, checkmarkCircleOutline, timeOutline } from 'ionicons/icons';
 import { 
   IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, 
-  IonBackButton, IonList, IonItem, IonLabel, IonAvatar, 
+  IonBackButton, IonList, IonItem, IonLabel,  
   IonIcon, IonBadge, IonSelect, IonSelectOption 
 } from '@ionic/angular/standalone';
 
@@ -22,7 +22,7 @@ import {
   imports: [
     CommonModule, FormsModule, IonContent, IonHeader, IonTitle, IonToolbar, 
     IonButtons, IonBackButton, IonList, IonItem, IonLabel, 
-    IonAvatar, IonIcon, IonBadge, IonSelect, IonSelectOption
+    IonIcon, IonBadge, IonSelect, IonSelectOption
   ]
 })
 export class ListaEsperaPage implements OnInit {

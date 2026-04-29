@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
 import { FormsModule } from '@angular/forms';
 import { addIcons } from 'ionicons';
-import { logOutOutline } from 'ionicons/icons';
+import { logOutOutline, chatbubblesOutline, chatbubbles, chatboxEllipsesOutline,chatbubbleEllipsesOutline } from 'ionicons/icons';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { ManagementActionsComponent } from '../../../shared/components/management-actions/management-actions.component';
 import { Router } from '@angular/router';
@@ -26,7 +26,7 @@ export class HomeMozoPage implements OnInit, OnDestroy {
   private chatSub: any;
 
   constructor() { 
-    addIcons({ logOutOutline });
+    addIcons({ logOutOutline,chatbubblesOutline, chatbubbles, chatboxEllipsesOutline,chatbubbleEllipsesOutline });
   }
 
   ngOnInit() {

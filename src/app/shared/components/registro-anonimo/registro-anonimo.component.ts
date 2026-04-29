@@ -2,7 +2,10 @@ import { Component, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonBackButton, IonItem, IonInput, IonButton, IonIcon, IonText } from '@ionic/angular/standalone';
+import { 
+  IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, 
+  IonBackButton, IonItem, IonInput, IonButton, IonIcon, IonText, IonSpinner 
+} from '@ionic/angular/standalone';
 import { cameraOutline, alertCircleOutline } from 'ionicons/icons';
 import { addIcons } from 'ionicons';
 
@@ -18,7 +21,11 @@ import { UsuarioAnonimo } from 'src/app/core/models/usuario-anonimo.model';
   templateUrl: './registro-anonimo.component.html',
   styleUrls: ['./registro-anonimo.component.scss'],
   standalone: true,
-  imports: [IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonBackButton, IonItem, IonInput, IonButton, IonIcon, IonText, CommonModule, ReactiveFormsModule]
+  imports: [
+    IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, 
+    IonBackButton, IonItem, IonInput, IonButton, IonIcon, 
+    IonText, IonSpinner, CommonModule, ReactiveFormsModule
+  ]
 })
 export class RegistroAnonimoComponent {
   private fb = inject(FormBuilder);
@@ -42,7 +49,11 @@ export class RegistroAnonimoComponent {
   }
 
   async ionViewWillEnter() {
-    await this.notificacionService.inicializarPushNotifications();
+    try {
+      await this.notificacionService.inicializarPushNotifications();
+    } catch (e) {
+      console.warn('Push notifications no disponibles en web');
+    }
   }
 
   async tomarFotografia() {
@@ -61,52 +72,50 @@ export class RegistroAnonimoComponent {
     }
 
     if (!this.fotoUrlTemporal) {
-      this.toastService.mostrarError('Es obligatorio tomarse una fotografía para entrar como anónimo.');
+      this.toastService.mostrarError('Es obligatorio tomarse una fotografía.');
       return;
     }
 
     this.isSubmitting = true;
+    // Iniciamos el spinner institucional
     await this.spinnerService.mostrar('Ingresando como anónimo...');
 
     try {
-  const nombre = this.registroForm.get('nombre')?.value;
-  let fotoUrlDefinitiva = null;
+      const nombre = this.registroForm.get('nombre')?.value;
+      let fotoUrlDefinitiva = null;
 
-  // 1. Subir foto al Storage
-  if (this.fotoUrlTemporal) {
-    const timestamp = new Date().getTime();
+      // 1. Subir foto al Storage de Supabase
+      if (this.fotoUrlTemporal) {
+        const timestamp = new Date().getTime();
+        const response = await fetch(this.fotoUrlTemporal);
+        const blob = await response.blob();
 
-    //convertir webPath a blob
-    const response = await fetch(this.fotoUrlTemporal);
-    const blob = await response.blob();
-
-    const res = await this.authService.supabaseClient.storage
-      .from('avatares')
-      .upload(`anonimo_${timestamp}.jpeg`, blob, {
-        upsert: true,
-        contentType: 'image/jpeg'
-      });
-
-    if (res.data) {
-      const { data: { publicUrl } } =
-        this.authService.supabaseClient.storage
+        const res = await this.authService.supabaseClient.storage
           .from('avatares')
-          .getPublicUrl(res.data.path);
+          .upload(`anonimo_${timestamp}.jpeg`, blob, {
+            upsert: true,
+            contentType: 'image/jpeg'
+          });
 
-      fotoUrlDefinitiva = publicUrl;
-    }
-  }
-      // 2. Obtener Push Token del dispositivo
+        if (res.data) {
+          const { data: { publicUrl } } = this.authService.supabaseClient.storage
+            .from('avatares')
+            .getPublicUrl(res.data.path);
+          fotoUrlDefinitiva = publicUrl;
+        }
+      }
+
+      // 2. Obtener Push Token
       const token = await this.notificacionService.obtenerPushToken();
 
-      // 3. Crear el objeto
+      // 3. Crear el objeto para la base de datos
       const nuevoAnonimo: UsuarioAnonimo = {
         nombre: nombre,
         foto: fotoUrlDefinitiva,
         push_token: token || null
       };
 
-      // 4. Insertar en tabla anónimos directamente
+      // 4. Insertar en tabla anónimos
       const { data, error } = await this.authService.supabaseClient
         .from('anonimos')
         .insert([nuevoAnonimo])
@@ -115,19 +124,25 @@ export class RegistroAnonimoComponent {
 
       if (error) throw error;
 
+      // 5. Persistencia de identidad para evitar rebote del AuthGuard
+      if (data) {
+        localStorage.setItem('anonimo_id', data.id);
+        localStorage.setItem('user_perfil', 'anonimo'); 
+      }
+
+      // 6. TIEMPO PRUDENTE: Esperamos 2 segundos para que se vea el spinner
+      await new Promise(resolve => setTimeout(resolve, 2000));
+
       await this.spinnerService.ocultar();
       this.toastService.mostrarExito('¡Bienvenido a Ristodeli!');
       
-      // Puedes guardar en localStorage el id del anónimo si lo necesitas para la sesión
-      if (data) {
-        localStorage.setItem('anonimo_id', data.id);
-      }
-
-      this.router.navigate(['/home-cliente']); // o la ruta para el anónimo
+      // 7. NAVEGACIÓN: Redirigimos al Home evitando el Login
+      this.router.navigate(['/home-cliente'], { replaceUrl: true });
 
     } catch (error: any) {
       await this.spinnerService.ocultar();
       this.toastService.mostrarError('Error al ingresar: ' + error.message);
+      console.error("Detalle técnico (posible RLS):", error);
     } finally {
       this.isSubmitting = false;
     }

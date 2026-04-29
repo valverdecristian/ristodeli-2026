@@ -2,7 +2,7 @@ import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonButton, IonIcon, IonBackButton } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { statsChartOutline, pieChartOutline } from 'ionicons/icons';
+import { statsChartOutline, pieChartOutline, apertureOutline } from 'ionicons/icons';
 
 @Component({
   selector: 'app-menu-encuestas',
@@ -15,10 +15,12 @@ export class MenuEncuestasPage {
   private router = inject(Router);
 
   constructor() {
-    addIcons({ statsChartOutline, pieChartOutline });
+    addIcons({ statsChartOutline, pieChartOutline, apertureOutline });
   }
 
   navegarAGrafico(tipo: string) {
-    this.router.navigate(['/graficos-encuestas', { tipo: tipo }]);
+    this.router.navigate(['/graficos-encuestas'], { 
+      queryParams: { tipo: tipo } 
+    });
   }
 }

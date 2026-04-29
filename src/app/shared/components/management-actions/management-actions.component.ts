@@ -43,7 +43,6 @@ export class ManagementActionsComponent implements OnInit {
     { title: 'Estado Mesas', icon: 'swap-horizontal-outline', color: '#f5a623', action: 'manage_status', roles: ['metre'] },
     { title: 'Crear Cliente', icon: 'person-add-outline', color: '#f5a623', action: 'register_client', roles: ['metre'] },
     
-    
     // Acciones de Mozo
     { title: 'Consultas', icon: 'chatbubble-ellipses-outline', color: '#f5a623', action: 'view_consultas', roles: ['mozo']}
   ];

@@ -3,74 +3,97 @@
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/login" color="dark"></ion-back-button>
     </ion-buttons>
-    <ion-title class="text-russet title-bold">Clientes Pendientes</ion-title>
+    <ion-title class="text-russet title-bold">GESTIÓN DE ALTAS</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding bg-green">
+<ion-content class="risto-background" [scrollY]="false">
   
-  <!-- ESTADO DE CARGA SKELETON -->
+  <div class="header-section fade-in">
+    <h2 class="section-title text-saffron">Clientes Pendientes</h2>
+  </div>
+
   @if (isLoading) {
-    @for (item of [1,2,3,4]; track $index) {
-      <div class="risto-card">
-        <ion-item lines="none" class="transparent-item">
-          <ion-avatar slot="start">
-            <ion-skeleton-text animated class="skeleton-avatar"></ion-skeleton-text>
-          </ion-avatar>
-          <ion-label>
-            <h3><ion-skeleton-text animated class="skeleton-heading"></ion-skeleton-text></h3>
-            <p><ion-skeleton-text animated class="skeleton-p1"></ion-skeleton-text></p>
-            <p><ion-skeleton-text animated class="skeleton-p2"></ion-skeleton-text></p>
-          </ion-label>
-        </ion-item>
-      </div>
-    }
-  }
-
-  <!-- ESTADO VACÍO -->
-  @if (!isLoading && pendientes.length === 0) {
-    <div class="empty-state-container fade-in">
-      <ion-icon name="checkmark-circle-outline" class="empty-icon"></ion-icon>
-      <h2 class="text-cream empty-title">¡Todo al día!</h2>
-      <p class="text-cream empty-desc">No hay clientes pendientes de aprobación en este momento.</p>
+    <div class="empty-state-premium fade-in">
+      <ion-spinner name="crescent" color="warning"></ion-spinner>
+      <p class="text-cream">Sincronizando...</p>
     </div>
-  }
+  } @else {
+    @if (pendientes.length === 0) {
+      <div class="empty-state-premium fade-in">
+        <div class="icon-circle">
+          <ion-icon name="checkmark-circle-outline"></ion-icon>
+        </div>
+        <h3 class="text-saffron">¡Todo al día!</h3>
+        <p class="text-cream">No hay clientes esperando aprobación.</p>
+      </div>
+    } @else {
+      <div class="snap-container-full">
+        @for (c of pendientes; track c.id) {
+          <div class="cliente-snap-card-full">
+            <div class="premium-card-aprobacion">
+              
+              <div class="card-user-header">
+                <div class="avatar-premium-gigante">
+                  <img [src]="c.foto_url || 'assets/icon/favicon.ico'" alt="Foto">
+                  <div class="status-indicator">PENDIENTE</div>
+                </div>
+                <div class="user-main-info">
+                  <h2 class="text-black-pure">{{ c.nombres }} {{ c.apellidos }}</h2>
+                  <p class="text-black-pure opacity-7">{{ c.email }}</p>
+                </div>
+              </div>
+          
+              <div class="card-data-vertical">
+                <div class="data-row">
+                  <ion-icon name="finger-print-outline" class="icon-black"></ion-icon>
+                  <div class="data-text">
+                    <span class="label">DNI</span>
+                    <span class="value">{{ c.dni }}</span>
+                  </div>
+                </div>
+                <div class="data-row">
+                  <ion-icon name="briefcase-outline" class="icon-black"></ion-icon>
+                  <div class="data-text">
+                    <span class="label">CUIL</span>
+                    <span class="value">{{ c.cuil }}</span>
+                  </div>
+                </div>
+              </div>
 
-  <!-- LISTA DE CLIENTES -->
-  @if (!isLoading && pendientes.length > 0) {
-    @for (c of pendientes; track c.id) {
-      <div class="risto-card fade-in">
-        <ion-item lines="none" class="transparent-item">
-          <ion-avatar slot="start" class="avatar-large">
-            <img [src]="c.foto_url || 'assets/icon/favicon.ico'" />
-          </ion-avatar>
-          <ion-label class="text-cream">
-            <h2 class="name-heading">{{ c.nombres }} {{ c.apellidos }}</h2>
-            <p class="text-saffron dni-cuil-text">DNI: {{ c.dni }}</p>
-            <p class="text-saffron dni-cuil-text">CUIL: {{ c.cuil }}</p>
-            <p class="email-text">{{ c.email }}</p>
-          </ion-label>
-        </ion-item>
-        
-        <!-- BOTONERA DE ACCIÓN -->
-        <ion-grid class="action-grid">
-          <ion-row>
-            <ion-col size="6">
-              <ion-button expand="block" color="danger" shape="round" class="btn-flat" (click)="rechazar(c)">
-                <ion-icon slot="start" name="close-circle-outline"></ion-icon>
-                Rechazar
-              </ion-button>
-            </ion-col>
-            <ion-col size="6">
-              <ion-button expand="block" shape="round" class="btn-saffron" (click)="aprobar(c)">
-                <ion-icon slot="start" name="checkmark-circle-outline"></ion-icon>
-                Aprobar
-              </ion-button>
-            </ion-col>
-          </ion-row>
-        </ion-grid>
+              <div class="security-check-area fade-in">
+                <p class="check-title">VERIFICACIONES DE SEGURIDAD</p>
+                <div class="badges-row">
+                  <div class="check-badge">
+                    <ion-icon name="shield-checkmark-outline"></ion-icon>
+                    <span>DNI VALIDADO</span>
+                  </div>
+                  <div class="check-badge">
+                    <ion-icon name="mail-unread-outline"></ion-icon>
+                    <span>EMAIL VALIDADO</span>
+                  </div>
+                  <div class="check-badge">
+                    <ion-icon name="image-outline"></ion-icon>
+                    <span>FACE VALIDADO</span>
+                  </div>
+                </div>
+              </div>
+          
+              <div class="card-actions-premium">
+                <ion-button expand="block" color="danger" fill="outline" class="btn-rechazar" (click)="rechazar(c)">
+                  <ion-icon slot="start" name="close-circle-outline"></ion-icon>
+                  RECHAZAR
+                </ion-button>
+                <ion-button expand="block" class="btn-aprobar" (click)="aprobar(c)">
+                  <ion-icon slot="start" name="checkmark-circle-outline"></ion-icon>
+                  APROBAR
+                </ion-button>
+              </div>
+              
+            </div>
+          </div>
+        }
       </div>
     }
   }
-
 </ion-content>

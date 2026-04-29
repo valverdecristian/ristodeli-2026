@@ -12,7 +12,6 @@ import { ToastService } from 'src/app/core/services/toast.service';
 import { SpinnerService } from 'src/app/core/services/spinner.service';
 import { BarcodeScanner } from '@capacitor-mlkit/barcode-scanning';
 import { NotificacionService } from 'src/app/core/services/notificacion.service';
-import { BotonConsultaMozoComponent } from '../../../shared/components/boton-consulta-mozo/boton-consulta-mozo.component';
 import { addIcons } from 'ionicons';
 import { logOutOutline, restaurantOutline, barChartOutline, qrCodeOutline } from 'ionicons/icons';
 
@@ -21,7 +20,7 @@ import { logOutOutline, restaurantOutline, barChartOutline, qrCodeOutline } from
   templateUrl: './home-cliente.page.html',
   styleUrls: ['./home-cliente.page.scss'],
   standalone: true,
-  imports: [IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonButton, IonIcon, CommonModule, FormsModule, BotonConsultaMozoComponent]
+  imports: [IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonButton, IonIcon, CommonModule, FormsModule]
 })
 export class HomeClientePage implements OnInit {
   private authService = inject(AuthService);
@@ -105,5 +104,9 @@ export class HomeClientePage implements OnInit {
   async cerrarSesion() {
     // Usamos el método que SI existe en tu auth.service.ts
     await this.authService.cerrarSesion();
+  }
+  simularEscaneoEntrada() {
+    // Navega directo a la pantalla de espera como si el QR fuera válido
+    this.router.navigate(['/espera-anonimo']);
   }
 }

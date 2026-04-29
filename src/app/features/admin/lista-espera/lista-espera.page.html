@@ -15,23 +15,29 @@
   </div>
 
   @if (clientesEsperando.length === 0) {
-    <div class="empty-state text-center fade-in">
-      <ion-icon name="time-outline" color="medium" class="empty-icon"></ion-icon>
-      <h3 class="text-cream" style="margin-top: 1rem;">No hay clientes en espera</h3>
-      <p class="text-medium">Todo listo para recibir nuevas solicitudes.</p>
+    <div class="empty-state-premium fade-in">
+      <div class="icon-circle">
+        <ion-icon name="time-outline"></ion-icon>
+      </div>
+      <h3 class="text-saffron">¡Sin espera!</h3>
+      <p class="text-cream">No hay clientes aguardando mesa en este momento.</p>
+      <div class="decoration-line"></div>
+    </div>
+    <div class="logo-wrapper">
+      <img src="assets/icon/favicon.ico" class="spin-logo" alt="Logo Ristodeli" />
     </div>
   } @else {
     <ion-list class="transparent-list fade-in">
       @for (cliente of clientesEsperando; track cliente.id) {
-        <ion-item class="premium-item mb-3" style="margin-bottom: 1rem;">
-          <ion-avatar slot="start" class="avatar-border">
-            <img [src]="cliente.foto || 'assets/img/default-user.png'" />
-          </ion-avatar>
+        <ion-item class="premium-item-lista mb-3">
+          <div slot="start" class="avatar-espera-wrapper">
+            <img [src]="cliente.foto || 'assets/img/default-user.png'" class="avatar-espera" />
+          </div>
           
           <ion-label>
-            <h2 class="text-cream item-title">{{ cliente.nombre }}</h2>
-            <p class="text-saffron item-subtitle">
-              <ion-badge color="warning">Pendiente</ion-badge>
+            <h2 class="cliente-nombre">{{ cliente.nombre }}</h2>
+            <p class="cliente-estado">
+              <ion-badge color="warning">EN FILA</ion-badge>
             </p>
           </ion-label>
 
@@ -49,6 +55,7 @@
                 }
               </ion-select>
             </ion-item>
+
           </div>
         </ion-item>
       }

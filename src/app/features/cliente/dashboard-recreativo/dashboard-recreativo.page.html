@@ -1,7 +1,7 @@
 <ion-header class="ion-no-border">
   <ion-toolbar color="warning">
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/home-cliente"></ion-back-button>
+      <ion-back-button defaultHref="/home-cliente" color="dark"></ion-back-button>
     </ion-buttons>
     <ion-title class="title-bold">Entretenimiento</ion-title>
   </ion-toolbar>
@@ -9,19 +9,41 @@
 
 <ion-content class="ion-padding bg-green">
   <div class="logo-header fade-in">
-    <img src="assets/icon/logo.png" alt="Ristodeli Logo" class="dashboard-logo">
-    <p class="welcome-text">¡Disfrutá mientras esperás!</p>
+    <img src="assets/icon/favicon.ico" alt="Ristodeli Logo" class="dashboard-logo">
+    <p class="welcome-text">¡Disfrutá la experiencia Ristodeli!</p>
   </div>
 
   <div class="actions-container fade-in">
-    <ion-button expand="block" class="action-btn" (click)="verEstadoPedido()">
-      <ion-icon slot="start" name="time-outline"></ion-icon>
-      Estado del Pedido
-    </ion-button>
+    @if (!pedidoEntregado) {
+      <ion-button expand="block" class="action-btn" (click)="verEstadoPedido()">
+        <ion-icon slot="start" name="time-outline"></ion-icon>
+        Estado del Pedido
+      </ion-button>
 
-    <ion-button expand="block" class="action-btn" (click)="irAJuegos()">
-      <ion-icon slot="start" name="game-controller-outline"></ion-icon>
-      Juegos y Descuentos
-    </ion-button>
+      <ion-button expand="block" class="action-btn" (click)="irAJuegos()">
+        <ion-icon slot="start" name="game-controller-outline"></ion-icon>
+        Juegos y Descuentos
+      </ion-button>
+      
+      <p class="text-cream text-center" style="margin-top: 2rem; opacity: 0.8;">
+        Podrá pedir la cuenta una vez recibido el pedido.
+      </p>
+    } 
+
+    @else {
+      <div class="fade-in-rapid">
+        <h2 class="text-saffron text-center">¡Buen provecho!</h2>
+        
+        <ion-button expand="block" class="action-btn btn-encuesta" (click)="irAEncuesta()">
+          <ion-icon slot="start" name="star-outline"></ion-icon>
+          Realizar Encuesta
+        </ion-button>
+
+        <ion-button expand="block" class="action-btn btn-cuenta" (click)="solicitarCuenta()">
+          <ion-icon slot="start" name="cash-outline"></ion-icon>
+          Pedir la Cuenta
+        </ion-button>
+      </div>
+    }
   </div>
 </ion-content>

@@ -141,13 +141,14 @@
     <div class="stepper-buttons">
       @if (step === 2) {
         <ion-button fill="outline" class="stepper-button-back" color="medium" (click)="prevStep()" type="button">Anterior</ion-button>
-        <ion-button type="submit" class="stepper-button-next" [disabled]="isLoading">
+        
+        <ion-button type="submit" class="btn-final stepper-button-next" expand="block" [disabled]="isLoading">
           {{ esEmpleado ? 'Crear' : 'Registrar' }}
         </ion-button>
       }
       
       @if (step === 1) {
-        <ion-button expand="block" style="width:100%" class="stepper-button-next" (click)="nextStep()" type="button">Siguiente Paso</ion-button>
+        <ion-button expand="block" style="width:100%" class="stepper-button-next btn-final" (click)="nextStep()" type="button">Siguiente Paso</ion-button>
       }
     </div>
   </div>
