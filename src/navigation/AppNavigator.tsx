@@ -1,6 +1,6 @@
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { HomeScreen } from '@features/home/HomeScreen';
+import { Home } from '@features/home/Home';
 import { SplashScreen } from '@features/splash/SplashScreen';
 import { Login } from '@features/auth/Login';
 import { RegistroAnonimo } from '@features/auth/RegistroAnonimo';
@@ -15,7 +15,7 @@ export const AppNavigator = () => {
       <Stack.Screen name="Login" component={Login} options={{ headerShown: false }} />
       <Stack.Screen name="RegistroAnonimo" component={RegistroAnonimo} options={{ headerShown: false }} />
       <Stack.Screen name="RegistroCliente" component={RegistroCliente} options={{ headerShown: false }} />
-      <Stack.Screen name="Home" component={HomeScreen} options={{ title: 'Ristodeli', headerShown: false }} />
+      <Stack.Screen name="Home" component={Home} options={{ title: 'Ristodeli', headerShown: false }} />
     </Stack.Navigator>
   );
 };

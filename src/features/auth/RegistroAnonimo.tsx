@@ -44,12 +44,11 @@ export const RegistroAnonimo = ({ navigation }: any) => {
 
       // 2. Insertar en Supabase DB con el link
       const { error } = await supabase
-        .from('perfiles')
+        .from('usuarios')
         .insert({
-          nombre: nombre,
-          foto_url: urlPublica,
-          rol: 'anonimo',
-          fecha_registro: new Date()
+          nombres: nombre,
+          foto: urlPublica,
+          rol: 'cliente_anon'
         });
 
       if (error) throw error;
