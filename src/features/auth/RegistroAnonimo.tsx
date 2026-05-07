@@ -76,11 +76,13 @@ export const RegistroAnonimo = ({ navigation }: any) => {
 
         <View style={styles.fotoContainer}>
           {fotoUri ? (
-            <Image source={{ uri: fotoUri }} style={styles.fotoPreview} />
+            <TouchableOpacity onPress={tomarFotografia}>
+              <Image source={{ uri: fotoUri }} style={styles.fotoPreview} />
+            </TouchableOpacity>
           ) : (
-            <View style={styles.fotoPlaceholder}>
+            <TouchableOpacity style={styles.fotoPlaceholder} onPress={tomarFotografia}>
               <MyIcon name="camera-outline" size={50} color={colors.russet} />
-            </View>
+            </TouchableOpacity>
           )}
           <TouchableOpacity style={styles.btnCamara} onPress={tomarFotografia}>
             <Text style={styles.btnCamaraText}>{fotoUri ? 'Cambiar Foto' : 'Tomar Foto'}</Text>

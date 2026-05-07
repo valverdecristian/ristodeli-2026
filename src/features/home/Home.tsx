@@ -45,7 +45,11 @@ export const Home = ({ navigation }: any) => {
     // Acciones de Mozo
     { label: 'Lista de Pedidos', icon: 'clipboard-outline', roles: ['mozo'], onPress: () => { } },
     { label: 'Consultas', icon: 'help-circle-outline', roles: ['mozo'], onPress: () => { } },
-    
+
+    // Acciones de Cliente Registrado
+    { label: 'Escanear QR de Entrada', icon: 'qr-code-outline', roles: ['cliente_reg', 'cliente_anon'], onPress: () => { } },
+    { label: 'Ver Menú', icon: 'restaurant-outline', roles: ['cliente_reg', 'cliente_anon'], onPress: () => { } },
+    { label: 'Consultar al Mozo', icon: 'help-circle-outline', roles: ['cliente_reg', 'cliente_anon'], onPress: () => { } },
   ];
 
   // useEffect(() => {

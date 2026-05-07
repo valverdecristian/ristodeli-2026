@@ -1,55 +1,119 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform, ScrollView, Image } from 'react-native';
+import React, { FC, useState, useEffect } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, KeyboardAvoidingView, Platform, ScrollView, SafeAreaView, StatusBar, Modal, ActivityIndicator, } from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
 import { MyIcon } from '../../shared/components/Icon';
 import { colors } from '../../theme/colors';
 import { globalStyles } from '../../theme/globalStyles';
-import { FotoService } from '../../core/services/FotoService';
-import { ToastService } from '../../core/services/ToastService';
+
+// 1. IMPORTACIONES DE PLUGINS NATIVOS
+import { launchCamera, ImagePickerResponse } from 'react-native-image-picker';
+import { Camera, useCameraDevice, useCameraPermission, useObjectOutput, ScannedCode } from 'react-native-vision-camera';
+
+// 2. IMPORTACIONES DE SUPABASE Y SERVICIOS
 import { supabase } from '../../core/services/supabase';
 import { StorageService } from '../../core/services/StorageService';
-import { ActivityIndicator } from 'react-native';
+import { ToastService } from '../../core/services/ToastService';
 
-export const RegistroCliente = ({ navigation }: any) => {
-  const [step, setStep] = useState(1);
-  const [fotoUri, setFotoUri] = useState<string | null>(null);
-  const [mostrarPassword, setMostrarPassword] = useState(false);
+interface RegisterProps {
+  navigation: any;
+}
+
+export const RegistroCliente: FC<RegisterProps> = ({ navigation }) => {
+  // --- ESTADOS PARA DATOS ---
+  const [nombre, setNombre] = useState('');
+  const [apellido, setApellido] = useState('');
+  const [dni, setDni] = useState('');
+  const [cuil, setCuil] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  // --- ESTADOS PARA FUNCIONALIDAD NATIVA ---
+  const [profileImageUri, setProfileImageUri] = useState<string | null>(null);
+  const [scannerVisible, setScannerVisible] = useState(false);
   const [loading, setLoading] = useState(false);
-  
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-    confirmPassword: '',
-    nombres: '',
-    apellidos: '',
-    dni: '',
-    cuil: '',
+
+  // --- CONFIGURACIÓN DE ESCÁNER DE DNI ---
+  const device = useCameraDevice('back');
+  const { hasPermission, requestPermission } = useCameraPermission();
+
+  // Escáner de objetos (códigos) para v5
+  const objectOutput = useObjectOutput({
+    types: ['pdf-417'],
+    onObjectsScanned: (objects) => {
+      if (objects.length > 0 && scannerVisible) {
+        const rawData = (objects[0] as ScannedCode).value;
+        if (rawData) {
+          processDniData(rawData);
+        }
+      }
+    }
   });
 
-  const handleChange = (name: string, value: string) => {
-    setFormData(prev => ({ ...prev, [name]: value }));
+  // Función para pedir permisos de cámara al iniciar
+  useEffect(() => {
+    if (!hasPermission) {
+      requestPermission();
+    }
+  }, [hasPermission]);
+
+  // --- LÓGICA DE FOTO DE PERFIL ---
+  const takeProfilePhoto = () => {
+    launchCamera(
+      {
+        mediaType: 'photo',
+        cameraType: 'front', // Foto selfie para el perfil
+        quality: 0.7,
+        includeBase64: false, // URI siempre
+      },
+      (response: ImagePickerResponse) => {
+        if (response.didCancel) return;
+        if (response.errorMessage) {
+          ToastService.mostrarError(response.errorMessage);
+          return;
+        }
+        if (response.assets && response.assets.length > 0) {
+          setProfileImageUri(response.assets[0].uri || null);
+        }
+      }
+    );
   };
 
-  const tomarFotografia = async () => {
+  // --- LÓGICA DE ESCÁNER DE DNI ---
+  const processDniData = (rawData: string) => {
+    // Cerrar escáner
+    setScannerVisible(false);
+
+    /**
+     * IMPORTANTE: El DNI Argentino usa PDF417.
+     * El rawData es una cadena separada por pipes (|).
+     * Ejemplo conceptual de parseo: "@DNI|APELLIDO|NOMBRE|GÉNERO|NÚMERO_DNI|..."
+     * Aquí extraemos el Número de DNI, Nombre y Apellido.
+     */
     try {
-      const uri = await FotoService.sacarFoto();
-      if (uri) {
-        setFotoUri(uri);
+      const datos = rawData.split('@');
+      const partes = datos.length > 1 ? datos[1].split('|') : rawData.split('|');
+      
+      if (partes.length > 4) {
+        setDni(partes[4].trim()); 
+        setNombre(partes[2].trim()); 
+        setApellido(partes[1].trim());
+        ToastService.mostrarExito('DNI Escaneado correctamente');
+      } else {
+        // Fallback si el formato es distinto
+        setDni(rawData.replace(/\D/g, '').substring(0, 8)); 
       }
-    } catch (error) {
-      console.log('Error foto', error);
+    } catch (e) {
+      ToastService.mostrarError('Error al parsear datos del DNI');
     }
   };
 
-  const escanearDocumento = () => {
-    ToastService.mostrarAdvertencia('Escáner de DNI en desarrollo...');
-  };
-
+  // --- LÓGICA DE ENVÍO A SUPABASE ---
   const enviarFormulario = async () => {
-    if (formData.password !== formData.confirmPassword) {
-      ToastService.mostrarError('Las contraseñas no coinciden.');
+    if (!nombre || !apellido || !dni || !email || !password) {
+      ToastService.mostrarAdvertencia('Por favor completa todos los campos requeridos.');
       return;
     }
-    if (!fotoUri) {
+    if (!profileImageUri) {
       ToastService.mostrarError('Es obligatorio tomarse una fotografía.');
       return;
     }
@@ -59,13 +123,13 @@ export const RegistroCliente = ({ navigation }: any) => {
     try {
       // 1. Crear usuario en Supabase Auth
       const { data: authData, error: authError } = await supabase.auth.signUp({
-        email: formData.email,
-        password: formData.password,
+        email: email,
+        password: password,
         options: {
           data: {
-            role: 'cliente',
-            nombres: formData.nombres,
-            apellidos: formData.apellidos,
+            role: 'cliente_reg', // Usamos cliente_reg como determinamos
+            nombres: nombre,
+            apellidos: apellido,
           }
         }
       });
@@ -74,8 +138,8 @@ export const RegistroCliente = ({ navigation }: any) => {
 
       // 2. Subir foto al Storage
       let urlPublica = '';
-      if (fotoUri) {
-        const url = await StorageService.subirImagen(fotoUri, 'avatares');
+      if (profileImageUri) {
+        const url = await StorageService.subirImagen(profileImageUri, 'avatares');
         if (url) urlPublica = url;
       }
 
@@ -84,13 +148,13 @@ export const RegistroCliente = ({ navigation }: any) => {
         .from('usuarios')
         .insert({
           id: authData.user?.id, // Vinculamos con el ID de Auth
-          email: formData.email,
-          nombres: formData.nombres,
-          apellidos: formData.apellidos,
-          dni: formData.dni,
-          cuil: formData.cuil,
+          email: email,
+          nombres: nombre,
+          apellidos: apellido,
+          dni: dni,
+          cuil: cuil,
           foto: urlPublica,
-          rol: 'cliente_reg'
+          rol: 'cliente_reg' // Perfil en tabla usuarios
         });
 
       if (dbError) throw dbError;
@@ -105,123 +169,149 @@ export const RegistroCliente = ({ navigation }: any) => {
   };
 
   return (
-    <KeyboardAvoidingView style={globalStyles.container} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
-        
-        <View style={styles.header}>
-          <TouchableOpacity onPress={() => step === 2 ? setStep(1) : navigation.goBack()}>
-            <MyIcon name="arrow-back-outline" size={30} color={colors.vanillaCream} />
-          </TouchableOpacity>
-          <Text style={styles.stepText}>Paso {step} de 2</Text>
-        </View>
-
-        <Text style={styles.title}>Registro de Cliente</Text>
-
-        {step === 1 ? (
-          <View style={styles.stepContainer}>
-            <TextInput 
-              style={styles.input} 
-              placeholder="Nombres" 
-              placeholderTextColor={colors.russet} 
-              value={formData.nombres} 
-              onChangeText={(val) => handleChange('nombres', val)} 
-            />
-            <TextInput 
-              style={styles.input} 
-              placeholder="Apellidos" 
-              placeholderTextColor={colors.russet} 
-              value={formData.apellidos} 
-              onChangeText={(val) => handleChange('apellidos', val)} 
-            />
-            
-            <View style={styles.inputWithIcon}>
-              <TextInput 
-                style={[styles.input, {flex: 1, marginBottom: 0}]} 
-                placeholder="DNI" 
-                placeholderTextColor={colors.russet} 
-                keyboardType="numeric" 
-                value={formData.dni} 
-                onChangeText={(val) => handleChange('dni', val)} 
-              />
-              <TouchableOpacity style={styles.scanBtn} onPress={escanearDocumento}>
-                <MyIcon name="barcode-outline" size={24} color={colors.russet} />
-              </TouchableOpacity>
+    <LinearGradient colors={['#0F2027', '#203A43', '#2C5364']} style={globalStyles.container}>
+      <StatusBar barStyle="light-content" />
+      <SafeAreaView style={{ flex: 1 }}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={{ flex: 1 }}
+        >
+          <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
+            {/* Logo superior */}
+            <View style={styles.logoHeader}>
+              <Text style={styles.logoTextMain}>RISTO</Text>
+              <Text style={styles.logoTextSub}>DELI</Text>
+              <Text style={styles.byAlfa}>by ALFA DEVS</Text>
             </View>
 
-            <TextInput 
-              style={styles.input} 
-              placeholder="CUIL" 
-              placeholderTextColor={colors.russet} 
-              keyboardType="numeric" 
-              value={formData.cuil} 
-              onChangeText={(val) => handleChange('cuil', val)} 
-            />
-            
-            <TouchableOpacity style={styles.buttonPrimary} onPress={() => setStep(2)}>
-              <Text style={styles.buttonTextPrimary}>SIGUIENTE</Text>
-            </TouchableOpacity>
-          </View>
-        ) : (
-          <View style={styles.stepContainer}>
-            <View style={styles.fotoContainer}>
-              {fotoUri ? (
-                <Image source={{ uri: fotoUri }} style={styles.fotoPreview} />
+            <Text style={styles.registerTitle}>REGISTRO</Text>
+
+            {/* --- SECTOR FOTO DE PERFIL --- */}
+            <TouchableOpacity style={styles.photoPicker} onPress={takeProfilePhoto}>
+              {profileImageUri ? (
+                <Image source={{ uri: profileImageUri }} style={styles.profileImage} />
               ) : (
-                <View style={styles.fotoPlaceholder}>
-                  <MyIcon name="person-circle-outline" size={60} color={colors.russet} />
+                <View style={styles.photoPlaceholder}>
+                  <MyIcon name="camera-outline" size={40} color={colors.russet} />
+                  <Text style={styles.photoText}>Tomar Foto</Text>
                 </View>
               )}
-              <TouchableOpacity style={styles.btnCamara} onPress={tomarFotografia}>
-                <MyIcon name="camera-outline" size={20} color={colors.russet} style={{marginRight: 5}}/>
-                <Text style={styles.btnCamaraText}>{fotoUri ? 'Cambiar Foto' : 'Tomar Foto'}</Text>
-              </TouchableOpacity>
-            </View>
-
-            <TextInput 
-              style={styles.input} 
-              placeholder="Correo Electrónico" 
-              placeholderTextColor={colors.russet} 
-              keyboardType="email-address" 
-              autoCapitalize="none" 
-              value={formData.email} 
-              onChangeText={(val) => handleChange('email', val)} 
-            />
-            
-            <View style={styles.inputWithIcon}>
-              <TextInput 
-                style={[styles.input, {flex: 1, marginBottom: 0}]} 
-                placeholder="Contraseña" 
-                placeholderTextColor={colors.russet} 
-                secureTextEntry={!mostrarPassword} 
-                value={formData.password} 
-                onChangeText={(val) => handleChange('password', val)} 
-              />
-              <TouchableOpacity style={styles.scanBtn} onPress={() => setMostrarPassword(!mostrarPassword)}>
-                <MyIcon name={mostrarPassword ? "eye-off-outline" : "eye-outline"} size={24} color={colors.russet} />
-              </TouchableOpacity>
-            </View>
-
-            <TextInput 
-              style={styles.input} 
-              placeholder="Confirmar Contraseña" 
-              placeholderTextColor={colors.russet} 
-              secureTextEntry={!mostrarPassword} 
-              value={formData.confirmPassword} 
-              onChangeText={(val) => handleChange('confirmPassword', val)} 
-            />
-
-            <TouchableOpacity style={styles.buttonPrimary} onPress={enviarFormulario} disabled={loading}>
-              {loading ? (
-                <ActivityIndicator color={colors.russet} />
-              ) : (
-                <Text style={styles.buttonTextPrimary}>REGISTRARSE</Text>
-              )}
             </TouchableOpacity>
-          </View>
-        )}
 
-      </ScrollView>
-    </KeyboardAvoidingView>
+            {/* Inputs del formulario */}
+            <View style={styles.formContainer}>
+              {/* Input Nombre */}
+              <View style={styles.inputWrapper}>
+                <MyIcon name="person-outline" size={20} color={colors.russet} style={styles.inputIcon} />
+                <TextInput style={styles.input} placeholder="Nombre" placeholderTextColor={colors.russet} value={nombre} onChangeText={setNombre} />
+              </View>
+
+              {/* Input Apellido */}
+              <View style={styles.inputWrapper}>
+                <MyIcon name="person-outline" size={20} color={colors.russet} style={styles.inputIcon} />
+                <TextInput style={styles.input} placeholder="Apellido" placeholderTextColor={colors.russet} value={apellido} onChangeText={setApellido} />
+              </View>
+
+              {/* --- INPUT DNI CON ESCÁNER --- */}
+              <View style={styles.dniInputGroup}>
+                <View style={[styles.inputWrapper, { flex: 1, marginBottom: 0 }]}>
+                  <MyIcon name="id-card-outline" size={20} color={colors.russet} style={styles.inputIcon} />
+                  <TextInput
+                    style={styles.input}
+                    placeholder="DNI"
+                    placeholderTextColor={colors.russet}
+                    value={dni}
+                    onChangeText={setDni}
+                    keyboardType="numeric"
+                  />
+                </View>
+                {/* Botón para escanear */}
+                <TouchableOpacity
+                  style={styles.scanBarButton}
+                  onPress={() => setScannerVisible(true)}
+                  disabled={!hasPermission}
+                >
+                  <LinearGradient colors={['#FF512F', '#DD2476']} style={styles.scanBarGradient}>
+                    <MyIcon name="scan-outline" size={22} color="#fff" />
+                  </LinearGradient>
+                </TouchableOpacity>
+              </View>
+
+              <View style={styles.inputWrapper}>
+                <MyIcon name="calculator-outline" size={20} color={colors.russet} style={styles.inputIcon} />
+                <TextInput style={styles.input} placeholder="CUIL" placeholderTextColor={colors.russet} value={cuil} onChangeText={setCuil} keyboardType="numeric" />
+              </View>
+
+              <View style={styles.inputWrapper}>
+                <MyIcon name="mail-outline" size={20} color={colors.russet} style={styles.inputIcon} />
+                <TextInput style={styles.input} placeholder="Email" placeholderTextColor={colors.russet} value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" />
+              </View>
+
+              <View style={styles.inputWrapper}>
+                <MyIcon name="lock-closed-outline" size={20} color={colors.russet} style={styles.inputIcon} />
+                <TextInput style={styles.input} placeholder="Contraseña" placeholderTextColor={colors.russet} value={password} onChangeText={setPassword} secureTextEntry />
+              </View>
+
+            </View>
+
+            {/* Botón principal */}
+            <TouchableOpacity style={styles.buttonRegister} onPress={enviarFormulario} disabled={loading}>
+              <LinearGradient
+                colors={['#FF512F', '#DD2476']}
+                style={styles.buttonGradient}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+              >
+                {loading ? (
+                  <ActivityIndicator color="#fff" />
+                ) : (
+                  <Text style={styles.buttonText}>REGISTRARSE</Text>
+                )}
+              </LinearGradient>
+            </TouchableOpacity>
+
+            {/* Footer */}
+            <View style={styles.footer}>
+              <Text style={styles.footerText}>¿Ya tienes cuenta?</Text>
+              <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+                <Text style={styles.footerTextBold}> Inicia sesión aquí</Text>
+              </TouchableOpacity>
+            </View>
+          </ScrollView>
+        </KeyboardAvoidingView>
+      </SafeAreaView>
+
+      {/* --- MODAL DEL ESCÁNER DE DNI --- */}
+      <Modal animationType="slide" transparent={false} visible={scannerVisible}>
+        <SafeAreaView style={{ flex: 1, backgroundColor: '#000' }}>
+          <View style={styles.scannerHeader}>
+            <TouchableOpacity onPress={() => setScannerVisible(false)} style={styles.closeScanner}>
+              <MyIcon name="close" size={30} color="#fff" />
+            </TouchableOpacity>
+            <Text style={styles.scannerTitle}>Escanee el código PDF417 del DNI</Text>
+          </View>
+          
+          {device != null && hasPermission ? (
+              <Camera
+                style={StyleSheet.absoluteFill}
+                device={device}
+                isActive={scannerVisible}
+                outputs={[objectOutput]}
+              />
+          ) : (
+            <View style={styles.noCamera}>
+              <Text style={{color: '#fff'}}>Esperando cámara o permisos...</Text>
+            </View>
+          )}
+          
+          {/* Superposición visual para centrar el DNI */}
+          <View style={styles.scannerOverlay}>
+            <View style={styles.scannerTarget} />
+          </View>
+        </SafeAreaView>
+      </Modal>
+
+    </LinearGradient>
   );
 };
 
@@ -231,97 +321,164 @@ const styles = StyleSheet.create({
     paddingHorizontal: 30,
     paddingVertical: 40,
   },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+  logoHeader: {
     alignItems: 'center',
+    marginTop: 10,
     marginBottom: 20,
   },
-  stepText: {
-    color: colors.vanillaCream,
+  logoTextMain: {
+    fontSize: 40,
     fontWeight: 'bold',
+    color: colors.vanillaCream,
+    letterSpacing: 2,
   },
-  title: {
-    fontSize: 28,
-    color: colors.vanillaCream,
-    fontFamily: 'serif',
+  logoTextSub: {
+    fontSize: 30,
     fontWeight: 'bold',
+    color: colors.saffron,
+    marginTop: -10,
+  },
+  byAlfa: {
+    fontSize: 12,
+    color: '#ddd',
+    marginTop: 5,
+  },
+  registerTitle: {
+    fontSize: 24,
+    color: colors.vanillaCream,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 20,
+    letterSpacing: 1,
+  },
+  photoPicker: {
+    alignItems: 'center',
     marginBottom: 30,
   },
-  stepContainer: {
-    flex: 1,
+  photoPlaceholder: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: colors.vanillaCream,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: 'rgba(0,0,0,0.1)',
   },
-  input: {
+  profileImage: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+  },
+  photoText: {
+    marginTop: 5,
+    color: colors.russet,
+    fontWeight: 'bold',
+    fontSize: 12,
+  },
+  formContainer: {
+    width: '100%',
+  },
+  inputWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
     backgroundColor: colors.vanillaCream,
     borderRadius: 15,
-    paddingHorizontal: 20,
+    marginBottom: 15,
+    paddingHorizontal: 15,
+  },
+  inputIcon: {
+    marginRight: 10,
+  },
+  input: {
+    flex: 1,
     paddingVertical: 15,
     fontSize: 16,
     color: colors.russet,
-    marginBottom: 15,
+    fontWeight: 'bold',
   },
-  inputWithIcon: {
+  dniInputGroup: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 15,
+    gap: 10,
   },
-  scanBtn: {
-    backgroundColor: colors.saffron,
-    padding: 15,
+  scanBarButton: {
+    width: 50,
+    height: 55, // Misma altura que el input
     borderRadius: 15,
-    marginLeft: 10,
+    overflow: 'hidden',
+    elevation: 3,
+  },
+  scanBarGradient: {
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  buttonPrimary: {
-    backgroundColor: colors.saffron,
+  buttonRegister: {
+    marginTop: 15,
     borderRadius: 25,
-    paddingVertical: 15,
-    alignItems: 'center',
-    marginTop: 20,
+    overflow: 'hidden',
     elevation: 3,
   },
-  buttonTextPrimary: {
-    color: colors.russet,
+  buttonGradient: {
+    paddingVertical: 15,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  buttonText: {
+    color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
     letterSpacing: 1,
   },
-  fotoContainer: {
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  fotoPlaceholder: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    backgroundColor: colors.vanillaCream,
+  footer: {
+    flexDirection: 'row',
     justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: colors.saffron,
-    borderStyle: 'dashed',
+    marginTop: 30,
   },
-  fotoPreview: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    borderWidth: 2,
-    borderColor: colors.saffron,
+  footerText: {
+    color: '#ddd',
   },
-  btnCamara: {
-    marginTop: -15,
-    backgroundColor: colors.saffron,
-    paddingHorizontal: 15,
-    paddingVertical: 8,
-    borderRadius: 20,
+  footerTextBold: {
+    color: colors.saffron,
+    fontWeight: 'bold',
+  },
+  scannerHeader: {
+    position: 'absolute',
+    top: 20,
+    left: 20,
+    right: 20,
+    zIndex: 10,
     flexDirection: 'row',
     alignItems: 'center',
-    elevation: 3,
   },
-  btnCamaraText: {
-    color: colors.russet,
+  closeScanner: {
+    padding: 10,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    borderRadius: 20,
+  },
+  scannerTitle: {
+    color: '#fff',
+    marginLeft: 15,
     fontWeight: 'bold',
-    fontSize: 12,
+  },
+  scannerOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.3)',
+  },
+  scannerTarget: {
+    width: '80%',
+    height: 150, // Formato DNI PDF417
+    borderWidth: 2,
+    borderColor: colors.saffron,
+    borderRadius: 10,
+  },
+  noCamera: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
