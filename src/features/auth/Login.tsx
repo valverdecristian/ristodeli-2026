@@ -19,11 +19,11 @@ export const Login: FC<LoginProps> = ({ navigation }) => {
   const handleQuickAccess = (role: string) => {
     const credentials: Record<string, string> = {
       admin: 'admin@ristodeli.com',
-      cliente: 'cliente@ristodeli.com',
+      mozo: 'mozo1@ristodeli.com',
       metre: 'metre@ristodeli.com',
       supervisor: 'supervisor@ristodeli.com',
       cocinero: 'cocinero1@ristodeli.com',
-      cantinero: 'cantinero@ristodeli.com',
+      cantinero: 'cantinero1@ristodeli.com',
     };
     setEmail(credentials[role]);
     setPassword('12345678');
@@ -98,16 +98,16 @@ export const Login: FC<LoginProps> = ({ navigation }) => {
             style={styles.buttonPurple}
             onPress={() => navigation.navigate('RegistroAnonimo')} 
           >
-            <Text style={styles.buttonTextPurple}>REGISTRARSE COMO ANONIMO</Text>
+            <Text style={styles.buttonTextPurple}>REGISTRARSE COMO ANÓNIMO</Text>
           </TouchableOpacity>
         </View>
 
         {/* Accesos rápidos */}
         <View style={styles.quickAccessContainer}>
           <View style={styles.row}>
-            {['admin', 'cliente', 'metre'].map(role => (
+            {['admin', 'mozo', 'metre'].map(role => (
               <TouchableOpacity key={role} style={styles.iconButton} onPress={() => handleQuickAccess(role)}>
-                <MyIcon name={role === 'admin' ? 'shield-outline' : role === 'cliente' ? 'person-outline' : 'notifications-outline'} size={30} color={colors.russet} />
+                <MyIcon name={role === 'admin' ? 'shield-outline' : role === 'mozo' ? 'person-outline' : 'notifications-outline'} size={30} color={colors.russet} />
               </TouchableOpacity>
             ))}
           </View>

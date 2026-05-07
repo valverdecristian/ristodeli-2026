@@ -5,11 +5,15 @@ import { colors } from '../../theme/colors';
 import { globalStyles } from '../../theme/globalStyles';
 import { FotoService } from '../../core/services/FotoService';
 import { ToastService } from '../../core/services/ToastService';
+import { supabase } from '../../core/services/supabase';
+import { StorageService } from '../../core/services/StorageService';
+import { ActivityIndicator } from 'react-native';
 
 export const RegistroCliente = ({ navigation }: any) => {
   const [step, setStep] = useState(1);
   const [fotoUri, setFotoUri] = useState<string | null>(null);
   const [mostrarPassword, setMostrarPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
   
   const [formData, setFormData] = useState({
     email: '',
@@ -40,7 +44,7 @@ export const RegistroCliente = ({ navigation }: any) => {
     ToastService.mostrarAdvertencia('Escáner de DNI en desarrollo...');
   };
 
-  const enviarFormulario = () => {
+  const enviarFormulario = async () => {
     if (formData.password !== formData.confirmPassword) {
       ToastService.mostrarError('Las contraseñas no coinciden.');
       return;
@@ -49,8 +53,55 @@ export const RegistroCliente = ({ navigation }: any) => {
       ToastService.mostrarError('Es obligatorio tomarse una fotografía.');
       return;
     }
-    // Lógica futura de Supabase
-    console.log('Registrando cliente:', formData);
+    
+    setLoading(true);
+
+    try {
+      // 1. Crear usuario en Supabase Auth
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: formData.email,
+        password: formData.password,
+        options: {
+          data: {
+            role: 'cliente',
+            nombres: formData.nombres,
+            apellidos: formData.apellidos,
+          }
+        }
+      });
+
+      if (authError) throw authError;
+
+      // 2. Subir foto al Storage
+      let urlPublica = '';
+      if (fotoUri) {
+        const url = await StorageService.subirImagen(fotoUri, 'avatares');
+        if (url) urlPublica = url;
+      }
+
+      // 3. Insertar datos adicionales en la tabla 'usuarios'
+      const { error: dbError } = await supabase
+        .from('usuarios')
+        .insert({
+          id: authData.user?.id, // Vinculamos con el ID de Auth
+          email: formData.email,
+          nombres: formData.nombres,
+          apellidos: formData.apellidos,
+          dni: formData.dni,
+          cuil: formData.cuil,
+          foto: urlPublica,
+          rol: 'cliente_reg'
+        });
+
+      if (dbError) throw dbError;
+
+      ToastService.mostrarExito('¡Registro exitoso!');
+      navigation.replace('Home');
+    } catch (error: any) {
+      ToastService.mostrarError(error.message || 'Error al registrar el cliente');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -159,8 +210,12 @@ export const RegistroCliente = ({ navigation }: any) => {
               onChangeText={(val) => handleChange('confirmPassword', val)} 
             />
 
-            <TouchableOpacity style={styles.buttonPrimary} onPress={enviarFormulario}>
-              <Text style={styles.buttonTextPrimary}>REGISTRARSE</Text>
+            <TouchableOpacity style={styles.buttonPrimary} onPress={enviarFormulario} disabled={loading}>
+              {loading ? (
+                <ActivityIndicator color={colors.russet} />
+              ) : (
+                <Text style={styles.buttonTextPrimary}>REGISTRARSE</Text>
+              )}
             </TouchableOpacity>
           </View>
         )}
