@@ -1,7 +1,0 @@
-{
-  "name": "ristodeli-2026",
-  "integrations": {
-    "capacitor": {}
-  },
-  "type": "angular-standalone"
-}
