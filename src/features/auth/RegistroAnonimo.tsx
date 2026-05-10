@@ -10,14 +10,14 @@ import { supabase } from '../../core/services/supabase';
 
 export const RegistroAnonimo = ({ navigation }: any) => {
   const [nombre, setNombre] = useState('');
-  const [fotoUri, setFotoUri] = useState<string | null>(null);
+  const [fotoData, setFotoData] = useState<{ uri: string; base64: string } | null>(null);
   const [loading, setLoading] = useState(false);
 
   const tomarFotografia = async () => {
     try {
-      const uri = await FotoService.sacarFoto();
-      if (uri) {
-        setFotoUri(uri);
+      const foto = await FotoService.sacarFoto();
+      if (foto) {
+        setFotoData(foto);
       }
     } catch (error) {
       console.log('Error al tomar foto', error);
@@ -29,7 +29,7 @@ export const RegistroAnonimo = ({ navigation }: any) => {
       ToastService.mostrarError('Por favor ingrese un nombre válido (mínimo 3 letras).');
       return;
     }
-    if (!fotoUri) {
+    if (!fotoData) {
       ToastService.mostrarError('Es obligatorio tomarse una fotografía.');
       return;
     }
@@ -37,18 +37,18 @@ export const RegistroAnonimo = ({ navigation }: any) => {
     setLoading(true);
 
     try {
-      // 1. Subir la foto al bucket 'avatares'
-      const urlPublica = await StorageService.subirImagen(fotoUri, 'avatares');
+      // 1. Subir la foto al bucket 'avatares' usando el base64
+      const urlPublica = await StorageService.subirImagen(fotoData.base64, 'avatares', true);
 
       if (!urlPublica) throw new Error('No se pudo subir la imagen.');
 
-      // 2. Insertar en Supabase DB con el link
+      // 2. Insertar en Supabase DB directamente a la tabla 'anonimos'
       const { error } = await supabase
-        .from('usuarios')
+        .from('anonimos')
         .insert({
-          nombres: nombre,
+          nombre: nombre,
           foto: urlPublica,
-          rol: 'cliente_anon'
+          push_token: 'token_pendiente' // TODO: Reemplazar con el token real de FCM/OneSignal
         });
 
       if (error) throw error;
@@ -75,9 +75,9 @@ export const RegistroAnonimo = ({ navigation }: any) => {
         <Text style={styles.subtitle}>Ingresa tu nombre y tómate una foto para continuar hacia el menú.</Text>
 
         <View style={styles.fotoContainer}>
-          {fotoUri ? (
+          {fotoData ? (
             <TouchableOpacity onPress={tomarFotografia}>
-              <Image source={{ uri: fotoUri }} style={styles.fotoPreview} />
+              <Image source={{ uri: fotoData.uri }} style={styles.fotoPreview} />
             </TouchableOpacity>
           ) : (
             <TouchableOpacity style={styles.fotoPlaceholder} onPress={tomarFotografia}>
@@ -85,7 +85,7 @@ export const RegistroAnonimo = ({ navigation }: any) => {
             </TouchableOpacity>
           )}
           <TouchableOpacity style={styles.btnCamara} onPress={tomarFotografia}>
-            <Text style={styles.btnCamaraText}>{fotoUri ? 'Cambiar Foto' : 'Tomar Foto'}</Text>
+            <Text style={styles.btnCamaraText}>{fotoData ? 'Cambiar Foto' : 'Tomar Foto'}</Text>
           </TouchableOpacity>
         </View>
 
@@ -100,7 +100,7 @@ export const RegistroAnonimo = ({ navigation }: any) => {
         </View>
 
         <TouchableOpacity style={styles.buttonPrimary} onPress={registrarAnonimo}>
-          <Text style={styles.buttonTextPrimary}>INGRESAR COMO ANÓNIMO</Text>
+          <Text style={styles.buttonTextPrimary}>ENTRAR COMO ANÓNIMO</Text>
         </TouchableOpacity>
 
       </ScrollView>

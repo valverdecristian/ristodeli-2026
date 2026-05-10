@@ -7,7 +7,8 @@ import { globalStyles } from '../../theme/globalStyles';
 
 // 1. IMPORTACIONES DE PLUGINS NATIVOS
 import { launchCamera, ImagePickerResponse } from 'react-native-image-picker';
-import { Camera, useCameraDevice, useCameraPermission, useObjectOutput, ScannedCode } from 'react-native-vision-camera';
+import { Camera, useCameraDevice, useCameraPermission } from 'react-native-vision-camera';
+import { useBarcodeScannerOutput } from 'react-native-vision-camera-barcode-scanner';
 
 // 2. IMPORTACIONES DE SUPABASE Y SERVICIOS
 import { supabase } from '../../core/services/supabase';
@@ -36,12 +37,12 @@ export const RegistroCliente: FC<RegisterProps> = ({ navigation }) => {
   const device = useCameraDevice('back');
   const { hasPermission, requestPermission } = useCameraPermission();
 
-  // Escáner de objetos (códigos) para v5
-  const objectOutput = useObjectOutput({
-    types: ['pdf-417'],
-    onObjectsScanned: (objects) => {
-      if (objects.length > 0 && scannerVisible) {
-        const rawData = (objects[0] as ScannedCode).value;
+  // Escáner de códigos compatible con v5 usando CameraOutput
+  const scannerOutput = useBarcodeScannerOutput({
+    barcodeFormats: ['pdf-417'],
+    onBarcodeScanned: (codes) => {
+      if (codes.length > 0 && scannerVisible) {
+        const rawData = codes[0].value;
         if (rawData) {
           processDniData(rawData);
         }
@@ -153,8 +154,8 @@ export const RegistroCliente: FC<RegisterProps> = ({ navigation }) => {
           apellidos: apellido,
           dni: dni,
           cuil: cuil,
-          foto: urlPublica,
-          rol: 'cliente_reg' // Perfil en tabla usuarios
+          foto_url: urlPublica,
+          perfil: 'cliente_reg' // Perfil en tabla usuarios
         });
 
       if (dbError) throw dbError;
@@ -296,7 +297,7 @@ export const RegistroCliente: FC<RegisterProps> = ({ navigation }) => {
                 style={StyleSheet.absoluteFill}
                 device={device}
                 isActive={scannerVisible}
-                outputs={[objectOutput]}
+                outputs={[scannerOutput]}
               />
           ) : (
             <View style={styles.noCamera}>

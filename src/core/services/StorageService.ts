@@ -1,6 +1,16 @@
 import { supabase } from './supabase';
 import { Platform } from 'react-native';
 
+const decodeBase64 = (base64: string): Uint8Array => {
+  const binaryString = atob(base64);
+  const len = binaryString.length;
+  const bytes = new Uint8Array(len);
+  for (let i = 0; i < len; i++) {
+    bytes[i] = binaryString.charCodeAt(i);
+  }
+  return bytes;
+};
+
 export const StorageService = {
   /**
    * Sube una imagen a un bucket de Supabase
@@ -8,27 +18,40 @@ export const StorageService = {
    * @param bucket Nombre del bucket (ej: 'usuarios' o 'productos')
    * @returns URL pública de la imagen
    */
-  subirImagen: async (uri: string, bucket: string): Promise<string | null> => {
+  subirImagen: async (fileData: string, bucket: string, isBase64: boolean = false): Promise<string | null> => {
     try {
       // 1. Preparar el nombre del archivo (único)
-      const extension = uri.split('.').pop();
+      const extension = isBase64 ? 'jpg' : fileData.split('.').pop() || 'jpg';
       const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${extension}`;
       const filePath = `usuarios/${fileName}`;
 
-      // 2. Convertir URI a Blob (Forma recomendada en React Native)
-      const response = await fetch(uri);
-      const blob = await response.blob();
+      let uploadBody: any;
+      
+      if (isBase64) {
+        // 2.A Convertir base64 a Uint8Array (Solución nativa 100% confiable)
+        uploadBody = decodeBase64(fileData);
+      } else {
+        // 2.B Preparar el archivo con FormData para URIs locales
+        const cleanUri = fileData.startsWith('file://') ? fileData : `file://${fileData}`;
+        const formData = new FormData();
+        formData.append('file', {
+          uri: cleanUri,
+          name: fileName,
+          type: 'image/jpeg',
+        } as any);
+        uploadBody = formData;
+      }
 
       // 3. Subir a Supabase Storage
       const { data, error } = await supabase.storage
         .from(bucket)
-        .upload(filePath, blob, {
-          contentType: 'image/jpeg',
-          cacheControl: '3600',
-          upsert: false,
-        });
+        .upload(filePath, uploadBody, isBase64 ? { contentType: 'image/jpeg' } : undefined);
 
-      if (error) throw error;
+      if (error) {
+        // 👈 Imprimimos el error real de Supabase para debuggear
+        console.error('Error de Supabase Storage:', error.message);
+        return null;
+      }
 
       // 4. Obtener la URL pública
       const { data: publicUrlData } = supabase.storage
@@ -36,8 +59,9 @@ export const StorageService = {
         .getPublicUrl(filePath);
 
       return publicUrlData.publicUrl;
-    } catch (error) {
-      console.error('Error en StorageService:', error);
+    } catch (error: any) {
+      // Ahora el error te dirá más en la consola de VS Code
+      console.error('Error detallado de Storage:', error.message);
       return null;
     }
   },

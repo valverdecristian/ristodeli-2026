@@ -31,7 +31,8 @@
     "react-native-toast-message": "^2.3.3",
     "react-native-url-polyfill": "^3.0.0",
     "react-native-vector-icons": "^10.3.0",
-    "react-native-vision-camera": "^5.0.9"
+    "react-native-vision-camera": "^5.0.9",
+    "react-native-vision-camera-barcode-scanner": "^5.0.9"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
