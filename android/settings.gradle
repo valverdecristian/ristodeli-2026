@@ -1,6 +1,38 @@
-pluginManagement { includeBuild("../node_modules/@react-native/gradle-plugin") }
-plugins { id("com.facebook.react.settings") }
-extensions.configure(com.facebook.react.ReactSettingsExtension){ ex -> ex.autolinkLibrariesFromCommand() }
-rootProject.name = 'Ristodeli'
+// android/settings.gradle
+
+pluginManagement {
+    def reactNativeGradlePluginDir = new File(settingsDir, "../node_modules/@react-native/gradle-plugin")
+    repositories {
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+    }
+    if (reactNativeGradlePluginDir.exists()) {
+        includeBuild(reactNativeGradlePluginDir)
+    }
+}
+
+dependencyResolutionManagement {
+    // 💡 Usamos PREFER_SETTINGS para centralizar los repositorios
+    repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
+    repositories {
+        google()
+        mavenCentral()
+        // Repositorios para librerías nativas
+        maven { url "$settingsDir/../node_modules/@react-native-async-storage/async-storage/android/maven" }
+        maven { url "$settingsDir/../node_modules/react-native/android" }
+        maven { url "$settingsDir/../node_modules/jsc-android/dist" }
+        maven { url 'https://www.jitpack.io' }
+    }
+}
+
+rootProject.name = 'ristodeli'
 include ':app'
-includeBuild('../node_modules/@react-native/gradle-plugin')
+
+// 💡 CARGA DE EXPO: Esto registra el ID "expo" para que el proyecto :app lo reconozca
+def expoAutolink = file("../node_modules/expo-modules-autolinking/scripts/android/autolinking.gradle")
+
+if (expoAutolink.exists()) {
+    apply from: expoAutolink
+    useExpoModules()
+}
