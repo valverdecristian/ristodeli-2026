@@ -22,8 +22,8 @@ export const Home = ({ navigation }: any) => {
   const allActions: Action[] = [
     // Acciones de Gestión (Admin y Supervisor)
     { label: 'Agregar Empleado', icon: 'person-add-outline', roles: ['admin', 'supervisor'], onPress: () => { } },
-    { label: 'Agregar Mesa', icon: 'add-circle-outline', roles: ['admin', 'supervisor'], onPress: () => { } },
-    { label: 'Lista de Mesas', icon: 'list-outline', roles: ['admin', 'supervisor'], onPress: () => { } },
+    { label: 'Agregar Mesa', icon: 'add-circle-outline', roles: ['admin', 'supervisor'], onPress: () => navigation.navigate('AgregarMesa') },
+    { label: 'Lista de Mesas', icon: 'list-outline', roles: ['admin', 'supervisor'], onPress: () => navigation.navigate('ListadoMesas') },
     { label: 'Gestión de Clientes', icon: 'people-outline', roles: ['admin', 'supervisor'], onPress: () => { } },
 
     // Acciones de Cocina
@@ -39,7 +39,7 @@ export const Home = ({ navigation }: any) => {
     // Acciones de Metre
     { label: 'Crear Cliente', icon: 'person-add-outline', roles: ['metre'], onPress: () => { } },
     { label: 'Lista de Espera', icon: 'people-outline', roles: ['metre'], onPress: () => { } },
-    { label: 'Lista de Mesas', icon: 'list-outline', roles: ['metre'], onPress: () => { } },
+    { label: 'Lista de Mesas', icon: 'list-outline', roles: ['metre'], onPress: () => navigation.navigate('ListadoMesas') },
 
     // Acciones de Mozo
     { label: 'Lista de Pedidos', icon: 'clipboard-outline', roles: ['mozo'], onPress: () => { } },
