@@ -14,7 +14,6 @@ interface Action {
 }
 
 export const Home = ({ navigation }: any) => {
-  const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [userRole, setUserRole] = useState<string>('cliente');
 
