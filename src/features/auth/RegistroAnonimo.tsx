@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, KeyboardAvoidingView, Platform, ScrollView, ActivityIndicator } from 'react-native';
 import { MyIcon } from '../../shared/components/Icon';
 import { colors } from '../../theme/colors';
-import { globalStyles } from '../../theme/globalStyles';
 import { FotoService } from '../../core/services/FotoService';
 import { ToastService } from '../../core/services/ToastService';
 import { StorageService } from '../../core/services/StorageService';
@@ -64,34 +63,34 @@ export const RegistroAnonimo = ({ navigation }: any) => {
   };
 
   return (
-    <KeyboardAvoidingView style={globalStyles.container} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
+    <KeyboardAvoidingView className="flex-1 bg-retro-green" behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+      <ScrollView contentContainerClassName="flex-grow px-8 py-10">
 
-        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+        <TouchableOpacity className="mb-5 self-start" onPress={() => navigation.goBack()}>
           <MyIcon name="arrow-back-outline" size={30} color={colors.vanillaCream} />
         </TouchableOpacity>
 
-        <Text style={styles.title}>Ingreso Anónimo</Text>
-        <Text style={styles.subtitle}>Ingresa tu nombre y tómate una foto para continuar hacia el menú.</Text>
+        <Text className="text-3xl text-vanilla-cream font-serif font-bold mb-3">Ingreso Anónimo</Text>
+        <Text className="text-base text-vanilla-cream/90 mb-8">Ingresa tu nombre y tómate una foto para continuar hacia el menú.</Text>
 
-        <View style={styles.fotoContainer}>
+        <View className="items-center mb-10">
           {fotoData ? (
             <TouchableOpacity onPress={tomarFotografia}>
-              <Image source={{ uri: fotoData.uri }} style={styles.fotoPreview} />
+              <Image source={{ uri: fotoData.uri }} className="w-36 h-36 rounded-full border-2 border-saffron" />
             </TouchableOpacity>
           ) : (
-            <TouchableOpacity style={styles.fotoPlaceholder} onPress={tomarFotografia}>
+            <TouchableOpacity className="w-36 h-36 rounded-full bg-vanilla-cream justify-center items-center border-2 border-dashed border-saffron" onPress={tomarFotografia}>
               <MyIcon name="camera-outline" size={50} color={colors.russet} />
             </TouchableOpacity>
           )}
-          <TouchableOpacity style={styles.btnCamara} onPress={tomarFotografia}>
-            <Text style={styles.btnCamaraText}>{fotoData ? 'Cambiar Foto' : 'Tomar Foto'}</Text>
+          <TouchableOpacity className="-mt-5 bg-saffron px-5 py-2 rounded-full shadow-sm" onPress={tomarFotografia}>
+            <Text className="text-russet font-bold">{fotoData ? 'Cambiar Foto' : 'Tomar Foto'}</Text>
           </TouchableOpacity>
         </View>
 
-        <View style={styles.formContainer}>
+        <View className="mb-8">
           <TextInput
-            style={styles.input}
+            className="bg-vanilla-cream rounded-2xl px-5 py-4 text-base text-russet mb-4"
             placeholder="Nombre o Apodo"
             placeholderTextColor={colors.russet}
             value={nombre}
@@ -99,99 +98,11 @@ export const RegistroAnonimo = ({ navigation }: any) => {
           />
         </View>
 
-        <TouchableOpacity style={styles.buttonPrimary} onPress={registrarAnonimo}>
-          <Text style={styles.buttonTextPrimary}>ENTRAR COMO ANÓNIMO</Text>
+        <TouchableOpacity className="bg-purple rounded-full py-4 items-center shadow-sm" onPress={registrarAnonimo}>
+          <Text className="text-russet text-base font-bold tracking-wider">ENTRAR COMO ANÓNIMO</Text>
         </TouchableOpacity>
 
       </ScrollView>
     </KeyboardAvoidingView>
   );
 };
-
-const styles = StyleSheet.create({
-  scrollContainer: {
-    flexGrow: 1,
-    paddingHorizontal: 30,
-    paddingVertical: 40,
-  },
-  backButton: {
-    marginBottom: 20,
-    alignSelf: 'flex-start',
-  },
-  title: {
-    fontSize: 32,
-    color: colors.vanillaCream,
-    fontFamily: 'serif',
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: colors.vanillaCream,
-    marginBottom: 30,
-    opacity: 0.9,
-  },
-  fotoContainer: {
-    alignItems: 'center',
-    marginBottom: 40,
-  },
-  fotoPlaceholder: {
-    width: 150,
-    height: 150,
-    borderRadius: 75,
-    backgroundColor: colors.vanillaCream,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: colors.saffron,
-    borderStyle: 'dashed',
-  },
-  fotoPreview: {
-    width: 150,
-    height: 150,
-    borderRadius: 75,
-    borderWidth: 2,
-    borderColor: colors.saffron,
-  },
-  btnCamara: {
-    marginTop: -20,
-    backgroundColor: colors.saffron,
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 20,
-    elevation: 3,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 3,
-  },
-  btnCamaraText: {
-    color: colors.russet,
-    fontWeight: 'bold',
-  },
-  formContainer: {
-    marginBottom: 30,
-  },
-  input: {
-    backgroundColor: colors.vanillaCream,
-    borderRadius: 15,
-    paddingHorizontal: 20,
-    paddingVertical: 15,
-    fontSize: 16,
-    color: colors.russet,
-    marginBottom: 15,
-  },
-  buttonPrimary: {
-    backgroundColor: colors.purple, // Usamos el morado que estaba en Login para anónimo
-    borderRadius: 25,
-    paddingVertical: 15,
-    alignItems: 'center',
-    elevation: 3,
-  },
-  buttonTextPrimary: {
-    color: colors.russet,
-    fontSize: 16,
-    fontWeight: 'bold',
-    letterSpacing: 1,
-  },
-});

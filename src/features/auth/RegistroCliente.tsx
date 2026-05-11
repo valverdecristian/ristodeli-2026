@@ -3,7 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, KeyboardAvo
 import LinearGradient from 'react-native-linear-gradient';
 import { MyIcon } from '../../shared/components/Icon';
 import { colors } from '../../theme/colors';
-import { globalStyles } from '../../theme/globalStyles';
+
 
 // 1. IMPORTACIONES DE PLUGINS NATIVOS
 import { launchCamera, ImagePickerResponse } from 'react-native-image-picker';
@@ -40,9 +40,10 @@ export const RegistroCliente: FC<RegisterProps> = ({ navigation }) => {
   // Escáner de códigos compatible con v5 usando CameraOutput
   const scannerOutput = useBarcodeScannerOutput({
     barcodeFormats: ['pdf-417'],
+    onError: (error) => console.log('Scanner error:', error),
     onBarcodeScanned: (codes) => {
       if (codes.length > 0 && scannerVisible) {
-        const rawData = codes[0].value;
+        const rawData = codes[0].displayValue || codes[0].rawValue;
         if (rawData) {
           processDniData(rawData);
         }
@@ -170,55 +171,55 @@ export const RegistroCliente: FC<RegisterProps> = ({ navigation }) => {
   };
 
   return (
-    <LinearGradient colors={['#0F2027', '#203A43', '#2C5364']} style={globalStyles.container}>
+    <LinearGradient colors={['#0F2027', '#203A43', '#2C5364']} className="flex-1">
       <StatusBar barStyle="light-content" />
-      <SafeAreaView style={{ flex: 1 }}>
+      <SafeAreaView className="flex-1">
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          style={{ flex: 1 }}
+          className="flex-1"
         >
-          <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
+          <ScrollView contentContainerClassName="flex-grow px-8 py-10" showsVerticalScrollIndicator={false}>
             {/* Logo superior */}
-            <View style={styles.logoHeader}>
-              <Text style={styles.logoTextMain}>RISTO</Text>
-              <Text style={styles.logoTextSub}>DELI</Text>
-              <Text style={styles.byAlfa}>by ALFA DEVS</Text>
+            <View className="items-center mt-2 mb-5">
+              <Text className="text-4xl font-bold text-vanilla-cream tracking-widest">RISTO</Text>
+              <Text className="text-3xl font-bold text-saffron -mt-2">DELI</Text>
+              <Text className="text-xs text-gray-300 mt-1">by ALFA DEVS</Text>
             </View>
 
-            <Text style={styles.registerTitle}>REGISTRO</Text>
+            <Text className="text-2xl text-vanilla-cream font-bold text-center mb-5 tracking-wide">REGISTRO</Text>
 
             {/* --- SECTOR FOTO DE PERFIL --- */}
-            <TouchableOpacity style={styles.photoPicker} onPress={takeProfilePhoto}>
+            <TouchableOpacity className="items-center mb-8" onPress={takeProfilePhoto}>
               {profileImageUri ? (
-                <Image source={{ uri: profileImageUri }} style={styles.profileImage} />
+                <Image source={{ uri: profileImageUri }} className="w-32 h-32 rounded-full" />
               ) : (
-                <View style={styles.photoPlaceholder}>
+                <View className="w-32 h-32 rounded-full bg-vanilla-cream justify-center items-center border-2 border-black/10">
                   <MyIcon name="camera-outline" size={40} color={colors.russet} />
-                  <Text style={styles.photoText}>Tomar Foto</Text>
+                  <Text className="mt-1 text-russet font-bold text-xs">Tomar Foto</Text>
                 </View>
               )}
             </TouchableOpacity>
 
             {/* Inputs del formulario */}
-            <View style={styles.formContainer}>
+            <View className="w-full">
               {/* Input Nombre */}
-              <View style={styles.inputWrapper}>
-                <MyIcon name="person-outline" size={20} color={colors.russet} style={styles.inputIcon} />
-                <TextInput style={styles.input} placeholder="Nombre" placeholderTextColor={colors.russet} value={nombre} onChangeText={setNombre} />
+              <View className="flex-row items-center bg-vanilla-cream rounded-2xl mb-4 px-4">
+                <MyIcon name="person-outline" size={20} color={colors.russet} style={{ marginRight: 10 }} />
+                <TextInput className="flex-1 py-4 text-base text-russet font-bold" placeholder="Nombre" placeholderTextColor={colors.russet} value={nombre} onChangeText={setNombre} />
               </View>
 
               {/* Input Apellido */}
-              <View style={styles.inputWrapper}>
-                <MyIcon name="person-outline" size={20} color={colors.russet} style={styles.inputIcon} />
-                <TextInput style={styles.input} placeholder="Apellido" placeholderTextColor={colors.russet} value={apellido} onChangeText={setApellido} />
+              <View className="flex-row items-center bg-vanilla-cream rounded-2xl mb-4 px-4">
+                <MyIcon name="person-outline" size={20} color={colors.russet} style={{ marginRight: 10 }} />
+                <TextInput className="flex-1 py-4 text-base text-russet font-bold" placeholder="Apellido" placeholderTextColor={colors.russet} value={apellido} onChangeText={setApellido} />
               </View>
 
               {/* --- INPUT DNI CON ESCÁNER --- */}
-              <View style={styles.dniInputGroup}>
-                <View style={[styles.inputWrapper, { flex: 1, marginBottom: 0 }]}>
-                  <MyIcon name="id-card-outline" size={20} color={colors.russet} style={styles.inputIcon} />
+              <View className="flex-row items-center mb-4 gap-2">
+                <View className="flex-row items-center bg-vanilla-cream rounded-2xl px-4 flex-1">
+                  <MyIcon name="id-card-outline" size={20} color={colors.russet} style={{ marginRight: 10 }} />
                   <TextInput
-                    style={styles.input}
+                    className="flex-1 py-4 text-base text-russet font-bold"
                     placeholder="DNI"
                     placeholderTextColor={colors.russet}
                     value={dni}
@@ -228,54 +229,54 @@ export const RegistroCliente: FC<RegisterProps> = ({ navigation }) => {
                 </View>
                 {/* Botón para escanear */}
                 <TouchableOpacity
-                  style={styles.scanBarButton}
+                  className="w-12 h-14 rounded-2xl overflow-hidden shadow-sm"
                   onPress={() => setScannerVisible(true)}
                   disabled={!hasPermission}
                 >
-                  <LinearGradient colors={['#FF512F', '#DD2476']} style={styles.scanBarGradient}>
+                  <LinearGradient colors={['#FF512F', '#DD2476']} className="flex-1 justify-center items-center">
                     <MyIcon name="scan-outline" size={22} color="#fff" />
                   </LinearGradient>
                 </TouchableOpacity>
               </View>
 
-              <View style={styles.inputWrapper}>
-                <MyIcon name="calculator-outline" size={20} color={colors.russet} style={styles.inputIcon} />
-                <TextInput style={styles.input} placeholder="CUIL" placeholderTextColor={colors.russet} value={cuil} onChangeText={setCuil} keyboardType="numeric" />
+              <View className="flex-row items-center bg-vanilla-cream rounded-2xl mb-4 px-4">
+                <MyIcon name="calculator-outline" size={20} color={colors.russet} style={{ marginRight: 10 }} />
+                <TextInput className="flex-1 py-4 text-base text-russet font-bold" placeholder="CUIL" placeholderTextColor={colors.russet} value={cuil} onChangeText={setCuil} keyboardType="numeric" />
               </View>
 
-              <View style={styles.inputWrapper}>
-                <MyIcon name="mail-outline" size={20} color={colors.russet} style={styles.inputIcon} />
-                <TextInput style={styles.input} placeholder="Email" placeholderTextColor={colors.russet} value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" />
+              <View className="flex-row items-center bg-vanilla-cream rounded-2xl mb-4 px-4">
+                <MyIcon name="mail-outline" size={20} color={colors.russet} style={{ marginRight: 10 }} />
+                <TextInput className="flex-1 py-4 text-base text-russet font-bold" placeholder="Email" placeholderTextColor={colors.russet} value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" />
               </View>
 
-              <View style={styles.inputWrapper}>
-                <MyIcon name="lock-closed-outline" size={20} color={colors.russet} style={styles.inputIcon} />
-                <TextInput style={styles.input} placeholder="Contraseña" placeholderTextColor={colors.russet} value={password} onChangeText={setPassword} secureTextEntry />
+              <View className="flex-row items-center bg-vanilla-cream rounded-2xl mb-4 px-4">
+                <MyIcon name="lock-closed-outline" size={20} color={colors.russet} style={{ marginRight: 10 }} />
+                <TextInput className="flex-1 py-4 text-base text-russet font-bold" placeholder="Contraseña" placeholderTextColor={colors.russet} value={password} onChangeText={setPassword} secureTextEntry />
               </View>
 
             </View>
 
             {/* Botón principal */}
-            <TouchableOpacity style={styles.buttonRegister} onPress={enviarFormulario} disabled={loading}>
+            <TouchableOpacity className="mt-4 rounded-3xl overflow-hidden shadow-sm" onPress={enviarFormulario} disabled={loading}>
               <LinearGradient
                 colors={['#FF512F', '#DD2476']}
-                style={styles.buttonGradient}
+                className="py-4 items-center justify-center"
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
               >
                 {loading ? (
                   <ActivityIndicator color="#fff" />
                 ) : (
-                  <Text style={styles.buttonText}>REGISTRARSE</Text>
+                  <Text className="text-white text-base font-bold tracking-wider">REGISTRARSE</Text>
                 )}
               </LinearGradient>
             </TouchableOpacity>
 
             {/* Footer */}
-            <View style={styles.footer}>
-              <Text style={styles.footerText}>¿Ya tienes cuenta?</Text>
+            <View className="flex-row justify-center mt-8">
+              <Text className="text-gray-300">¿Ya tienes cuenta?</Text>
               <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-                <Text style={styles.footerTextBold}> Inicia sesión aquí</Text>
+                <Text className="text-saffron font-bold"> Inicia sesión aquí</Text>
               </TouchableOpacity>
             </View>
           </ScrollView>
@@ -284,12 +285,12 @@ export const RegistroCliente: FC<RegisterProps> = ({ navigation }) => {
 
       {/* --- MODAL DEL ESCÁNER DE DNI --- */}
       <Modal animationType="slide" transparent={false} visible={scannerVisible}>
-        <SafeAreaView style={{ flex: 1, backgroundColor: '#000' }}>
-          <View style={styles.scannerHeader}>
-            <TouchableOpacity onPress={() => setScannerVisible(false)} style={styles.closeScanner}>
+        <SafeAreaView className="flex-1 bg-black">
+          <View className="absolute top-5 left-5 right-5 z-10 flex-row items-center">
+            <TouchableOpacity onPress={() => setScannerVisible(false)} className="p-2 bg-black/50 rounded-full">
               <MyIcon name="close" size={30} color="#fff" />
             </TouchableOpacity>
-            <Text style={styles.scannerTitle}>Escanee el código PDF417 del DNI</Text>
+            <Text className="text-white ml-4 font-bold">Escanee el código PDF417 del DNI</Text>
           </View>
           
           {device != null && hasPermission ? (
@@ -300,14 +301,14 @@ export const RegistroCliente: FC<RegisterProps> = ({ navigation }) => {
                 outputs={[scannerOutput]}
               />
           ) : (
-            <View style={styles.noCamera}>
-              <Text style={{color: '#fff'}}>Esperando cámara o permisos...</Text>
+            <View className="flex-1 justify-center items-center">
+              <Text className="text-white">Esperando cámara o permisos...</Text>
             </View>
           )}
           
           {/* Superposición visual para centrar el DNI */}
-          <View style={styles.scannerOverlay}>
-            <View style={styles.scannerTarget} />
+          <View className="flex-1 justify-center items-center bg-black/30">
+            <View className="w-4/5 h-40 border-2 border-saffron rounded-xl" />
           </View>
         </SafeAreaView>
       </Modal>
@@ -316,170 +317,4 @@ export const RegistroCliente: FC<RegisterProps> = ({ navigation }) => {
   );
 };
 
-const styles = StyleSheet.create({
-  scrollContainer: {
-    flexGrow: 1,
-    paddingHorizontal: 30,
-    paddingVertical: 40,
-  },
-  logoHeader: {
-    alignItems: 'center',
-    marginTop: 10,
-    marginBottom: 20,
-  },
-  logoTextMain: {
-    fontSize: 40,
-    fontWeight: 'bold',
-    color: colors.vanillaCream,
-    letterSpacing: 2,
-  },
-  logoTextSub: {
-    fontSize: 30,
-    fontWeight: 'bold',
-    color: colors.saffron,
-    marginTop: -10,
-  },
-  byAlfa: {
-    fontSize: 12,
-    color: '#ddd',
-    marginTop: 5,
-  },
-  registerTitle: {
-    fontSize: 24,
-    color: colors.vanillaCream,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 20,
-    letterSpacing: 1,
-  },
-  photoPicker: {
-    alignItems: 'center',
-    marginBottom: 30,
-  },
-  photoPlaceholder: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    backgroundColor: colors.vanillaCream,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: 'rgba(0,0,0,0.1)',
-  },
-  profileImage: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-  },
-  photoText: {
-    marginTop: 5,
-    color: colors.russet,
-    fontWeight: 'bold',
-    fontSize: 12,
-  },
-  formContainer: {
-    width: '100%',
-  },
-  inputWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.vanillaCream,
-    borderRadius: 15,
-    marginBottom: 15,
-    paddingHorizontal: 15,
-  },
-  inputIcon: {
-    marginRight: 10,
-  },
-  input: {
-    flex: 1,
-    paddingVertical: 15,
-    fontSize: 16,
-    color: colors.russet,
-    fontWeight: 'bold',
-  },
-  dniInputGroup: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 15,
-    gap: 10,
-  },
-  scanBarButton: {
-    width: 50,
-    height: 55, // Misma altura que el input
-    borderRadius: 15,
-    overflow: 'hidden',
-    elevation: 3,
-  },
-  scanBarGradient: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  buttonRegister: {
-    marginTop: 15,
-    borderRadius: 25,
-    overflow: 'hidden',
-    elevation: 3,
-  },
-  buttonGradient: {
-    paddingVertical: 15,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
-    letterSpacing: 1,
-  },
-  footer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginTop: 30,
-  },
-  footerText: {
-    color: '#ddd',
-  },
-  footerTextBold: {
-    color: colors.saffron,
-    fontWeight: 'bold',
-  },
-  scannerHeader: {
-    position: 'absolute',
-    top: 20,
-    left: 20,
-    right: 20,
-    zIndex: 10,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  closeScanner: {
-    padding: 10,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    borderRadius: 20,
-  },
-  scannerTitle: {
-    color: '#fff',
-    marginLeft: 15,
-    fontWeight: 'bold',
-  },
-  scannerOverlay: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.3)',
-  },
-  scannerTarget: {
-    width: '80%',
-    height: 150, // Formato DNI PDF417
-    borderWidth: 2,
-    borderColor: colors.saffron,
-    borderRadius: 10,
-  },
-  noCamera: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-});
+

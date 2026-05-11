@@ -3,7 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, KeyboardAvo
 import { MyIcon } from '../../shared/components/Icon';
 import { colors } from '../../theme/colors';
 import { supabase } from '@core/services/supabase';
-import { globalStyles } from '../../theme/globalStyles';
+
 import { ToastService } from '@core/services/ToastService';
 
 interface LoginProps {
@@ -49,22 +49,22 @@ export const Login: FC<LoginProps> = ({ navigation }) => {
 
   return (
     <KeyboardAvoidingView 
-      style={globalStyles.container} 
+      className="flex-1 bg-retro-green" 
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
-      <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerClassName="flex-grow justify-center px-8 py-5" showsVerticalScrollIndicator={false}>
         
-        <View style={styles.logoContainer}>
+        <View className="items-center mb-8 mt-5">
           <Image 
             source={require('../../../assets/icon.png')} 
-            style={styles.logo} 
+            className="w-24 h-24" 
             resizeMode="contain"
           />
         </View>
 
-        <View style={styles.formContainer}>
+        <View className="w-full mb-4">
           <TextInput
-            style={styles.input}
+            className="bg-vanilla-cream rounded-full px-5 py-4 text-base text-russet mb-4 text-center font-bold"
             placeholder="Correo Electrónico"
             placeholderTextColor={colors.russet}
             value={email}
@@ -73,7 +73,7 @@ export const Login: FC<LoginProps> = ({ navigation }) => {
             autoCapitalize="none"
           />
           <TextInput
-            style={styles.input}
+            className="bg-vanilla-cream rounded-full px-5 py-4 text-base text-russet mb-4 text-center font-bold"
             placeholder="Contraseña"
             placeholderTextColor={colors.russet}
             value={password}
@@ -82,38 +82,38 @@ export const Login: FC<LoginProps> = ({ navigation }) => {
           />
         </View>
 
-        <View style={styles.buttonsContainer}>
-          <TouchableOpacity style={styles.buttonPrimary} onPress={handleLogin} disabled={loading}>
-            {loading ? <ActivityIndicator color={colors.russet} /> : <Text style={styles.buttonTextPrimary}>INICIAR SESIÓN</Text>}
+        <View className="w-full mb-8">
+          <TouchableOpacity className="bg-saffron rounded-full py-4 items-center shadow-sm" onPress={handleLogin} disabled={loading}>
+            {loading ? <ActivityIndicator color={colors.russet} /> : <Text className="text-russet text-sm font-bold tracking-wider">INICIAR SESIÓN</Text>}
           </TouchableOpacity>
 
           <TouchableOpacity 
-            style={[styles.buttonPrimary, { marginTop: 10 }]}
+            className="bg-saffron rounded-full py-4 items-center shadow-sm mt-3"
             onPress={() => navigation.navigate('RegistroCliente')} 
           >
-            <Text style={styles.buttonTextPrimary}>REGISTRARSE</Text>
+            <Text className="text-russet text-sm font-bold tracking-wider">REGISTRARSE</Text>
           </TouchableOpacity>
 
           <TouchableOpacity 
-            style={styles.buttonPurple}
+            className="bg-purple rounded-full py-4 items-center shadow-sm mt-4"
             onPress={() => navigation.navigate('RegistroAnonimo')} 
           >
-            <Text style={styles.buttonTextPurple}>REGISTRARSE COMO ANÓNIMO</Text>
+            <Text className="text-russet text-sm font-bold tracking-wider">REGISTRARSE COMO ANÓNIMO</Text>
           </TouchableOpacity>
         </View>
 
         {/* Accesos rápidos */}
-        <View style={styles.quickAccessContainer}>
-          <View style={styles.row}>
+        <View className="items-center">
+          <View className="flex-row justify-center mb-4 gap-5">
             {['admin', 'mozo', 'metre'].map(role => (
-              <TouchableOpacity key={role} style={styles.iconButton} onPress={() => handleQuickAccess(role)}>
+              <TouchableOpacity key={role} className="w-14 h-14 rounded-full bg-saffron justify-center items-center shadow-sm" onPress={() => handleQuickAccess(role)}>
                 <MyIcon name={role === 'admin' ? 'shield-outline' : role === 'mozo' ? 'person-outline' : 'notifications-outline'} size={30} color={colors.russet} />
               </TouchableOpacity>
             ))}
           </View>
-          <View style={styles.row}>
+          <View className="flex-row justify-center mb-4 gap-5">
             {['supervisor', 'cocinero', 'cantinero'].map(role => (
-              <TouchableOpacity key={role} style={styles.iconButton} onPress={() => handleQuickAccess(role)}>
+              <TouchableOpacity key={role} className="w-14 h-14 rounded-full bg-saffron justify-center items-center shadow-sm" onPress={() => handleQuickAccess(role)}>
                 <MyIcon name={role === 'supervisor' ? 'clipboard-outline' : role === 'cocinero' ? 'flame-outline' : 'wine-outline'} size={30} color={colors.russet} />
               </TouchableOpacity>
             ))}
@@ -123,105 +123,3 @@ export const Login: FC<LoginProps> = ({ navigation }) => {
     </KeyboardAvoidingView>
   );
 };
-
-const styles = StyleSheet.create({
-  scrollContainer: {
-    flexGrow: 1,
-    justifyContent: 'center',
-    paddingHorizontal: 30,
-    paddingVertical: 20,
-  },
-  logoContainer: {
-    alignItems: 'center',
-    marginBottom: 30,
-    marginTop: 20,
-  },
-  logoCircle: {
-    width: 140,
-    height: 140,
-    borderRadius: 70,
-    backgroundColor: 'rgba(0,0,0,0.1)', 
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  logo: {
-    width: 100,
-    height: 100,
-  },
-  formContainer: {
-    width: '100%',
-    marginBottom: 15,
-  },
-  input: {
-    backgroundColor: colors.vanillaCream,
-    borderRadius: 25,
-    paddingHorizontal: 20,
-    paddingVertical: 15,
-    fontSize: 16,
-    color: colors.russet,
-    marginBottom: 15,
-    textAlign: 'center', 
-    fontWeight: 'bold',
-  },
-  buttonsContainer: {
-    width: '100%',
-    marginBottom: 30,
-  },
-  buttonPrimary: {
-    backgroundColor: colors.saffron,
-    borderRadius: 25,
-    paddingVertical: 15,
-    alignItems: 'center',
-    elevation: 3,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 3,
-  },
-  buttonTextPrimary: {
-    color: colors.russet,
-    fontSize: 14,
-    fontWeight: 'bold',
-    letterSpacing: 1,
-  },
-  buttonPurple: {
-    backgroundColor: colors.purple,
-    borderRadius: 25,
-    paddingVertical: 15,
-    alignItems: 'center',
-    elevation: 3,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 3,
-    marginTop: 15,
-  },
-  buttonTextPurple: {
-    color: colors.russet,
-    fontSize: 14,
-    fontWeight: 'bold',
-    letterSpacing: 0.5,
-  },
-  quickAccessContainer: {
-    alignItems: 'center',
-  },
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginBottom: 15,
-    gap: 20, 
-  },
-  iconButton: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: colors.saffron,
-    justifyContent: 'center',
-    alignItems: 'center',
-    elevation: 3,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 3,
-  },
-});
