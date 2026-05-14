@@ -1,50 +1,24 @@
-import React from 'react';
-import { Tabs } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
+import { useEffect } from 'react';
+import { Stack } from 'expo-router';
+import * as SplashScreen from 'expo-splash-screen';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-export default function TabLayout() {
+SplashScreen.preventAutoHideAsync();
+
+
+export default function RootLayout() {
+  useEffect(() => {
+    // Simula una carga (fuentes, auth, etc.) y despues oculta el splash
+    setTimeout(async () => {
+      await SplashScreen.hideAsync();
+    }, 2000);
+  }, []);
+
   return (
-    <Tabs
-      screenOptions={{
-        headerShown: false, 
-        
-        tabBarActiveTintColor: '#31603D',  
-        tabBarInactiveTintColor: '#6E433D',
-        
-        tabBarStyle: {
-          backgroundColor: '#F8EECB',       
-          borderTopWidth: 2,
-          borderTopColor: '#31603D',        
-          height: 65,
-          paddingBottom: 10,
-          paddingTop: 5,
-        },
-        tabBarLabelStyle: {
-          fontWeight: 'bold',
-          fontSize: 11,
-          textTransform: 'uppercase',
-        },
-      }}
-    >
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Inicio',
-          tabBarIcon: ({ color, focused }) => (
-            <Ionicons name={focused ? 'home' : 'home-outline'} size={26} color={color} />
-          ),
-        }}
-      />
-
-      <Tabs.Screen
-        name="explore"
-        options={{
-          title: 'Opciones',
-          tabBarIcon: ({ color, focused }) => (
-            <Ionicons name={focused ? 'grid' : 'grid-outline'} size={26} color={color} />
-          ),
-        }}
-      />
-    </Tabs>
+    <SafeAreaProvider>
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="index" /> 
+      </Stack>
+    </SafeAreaProvider>
   );
 }
