@@ -16,27 +16,26 @@ export const unstable_settings = {
 };
 
 export default function RootLayout() {
-
-  // 2. Controlamos cuándo ocultar el splash screen
   useEffect(() => {
-    // Más adelante acá vas a poder chequear si el usuario está logueado en Supabase
-    // Por ahora, simplemente lo ocultamos al renderizar
     SplashScreen.hideAsync();
   }, []);
 
   return (
-    // 3. Envolvemos todo en SafeAreaProvider
     <SafeAreaProvider>
-      {/* 4. Forzamos DefaultTheme cumpliendo el requerimiento del TFI */}
       <ThemeProvider value={DefaultTheme}>
-        <Stack>
+        {/* Agregamos screenOptions para apagar todos los encabezados por defecto */}
+        <Stack screenOptions={{ headerShown: false }}>
+          
+          {/* Declaramos explícitamente el grupo (homes) para asegurar que no tenga header */}
+          <Stack.Screen name="(homes)" options={{ headerShown: false }} />
+          
+          <Stack.Screen name="index" options={{ headerShown: false }} />
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
-          {/* Es buena práctica dejar la ruta de error por si falla la navegación */}
           <Stack.Screen name="+not-found" options={{ title: 'Oops!' }} />
         </Stack>
-        {/* Forzamos la barra de estado en "dark" para que contraste con fondos claros */}
-        <StatusBar style="dark" />
+        
+        <StatusBar style="light" /> 
       </ThemeProvider>
     </SafeAreaProvider>
   );
