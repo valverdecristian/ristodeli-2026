@@ -1,0 +1,29 @@
+https://ionicframework.com/docs/api/fab
+
+https://coolors.co/
+
+
+correcciones---
+---------------
+* ajustar accesos rapidos
+* usar mas snap
+* ojo contraste
+* colores bien definidos
+* no guarda el empleado, agrandar el botón
+* agrandar precio y tiempo 2 y 3
+----
+4
+redirigir al home 
+ver mesas, foto mas grande, datos mas grande, botón...
+
+5-6-7-8 revisar la recepción de mail
+
+9 OK
+
+10 agregar botón qr
+Al tener la mesa asignada, se verifica que NO se le pueda asignar dicha mesa a otro cliente.
+
+"su pedido fue entregado" "confirmar recepción del pedido"
+redirigir al home siempre
+"estado del pedido" tiene que desaparecer y ver botón "pedir cuenta" y "realizar encuesta"
+
