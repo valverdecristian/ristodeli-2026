@@ -5,6 +5,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { ToastProvider } from '@/src/context/ToastContext';
 
 import '../global.css'; // <-- La magia de Tailwind
 
@@ -22,6 +23,7 @@ export default function RootLayout() {
 
   return (
     <SafeAreaProvider>
+      <ToastProvider>
       <ThemeProvider value={DefaultTheme}>
         {/* Agregamos screenOptions para apagar todos los encabezados por defecto */}
         <Stack screenOptions={{ headerShown: false }}>
@@ -37,6 +39,7 @@ export default function RootLayout() {
         
         <StatusBar style="light" /> 
       </ThemeProvider>
+      </ToastProvider>
     </SafeAreaProvider>
   );
 }

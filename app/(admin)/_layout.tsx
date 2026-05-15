@@ -20,6 +20,7 @@ export default function AdminLayout() {
         name="visualizar-encuestas"
         options={{ title: "Visualizar Encuestas" }}
       />
+      <Stack.Screen name="test-camera" options={{ title: "Test de Cámara" }} />
     </Stack>
   );
 }
