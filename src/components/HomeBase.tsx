@@ -33,7 +33,7 @@ export default function HomeBase({ roleTitle, buttons }: HomeBaseProps) {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-primary">
+    <SafeAreaView edges={['bottom', 'left', 'right']} className="flex-1 bg-primary">
       
       {/* 1. INDICADOR VISUAL (SPINNER) DE CIERRE  */}
       <Modal transparent={true} visible={isLoggingOut} animationType="fade">
