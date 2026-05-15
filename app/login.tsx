@@ -1,8 +1,18 @@
-import * as Haptics from "expo-haptics";
+import { useToast } from "@/src/context/ToastContext";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { ActivityIndicator, Image, KeyboardAvoidingView, Modal, Platform, ScrollView,
-    Text, TextInput, TouchableOpacity, View } from "react-native";
+import {
+  ActivityIndicator,
+  Image,
+  KeyboardAvoidingView,
+  Modal,
+  Platform,
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 const Icon = ({ emoji }: { emoji: string }) => (
   <Text className="text-primary text-3xl mb-1">{emoji}</Text>
@@ -10,12 +20,12 @@ const Icon = ({ emoji }: { emoji: string }) => (
 
 export default function LoginScreen() {
   const router = useRouter();
+  const { showToast } = useToast();
   const [showQuickAccess, setShowQuickAccess] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
 
   const profiles = [
     {
@@ -65,28 +75,35 @@ export default function LoginScreen() {
   const fillCredentials = (userEmail: string, userPass: string) => {
     setEmail(userEmail);
     setPassword(userPass);
-    setErrorMessage("");
   };
 
   const handleLogin = async () => {
-    setErrorMessage("");
     const emailRegex = /\S+@\S+\.\S+/;
 
     if (!email || !password) {
-      setErrorMessage("Por favor, completa todos los campos.");
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      showToast(
+        "error",
+        "Campos incompletos",
+        "Por favor, completa todos los campos.",
+      );
       return;
     }
 
     if (!emailRegex.test(email)) {
-      setErrorMessage("El formato del correo electrónico no es válido.");
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      showToast(
+        "error",
+        "Email inválido",
+        "El formato del correo electrónico no es válido.",
+      );
       return;
     }
 
     if (password.length < 6) {
-      setErrorMessage("La contraseña debe tener al menos 6 caracteres.");
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      showToast(
+        "error",
+        "Contraseña débil",
+        "La contraseña debe tener al menos 6 caracteres.",
+      );
       return;
     }
 
@@ -155,12 +172,6 @@ export default function LoginScreen() {
           </View>
 
           <View className="w-full">
-            {errorMessage ? (
-              <Text className="text-red-500 font-bold text-center mb-4 bg-white/20 p-2 rounded-lg">
-                {errorMessage}
-              </Text>
-            ) : null}
-
             <TextInput
               placeholder="Correo electrónico"
               placeholderTextColor="#555"
