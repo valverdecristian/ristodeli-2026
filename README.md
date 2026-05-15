@@ -3,7 +3,7 @@
 <br>
 
 <p align="center">
-  <img src="assets/icon.png" alt="Logo de la App" width="200">
+  <img src="assets/images//icon.png" alt="Logo de la App" width="200">
 </p>
 
 Este proyecto consiste en el desarrollo de una aplicación móvil para la gestión integral de un restaurante, enfocada en la experiencia del usuario (clientes y empleados).

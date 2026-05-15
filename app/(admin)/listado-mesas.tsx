@@ -1,7 +1,8 @@
 import React from 'react';
-import { View, Text, FlatList, SafeAreaView, TouchableOpacity, Image } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, Image } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 // Datos de prueba (Luego vendrán de tu base de datos)
 const MESAS_DATA = [
