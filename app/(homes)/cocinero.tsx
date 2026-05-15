@@ -1,5 +1,4 @@
-import React from 'react';
-import HomeBase from '../../src/components/HomeBase';
+import HomeBase from '@/src/components/HomeBase';
 import { useRouter } from 'expo-router';
 
 export default function HomeCocinero() {
