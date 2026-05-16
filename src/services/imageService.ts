@@ -1,4 +1,3 @@
-// src/services/imageService.ts
 import * as ImagePicker from "expo-image-picker";
 import { supabase } from "./SupabaseClient";
 
@@ -10,33 +9,35 @@ export interface UploadResult {
 
 export const ImageService = {
   /**
-   * 1. Abre la galería y devuelve las URIs de las fotos seleccionadas
+   * 1. Abre la cámara del dispositivo de manera obligatoria y captura la foto.
+   * No permite elegir archivos desde la galería.
    */
-  pickImage: async (allowsMultipleSelection = false) => {
-    const permissionResult =
-      await ImagePicker.requestMediaLibraryPermissionsAsync();
+  takePhoto: async () => {
+    
+    const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
 
     if (permissionResult.granted === false) {
-      alert("Necesitamos permiso para acceder a la galería.");
+      alert("Se requieren permisos de la cámara para completar el registro en Ristodeli.");
       return null;
     }
 
-    const result = await ImagePicker.launchImageLibraryAsync({
+    // Disparamos de forma directa la interfaz de la cámara
+    const result = await ImagePicker.launchCameraAsync({
       mediaTypes: ["images"],
-      allowsEditing: !allowsMultipleSelection, // Solo permite recortar si es 1 sola foto
-      allowsMultipleSelection: allowsMultipleSelection,
-      quality: 0.7, // Comprime la imagen para que suba más rápido
+      allowsEditing: true, 
+      aspect: [1, 1],      
+      quality: 0.5,        
     });
 
     if (!result.canceled) {
-      return result.assets; // Retorna el array con los datos de la/s imagen/es
+      return result.assets[0]; 
     }
 
     return null;
   },
 
   /**
-   * 2. Sube la foto al Storage de Supabase y devuelve un objeto con el resultado
+   * 2. Sube la foto capturada al Storage de Supabase y devuelve la URL pública.
    */
   uploadToSupabase: async (
     uri: string,
@@ -45,11 +46,11 @@ export const ImageService = {
     fileName: string,
   ): Promise<UploadResult> => {
     try {
-      // Magia moderna: transformamos la URI local en un ArrayBuffer nativo
+      
       const response = await fetch(uri);
       const arrayBuffer = await response.arrayBuffer();
 
-      // Subimos el archivo a Supabase
+
       const { data, error } = await supabase.storage
         .from(bucketName)
         .upload(`${folderPath}/${fileName}.jpeg`, arrayBuffer, {
@@ -59,19 +60,19 @@ export const ImageService = {
 
       if (error) throw error;
 
-      // Obtenemos la URL para poder mostrarla en la app
+      
       const { data: publicUrlData } = supabase.storage
         .from(bucketName)
         .getPublicUrl(`${folderPath}/${fileName}.jpeg`);
 
       return {
         success: true,
-        message: "Imagen subida correctamente",
+        message: "Imagen capturada y subida correctamente",
         url: publicUrlData.publicUrl,
       };
     } catch (error) {
       const errorMessage =
-        error instanceof Error ? error.message : "Error al subir la imagen";
+        error instanceof Error ? error.message : "Error al subir la foto al servidor";
       return {
         success: false,
         message: errorMessage,

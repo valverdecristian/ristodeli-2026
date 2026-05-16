@@ -4,6 +4,8 @@ import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons'; 
 import * as Haptics from 'expo-haptics';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { supabase } from '@/src/services/SupabaseClient';
+import { SoundService } from '@/src/services/soundService';
 
 interface HomeButton {
   title: string;
@@ -21,25 +23,38 @@ export default function HomeBase({ roleTitle, buttons }: HomeBaseProps) {
   const [isLoggingOut, setIsLoggingOut] = useState(false); 
 
   const handleLogout = async () => {
-    
+    // 1. Vibración táctil media al presionar salir
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     
     setIsLoggingOut(true); 
 
-    setTimeout(() => {
+    try {
+      // 2. Disparamos de forma asíncrona el sonido de despedida exigido por el TFI [cite: 49]
+      await SoundService.reproducir('cierre');
+
+      // 3. Borrado real de credenciales y sesión en el servidor de Supabase 
+      const { error } = await supabase.auth.signOut();
+      
+      if (error) {
+        console.error("Error al limpiar la sesión en el servidor:", error.message);
+      }
+    } catch (error) {
+      console.log("Fallo multimedia o de red en el deslogueo:", error);
+    } finally {
       setIsLoggingOut(false);
+      // 4. Redirección limpia a la pantalla de Login 
       router.replace('/'); 
-    }, 2000);
+    }
   };
 
   return (
     <SafeAreaView edges={['bottom', 'left', 'right']} className="flex-1 bg-primary">
       
-      {/* 1. INDICADOR VISUAL (SPINNER) DE CIERRE  */}
+      {/* 1. INDICADOR VISUAL (SPINNER) DE CIERRE */}
       <Modal transparent={true} visible={isLoggingOut} animationType="fade">
         <View className="flex-1 justify-center items-center bg-black/60">
           <View className="bg-primary p-10 rounded-3xl items-center border-2 border-tertiary shadow-2xl">
-            {/* Logo de la empresa en la espera  */}
+            {/* Logo de la empresa en la espera [cite: 51] */}
             <View className="bg-secondary rounded-full p-2 mb-4 border border-tertiary">
               <Image 
                 source={require('../../assets/images/icon.png')} 
@@ -49,7 +64,7 @@ export default function HomeBase({ roleTitle, buttons }: HomeBaseProps) {
             </View>
             <ActivityIndicator size="large" color="#F5C065" />
             <Text className="text-secondary font-bold mt-4 text-lg text-center">
-              Cerrando sesión...
+              Cerrando sesión de forma segura...
             </Text>
           </View>
         </View>
