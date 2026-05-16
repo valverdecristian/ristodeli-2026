@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Image, KeyboardAvoidingView, Platform, ScrollView, Modal, ActivityIndicator } from 'react-native';
-import { useRouter } from 'expo-router';
 import { useToast } from "@/src/context/ToastContext";
-import { AuthService } from '@/src/services/authService';
+import { supabase } from '@/src/services/SupabaseClient';
+import { useRouter } from 'expo-router';
+import React, { useState } from 'react';
+import { ActivityIndicator, Image, KeyboardAvoidingView, Modal, Platform, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+
+// Importamos el administrador de estímulos multimedia
 import { SoundService } from '@/src/services/soundService';
 
 const Icon = ({ emoji }: { emoji: string }) => (
@@ -26,6 +28,8 @@ export default function LoginScreen() {
     { id: "mozo", label: "Mozo", emoji: "🍽️", email: "mozo1@ristodeli.com", pass: "12345678" },
     { id: "Cantinero", label: "Cantinero", emoji: "🍸", email: "cantinero1@ristodeli.com", pass: "12345678" },
     { id: "cocinero", label: "Cocinero", emoji: "👨‍🍳", email: "cocinero1@ristodeli.com", pass: "12345678" },
+    // Agregamos un acceso rápido de testeo para verificar el rebote de pendientes
+    { id: "pendiente", label: "Pendiente", emoji: "⏳", email: "juan.perez.test@ristodeli.com", pass: "12345678" }
   ];
 
   const fillCredentials = (userEmail: string, userPass: string) => {
@@ -58,8 +62,18 @@ export default function LoginScreen() {
     setLoading(true);
 
     try {
-      // 2. AUTENTICAR CON EL SERVICIO CENTRALIZADO
-      const authData = await AuthService.ingresar(email, password);
+      // 2. LOGUEAR EN AUTH DE SUPABASE
+      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+        email: email.trim(),
+        password: password,
+      });
+
+      if (authError) {
+        setLoading(false);
+        SoundService.reproducir('error');
+        showToast("error", "Error de autenticación", "Correo o contraseña incorrectos.");
+        return;
+      }
 
       if (!authData?.user) {
         setLoading(false);
@@ -68,30 +82,78 @@ export default function LoginScreen() {
         return;
       }
 
-      // 3. OBTENER EL PERFIL DESDE LA TABLA public.usuarios
-      const perfil = await AuthService.obtenerPerfil(authData.user.id);
+      // 3. CONSULTAR EL PERFIL EN LA TABLA PUBLIC.USUARIOS usando la FK
+      const { data: userProfile, error: profileError } = await supabase
+        .from('usuarios')
+        .select('perfil')
+        .eq('id', authData.user.id)
+        .single();
 
-      setLoading(false);
-
-      if (!perfil) {
+      if (profileError || !userProfile) {
+        setLoading(false);
+        SoundService.reproducir('error');
         showToast("error", "Error de perfil", "No se encontró el rol asociado a este usuario.");
         return;
       }
 
-      // 4. SONIDO DE ÉXITO + ROUTING DINÁMICO USANDO EL SERVICIO
+      const currentRole = userProfile.perfil.toLowerCase().trim();
+
+      // 🌟 LÓGICA DE CONTROL EXCLUYENTE PARA REBOTAR SOLICITUDES NO APROBADAS
+      if (currentRole === "cliente_pendiente") {
+        setLoading(false);
+        // Deslogueamos la instancia de Auth inmediatamente para limpiar credenciales
+        await supabase.auth.signOut(); 
+        SoundService.reproducir('error'); // Activa sonido + vibración por error
+        showToast("error", "Acceso Retenido", "Tu cuenta está registrada pero aguarda la aprobación de un Supervisor.");
+        return;
+      }
+
+      if (currentRole === "cliente_rechazado") {
+        setLoading(false);
+        await supabase.auth.signOut();
+        SoundService.reproducir('error');
+        showToast("error", "Acceso Denegado", "Tu solicitud de registro fue rechazada por la empresa.");
+        return;
+      }
+
+      // Si pasa los bloqueos, apagamos la carga y ejecutamos el bip de éxito
+      setLoading(false);
       await SoundService.reproducir('exito');
 
-      try {
-        const ruta = AuthService.resolverRutaPorPerfil(perfil.perfil);
-        router.replace(ruta as any);
-      } catch {
-        showToast("error", "Perfil no válido", "Tu cuenta no tiene un rol asignado. Contactá al administrador.");
+      // 4. ROUTING DINÁMICO SEGÚN EL ROL AUTORIZADO
+      switch (currentRole) {
+        case "dueño":
+        case "admin": 
+          router.replace("/(homes)/duenio");
+          break;
+        case "supervisor":
+          router.replace("/(homes)/supervisor");
+          break;
+        case "metre":
+          router.replace("/(homes)/metre");
+          break;
+        case "mozo":
+          router.replace("/(homes)/mozo");
+          break;
+        case "cantinero":
+          router.replace("/(homes)/cantinero");
+          break;
+        case "cocinero":
+          router.replace("/(homes)/cocinero");
+          break;
+        case "cliente":
+          // Clientes aprobados van directo al flujo operativo de las mesas
+          router.replace("/");
+          break;
+        default:
+          router.replace("/");
+          break;
       }
 
     } catch (error) {
       setLoading(false);
       SoundService.reproducir('error');
-      showToast("error", "Error de autenticación", "Correo o contraseña incorrectos.");
+      showToast("error", "Error de conexión", "Ocurrió un problema de red inesperado.");
       console.error(error);
     }
   };
@@ -188,7 +250,7 @@ export default function LoginScreen() {
                 Acceso rápido
               </Text>
               <TouchableOpacity
-                onPress={() => !showQuickAccess ? setShowQuickAccess(true) : setShowQuickAccess(false)}
+                onPress={() => setShowQuickAccess(!showQuickAccess)}
                 className="bg-secondary rounded-full p-2"
               >
                 <Text

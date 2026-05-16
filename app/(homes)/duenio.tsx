@@ -23,7 +23,7 @@ export default function HomeDuenio() {
     {
       title: "Aprobar clientes",
       icon: "people-outline",
-      onPress: () => router.push("/aprobar-clientes"),
+      onPress: () => router.push("/(homes)/supervisor/aprobaciones")
     },
     {
       title: "Visualizar encuestas",
