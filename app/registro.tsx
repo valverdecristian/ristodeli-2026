@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Image, KeyboardAvoidingView, Platform, ScrollView, Modal, ActivityIndicator, Vibration } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Image, KeyboardAvoidingView, Platform, ScrollView, Modal, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useToast } from "@/src/context/ToastContext";
 import { supabase } from '@/src/services/SupabaseClient';
 import { ImageService } from '@/src/services/imageService';
 import { Ionicons } from '@expo/vector-icons';
-import { Audio } from 'expo-av';
+// import { Audio } from 'expo-av';
 import { SoundService } from '@/src/services/soundService';
-import * as Haptics from 'expo-haptics';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 
 export default function RegistroScreen() {
@@ -30,21 +29,21 @@ export default function RegistroScreen() {
     const [password, setPassword] = useState('');
     const [fotoUri, setFotoUri] = useState<string | null>(null);
 
-    const reproducirSonidoError = async () => {
-        try {
-        const { sound } = await Audio.Sound.createAsync(
-            require('@/assets/sounds/error_alert.mp3') 
-        );
-        await sound.playAsync();
-        sound.setOnPlaybackStatusUpdate((status) => {
-            if (status.isLoaded && status.didJustFinish) {
-            sound.unloadAsync();
-            }
-        });
-        } catch (error) {
-        console.log('Error de audio:', error);
-        }
-    };
+    // const reproducirSonidoError = async () => {
+    //     try {
+    //     const { sound } = await Audio.Sound.createAsync(
+    //         require('@/assets/sounds/error_alert.mp3') 
+    //     );
+    //     await sound.playAsync();
+    //     sound.setOnPlaybackStatusUpdate((status) => {
+    //         if (status.isLoaded && status.didJustFinish) {
+    //         sound.unloadAsync();
+    //         }
+    //     });
+    //     } catch (error) {
+    //     console.log('Error de audio:', error);
+    //     }
+    // };
 
     const dispararAlertaError = (titulo: string, mensaje: string) => {
         SoundService.reproducir('error');

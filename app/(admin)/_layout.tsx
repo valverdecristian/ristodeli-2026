@@ -7,11 +7,8 @@ export default function AdminLayout() {
         name="agregar-empleado"
         options={{ title: "Agregar Empleado" }}
       />
-      <Stack.Screen name="alta-mesa" options={{ title: "Alta de Mesa" }} />
-      <Stack.Screen
-        name="listado-mesas"
-        options={{ title: "Listado de Mesas" }}
-      />
+      <Stack.Screen name="alta-mesa" options={{ headerShown: false }} />
+      <Stack.Screen name="listado-mesas" options={{ headerShown: false }} />
       <Stack.Screen
         name="aprobar-clientes"
         options={{ title: "Aprobar Clientes" }}
