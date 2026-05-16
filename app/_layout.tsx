@@ -6,6 +6,7 @@ import { useEffect } from 'react';
 import 'react-native-reanimated';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { ToastProvider } from '@/src/context/ToastContext';
+import { AuthProvider } from '@/src/context/AuthContext';
 
 // Importamos el administrador de sonidos nativos
 import { SoundService } from '@/src/services/soundService';
@@ -39,28 +40,31 @@ export default function RootLayout() {
 
   return (
     <SafeAreaProvider>
-      <ToastProvider>
-        <ThemeProvider value={DefaultTheme}>
-          {/* Agregamos screenOptions para apagar todos los encabezados por defecto */}
-          <Stack screenOptions={{ headerShown: false }}>
-            
-            {/* Declaramos el Login */}
-            <Stack.Screen name="index" options={{ headerShown: false }} />
+      {/* AuthProvider detecta la sesión activa al arrancar y la comparte en toda la app */}
+      <AuthProvider>
+        <ToastProvider>
+          <ThemeProvider value={DefaultTheme}>
+            {/* Agregamos screenOptions para apagar todos los encabezados por defecto */}
+            <Stack screenOptions={{ headerShown: false }}>
+              
+              {/* Declaramos el Login */}
+              <Stack.Screen name="index" options={{ headerShown: false }} />
 
-            {/* Declaramos explícitamente la pantalla de Registro para que no tenga Header */}
-            <Stack.Screen name="registro" options={{ headerShown: false }} />
+              {/* Declaramos explícitamente la pantalla de Registro para que no tenga Header */}
+              <Stack.Screen name="registro" options={{ headerShown: false }} />
+              
+              {/* Declaramos explícitamente el grupo (homes) para asegurar que no tenga header */}
+              <Stack.Screen name="(homes)" options={{ headerShown: false }} />
+              
+              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+              <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
+              <Stack.Screen name="+not-found" options={{ title: 'Oops!' }} />
+            </Stack>
             
-            {/* Declaramos explícitamente el grupo (homes) para asegurar que no tenga header */}
-            <Stack.Screen name="(homes)" options={{ headerShown: false }} />
-            
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
-            <Stack.Screen name="+not-found" options={{ title: 'Oops!' }} />
-          </Stack>
-          
-          <StatusBar style="light" /> 
-        </ThemeProvider>
-      </ToastProvider>
+            <StatusBar style="light" /> 
+          </ThemeProvider>
+        </ToastProvider>
+      </AuthProvider>
     </SafeAreaProvider>
   );
 }

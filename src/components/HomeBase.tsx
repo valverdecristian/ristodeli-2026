@@ -4,7 +4,7 @@ import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons'; 
 import * as Haptics from 'expo-haptics';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { supabase } from '@/src/services/SupabaseClient';
+import { useAuth } from '@/src/context/AuthContext';
 import { SoundService } from '@/src/services/soundService';
 
 interface HomeButton {
@@ -20,29 +20,21 @@ interface HomeBaseProps {
 
 export default function HomeBase({ roleTitle, buttons }: HomeBaseProps) {
   const router = useRouter();
+  const { cerrarSesion } = useAuth();
   const [isLoggingOut, setIsLoggingOut] = useState(false); 
 
   const handleLogout = async () => {
-    // 1. Vibración táctil media al presionar salir
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    
     setIsLoggingOut(true); 
 
     try {
-      // 2. Disparamos de forma asíncrona el sonido de despedida exigido por el TFI [cite: 49]
       await SoundService.reproducir('cierre');
-
-      // 3. Borrado real de credenciales y sesión en el servidor de Supabase 
-      const { error } = await supabase.auth.signOut();
-      
-      if (error) {
-        console.error("Error al limpiar la sesión en el servidor:", error.message);
-      }
+      // cerrarSesion() hace signOut + limpia el contexto global (currentUser, currentSession)
+      await cerrarSesion();
     } catch (error) {
       console.log("Fallo multimedia o de red en el deslogueo:", error);
     } finally {
       setIsLoggingOut(false);
-      // 4. Redirección limpia a la pantalla de Login 
       router.replace('/'); 
     }
   };

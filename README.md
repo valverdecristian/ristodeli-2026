@@ -137,30 +137,46 @@ De acuerdo a los requerimientos de la cátedra, se detallan las tareas asignadas
 
 <br>
 
-## 📂 Arquitectura del proyecto
+## 📂 Estructura del proyecto
 
 ```jsx
-src/
-└── app/
-    ├── core/                 <-- (Lo que se carga una vez: Servicios globales)
-    │   ├── services/
-    │   ├── models/
-    │   └── guards/
-    │
-    ├── shared/               <-- (Componentes reutilizables en toda la app)
-    │   ├── components/
-    │   └── pipes/
-    │
-    ├── features/             <-- (Módulos lógicos del negocio / Entregas)
-assets/
-docs/
-environments/
-theme/
+ristodeli/
+├── app/                       # Rutas de Expo Router
+│   ├── _layout.tsx            # Layout raíz (ToastProvider + SoundService de inicio)
+│   ├── index.tsx              # Splash screen animado (3s → redirige a /login)
+│   ├── login.tsx              # Login completo con acceso rápido por roles
+│   ├── registro.tsx           # Registro de cliente con scanner DNI + foto obligatoria
+│   ├── (homes)/               # Homes por rol (usan HomeBase como base compartida)
+│   │   ├── duenio.tsx
+│   │   ├── supervisor.tsx
+│   │   ├── metre.tsx
+│   │   ├── mozo.tsx
+│   │   ├── cantinero.tsx
+│   │   └── cocinero.tsx
+│   └── (admin)/               # Pantallas de administración
+│       ├── alta-mesa.tsx      # Crear mesa con foto y tipo
+│       ├── listado-mesas.tsx  # Lista de mesas (datos estáticos por ahora)
+│       ├── agregar-empleado.tsx
+│       ├── aprobar-clientes.tsx  (vacío)
+│       └── visualizar-encuestas.tsx (vacío)
+├── src/
+│   ├── services/
+│   │   ├── SupabaseClient.ts  # Cliente Supabase (EXPO_PUBLIC_ env vars)
+│   │   ├── imageService.ts    # Servicio de fotos (cámara + upload)
+│   │   └── soundService.ts    # Servicio de audio (inicio, error, éxito, cierre)
+│   ├── context/
+│   │   └── ToastContext.tsx   # Toast personalizado + vibración haptic
+│   ├── components/
+│   │   └── HomeBase.tsx       # Componente base compartido para todos los homes de rol
+│   ├── constants/
+│   │   └── theme.ts           # Colors y Fonts (referencia, no usada activamente)
+│   └── hooks/                 # use-color-scheme y use-theme-color
+└── assets/
+    └── sounds/
+        ├── app_start.mp3
+        ├── error_alert.mp3
+        └── success_bip.mp3
 ```
-
-**core/**: Aquí van los servicios que manejan datos globales. <br>
-**shared/**: Componentes que se usan en más de una pantalla. <br>
-**features/**: Aquí va la lógica de cada punto funcional. <br>
 
 <br>
 

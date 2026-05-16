@@ -2,10 +2,9 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Image, KeyboardAvoidingView, Platform, ScrollView, Modal, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useToast } from "@/src/context/ToastContext";
-import { supabase } from '@/src/services/SupabaseClient';
+import { AuthService } from '@/src/services/authService';
 import { ImageService } from '@/src/services/imageService';
 import { Ionicons } from '@expo/vector-icons';
-// import { Audio } from 'expo-av';
 import { SoundService } from '@/src/services/soundService';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 
@@ -158,8 +157,8 @@ export default function RegistroScreen() {
         setLoadingText('Subiendo foto de perfil...');
         const resultadoSubida = await ImageService.uploadToSupabase(
             fotoUri,
-            "avatares", // Tu bucket real público
-            "",         // En la raíz junto con los anónimos
+            "avatares",
+            "",
             `user_${dni.trim()}`
         );
 
@@ -169,53 +168,35 @@ export default function RegistroScreen() {
             return;
         }
 
-        // 3. REGISTRO EN SUPABASE AUTHENTICATION
-        setLoadingText('Registrando credenciales...');
-        const { data: authData, error: authError } = await supabase.auth.signUp({
-            email: email.trim(),
-            password: password,
+        // 3. REGISTRO COMPLETO usando AuthService (auth.users + tabla usuarios en 1 llamada)
+        setLoadingText('Creando tu cuenta en Ristodeli...');
+        await AuthService.registrar(password, {
+            email,
+            nombres,
+            apellidos,
+            dni,
+            cuil,
+            perfil: 'cliente', // Estado inicial por defecto para autoregistro
+            foto_url: resultadoSubida.url,
         });
 
-        if (authError) {
-            setLoading(false);
-            dispararAlertaError("Error de Autenticación", authError.message);
-            return;
-        }
-
-        // 4. INSERCIÓN EN LA TABLA PUBLIC.USUARIOS (PASA POR EL RLS PERMITIDO)
-        setLoadingText('Guardando perfil en Ristodeli...');
-        const { error: dbError } = await supabase
-            .from('usuarios')
-            .insert([
-            {
-                id: authData.user!.id,
-                nombres: nombres.trim(),
-                apellidos: apellidos.trim(),
-                dni: dni.trim(),
-                cuil: cuil.trim(),
-                email: email.trim().toLowerCase(),
-                perfil: 'cliente', // Estado inicial por defecto
-                foto_url: resultadoSubida.url,
-                push_token: null
-            }
-            ]);
-
         setLoading(false);
 
-        if (dbError) {
-            dispararAlertaError("Datos duplicados", "El DNI, CUIL o Email ya se encuentran registrados.");
-            return;
-        }
-
-        // 🔊 ¡REGISTRO CORRECTO! Dispara el sonido de éxito antes de enrutar al Login
+        // 🔊 ¡REGISTRO CORRECTO!
         await SoundService.reproducir('exito');
+        showToast("success", "Registro enviado", "Cuenta creada. Aguarda la aprobación del Supervisor.");
+        router.replace('/login');
 
-        showToast("success", "Registro enviado", "Cuenta creada con éxito. Aguarda la aprobación del Supervisor.");
-        router.replace('/');
-
-        } catch (error) {
+        } catch (error: any) {
         setLoading(false);
-        dispararAlertaError("Error crítico", "Ocurrió un fallo imprevisto con la conexión de red.");
+        // Manejo diferenciado de errores conocidos de Supabase
+        if (error?.message?.includes('duplicate') || error?.code === '23505') {
+            dispararAlertaError("Datos duplicados", "El DNI, CUIL o Email ya se encuentran registrados.");
+        } else if (error?.message?.includes('Password')) {
+            dispararAlertaError("Error de Autenticación", error.message);
+        } else {
+            dispararAlertaError("Error crítico", "Ocurrió un fallo imprevisto. Intenta nuevamente.");
+        }
         }
     };
 

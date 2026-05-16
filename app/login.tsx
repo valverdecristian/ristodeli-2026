@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Image, KeyboardAvoidingView, Platform, ScrollView, Modal, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useToast } from "@/src/context/ToastContext";
-import { supabase } from '@/src/services/SupabaseClient';
+import { AuthService } from '@/src/services/authService';
 import { SoundService } from '@/src/services/soundService';
 
 const Icon = ({ emoji }: { emoji: string }) => (
@@ -23,9 +23,9 @@ export default function LoginScreen() {
     { id: "dueño", label: "Dueño", emoji: "👑", email: "admin@ristodeli.com", pass: "12345678" },
     { id: "supervisor", label: "Supervisor", emoji: "🔑", email: "supervisor@ristodeli.com", pass: "12345678" },
     { id: "metre", label: "Metre", emoji: "📋", email: "metre@ristodeli.com", pass: "12345678" },
-    { id: "mozo", label: "Mozo", emoji: "🍽️", email: "mozo@ristodeli.com", pass: "12345678" },
-    { id: "Cantinero", label: "Cantinero", emoji: "🍸", email: "cantinero@ristodeli.com", pass: "12345678" },
-    { id: "cocinero", label: "Cocinero", emoji: "👨‍🍳", email: "cocinero@ristodeli.com", pass: "12345678" },
+    { id: "mozo", label: "Mozo", emoji: "🍽️", email: "mozo1@ristodeli.com", pass: "12345678" },
+    { id: "Cantinero", label: "Cantinero", emoji: "🍸", email: "cantinero1@ristodeli.com", pass: "12345678" },
+    { id: "cocinero", label: "Cocinero", emoji: "👨‍🍳", email: "cocinero1@ristodeli.com", pass: "12345678" },
   ];
 
   const fillCredentials = (userEmail: string, userPass: string) => {
@@ -38,21 +38,18 @@ export default function LoginScreen() {
 
     // 1. VALIDACIONES LOCALES PREVIAS
     if (!email || !password) {
-      // 🔊 Error por campos incompletos
       SoundService.reproducir('error');
       showToast("error", "Campos incompletos", "Por favor, completa todos los campos.");
       return;
     }
 
     if (!emailRegex.test(email)) {
-      // 🔊 Error por formato incorrecto
       SoundService.reproducir('error');
       showToast("error", "Email inválido", "El formato del correo electrónico no es válido.");
       return;
     }
 
     if (password.length < 6) {
-      // 🔊 Error por contraseña corta
       SoundService.reproducir('error');
       showToast("error", "Contraseña débil", "La contraseña debe tener al menos 6 caracteres.");
       return;
@@ -61,19 +58,8 @@ export default function LoginScreen() {
     setLoading(true);
 
     try {
-      // 2. LOGUEAR EN AUTH DE SUPABASE
-      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-        email: email.trim(),
-        password: password,
-      });
-
-      if (authError) {
-        setLoading(false);
-        // 🔊 Error por credenciales rebotadas por el servidor
-        SoundService.reproducir('error');
-        showToast("error", "Error de autenticación", "Correo o contraseña incorrectos.");
-        return;
-      }
+      // 2. AUTENTICAR CON EL SERVICIO CENTRALIZADO
+      const authData = await AuthService.ingresar(email, password);
 
       if (!authData?.user) {
         setLoading(false);
@@ -82,56 +68,30 @@ export default function LoginScreen() {
         return;
       }
 
-      // 🔊 ¡AUTENTICACIÓN DE AUTH EXITOSA! Hacemos sonar tu bip de éxito configurado
-      await SoundService.reproducir('exito');
-
-      // 3. CONSULTAR EL PERFIL EN LA TABLA PUBLIC.USUARIOS usando la FK
-      const { data: userProfile, error: profileError } = await supabase
-        .from('usuarios')
-        .select('perfil')
-        .eq('id', authData.user.id)
-        .single();
+      // 3. OBTENER EL PERFIL DESDE LA TABLA public.usuarios
+      const perfil = await AuthService.obtenerPerfil(authData.user.id);
 
       setLoading(false);
 
-      if (profileError || !userProfile) {
+      if (!perfil) {
         showToast("error", "Error de perfil", "No se encontró el rol asociado a este usuario.");
         return;
       }
 
-      // 4. ROUTING DINÁMICO SEGÚN EL CAMPO 'PERFIL' DE LA TABLA
-      const currentRole = userProfile.perfil.toLowerCase().trim();
+      // 4. SONIDO DE ÉXITO + ROUTING DINÁMICO USANDO EL SERVICIO
+      await SoundService.reproducir('exito');
 
-      switch (currentRole) {
-        case "dueño":
-        case "admin": // Tolerancia por si el registro se guardó como 'admin'
-          router.replace("/(homes)/duenio");
-          break;
-        case "supervisor":
-          router.replace("/(homes)/supervisor");
-          break;
-        case "metre":
-          router.replace("/(homes)/metre");
-          break;
-        case "mozo":
-          router.replace("/(homes)/mozo");
-          break;
-        case "cantinero":
-          router.replace("/(homes)/cantinero");
-          break;
-        case "cocinero":
-          router.replace("/(homes)/cocinero");
-          break;
-        default:
-          // Clientes registrados o anónimos van directos al flujo general
-          router.replace("/");
-          break;
+      try {
+        const ruta = AuthService.resolverRutaPorPerfil(perfil.perfil);
+        router.replace(ruta as any);
+      } catch {
+        showToast("error", "Perfil no válido", "Tu cuenta no tiene un rol asignado. Contactá al administrador.");
       }
 
     } catch (error) {
       setLoading(false);
       SoundService.reproducir('error');
-      showToast("error", "Error de conexión", "Ocurrió un problema de red inesperado.");
+      showToast("error", "Error de autenticación", "Correo o contraseña incorrectos.");
       console.error(error);
     }
   };
