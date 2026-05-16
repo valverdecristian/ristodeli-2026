@@ -1,12 +1,17 @@
+import { useToast } from "@/src/context/ToastContext";
 import { ImageService } from "@/src/services/imageService";
+import { SoundService } from "@/src/services/soundService";
+import { supabase } from "@/src/services/SupabaseClient";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
 import React, { useCallback, useState } from "react";
 import {
+  ActivityIndicator,
   Alert,
   Image,
   KeyboardAvoidingView,
+  Modal,
   Platform,
   ScrollView,
   StyleSheet,
@@ -16,7 +21,6 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-
 const styles = StyleSheet.create({
   tabButton: {
     paddingHorizontal: 16,
@@ -40,21 +44,25 @@ const styles = StyleSheet.create({
     color: "rgba(49, 96, 61, 0.4)",
   },
 });
-
+const normalizarTipo = (tipo: string) => {
+  return tipo
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+};
 export default function AltaMesa() {
   const router = useRouter();
-
+  const { showToast } = useToast();
   const [numeroMesa, setNumeroMesa] = useState("");
   const [cantidadComensales, setCantidadComensales] = useState("");
-  const [tipoMesa, setTipoMesa] = useState("estándar");
+  const [tipoMesa, setTipoMesa] = useState("Estándar");
   const [fotoMesa, setFotoMesa] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-
+  const [loadingText, setLoadingText] = useState("");
   const handleCapturarFoto = useCallback(async () => {
     setIsLoading(true);
     try {
       const photo = await ImageService.takePhoto();
-
       if (photo) {
         setFotoMesa(photo.uri);
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
@@ -68,34 +76,72 @@ export default function AltaMesa() {
       setIsLoading(false);
     }
   }, []);
-
-  const handleGenerarMesa = useCallback(() => {
+  const handleGenerarMesa = useCallback(async () => {
     if (!numeroMesa) {
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      SoundService.reproducir("error");
       Alert.alert("Campo incompleto", "Por favor ingresa el número de mesa");
       return;
     }
-
     if (!cantidadComensales) {
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      SoundService.reproducir("error");
       Alert.alert(
         "Campo incompleto",
         "Por favor ingresa la cantidad de comensales",
       );
       return;
     }
-
     if (!fotoMesa) {
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      SoundService.reproducir("error");
       Alert.alert("Foto requerida", "Por favor captura una foto de la mesa");
       return;
     }
-
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    // TODO: Guardar datos en Supabase
-    router.replace("/(admin)/listado-mesas");
-  }, [numeroMesa, cantidadComensales, fotoMesa, router]);
-
+    setIsLoading(true);
+    try {
+      setLoadingText("Subiendo imagen...");
+      const nombreArchivo = `mesa_${numeroMesa}_${Date.now()}`;
+      const resultadoSubida = await ImageService.uploadToSupabase(
+        fotoMesa,
+        "avatares",
+        "mesas",
+        nombreArchivo,
+      );
+      if (!resultadoSubida.success || !resultadoSubida.url) {
+        throw new Error("Error al subir la foto de la mesa");
+      }
+      setLoadingText("Guardando mesa...");
+      const qrData = `ristodeli://mesa/${numeroMesa}`;
+      const tipoNormalizado = normalizarTipo(tipoMesa);
+      const { error: dbError } = await supabase.from("mesas").insert([
+        {
+          numero: parseInt(numeroMesa, 10),
+          comensales: parseInt(cantidadComensales, 10),
+          tipo: tipoNormalizado,
+          qr_data: qrData,
+          foto: resultadoSubida.url,
+          estado: "Libre",
+        },
+      ]);
+      if (dbError) {
+        if (dbError.code === "23505") {
+          throw new Error("Ya existe una mesa con ese número");
+        }
+        throw new Error(dbError.message);
+      }
+      await SoundService.reproducir("exito");
+      showToast(
+        "success",
+        "Mesa creada",
+        `Mesa ${numeroMesa} registrada correctamente`,
+      );
+      router.replace("/(admin)/listado-mesas");
+    } catch (error: any) {
+      await SoundService.reproducir("error");
+      showToast("error", "Error", error.message || "No se pudo crear la mesa");
+    } finally {
+      setIsLoading(false);
+      setLoadingText("");
+    }
+  }, [numeroMesa, cantidadComensales, tipoMesa, fotoMesa, router, showToast]);
   return (
     <SafeAreaView className="flex-1 bg-primary">
       <KeyboardAvoidingView
@@ -110,7 +156,23 @@ export default function AltaMesa() {
             Alta De Mesa
           </Text>
         </View>
-
+        <Modal transparent visible={isLoading} animationType="fade">
+          <View className="flex-1 justify-center items-center bg-black/60">
+            <View className="bg-primary p-10 rounded-3xl items-center border-2 border-tertiary shadow-2xl w-[80%]">
+              <View className="bg-secondary rounded-full p-2 mb-4 border border-tertiary">
+                <Image
+                  source={require("../../assets/images/icon.png")}
+                  className="w-12 h-12"
+                  resizeMode="contain"
+                />
+              </View>
+              <ActivityIndicator size="large" color="#F5C065" />
+              <Text className="text-secondary font-bold mt-4 text-base text-center">
+                {loadingText}
+              </Text>
+            </View>
+          </View>
+        </Modal>
         <ScrollView
           contentContainerStyle={{ flexGrow: 1 }}
           className="px-10 pt-8"
@@ -125,7 +187,6 @@ export default function AltaMesa() {
               className="bg-secondary rounded-full px-8 py-5 text-primary text-center text-xl font-bold shadow-lg"
             />
           </View>
-
           <View className="mb-8">
             <TextInput
               value={cantidadComensales}
@@ -136,7 +197,6 @@ export default function AltaMesa() {
               className="bg-secondary rounded-full px-8 py-5 text-primary text-center text-xl font-bold shadow-lg"
             />
           </View>
-
           <View className="mb-10">
             <View className="bg-secondary rounded-3xl p-2 flex-row justify-around items-center shadow-md">
               {["Estándar", "VIP", "Discapacidad"].map((tipo) => (
@@ -165,13 +225,10 @@ export default function AltaMesa() {
               ))}
             </View>
           </View>
-
-          {/* Sección de foto */}
           <View className="mb-10">
             <Text className="text-primary font-bold text-sm uppercase mb-4">
               Foto de la Mesa
             </Text>
-
             {fotoMesa ? (
               <View className="relative">
                 <Image
@@ -202,7 +259,6 @@ export default function AltaMesa() {
               </TouchableOpacity>
             )}
           </View>
-
           <TouchableOpacity
             onPress={handleGenerarMesa}
             style={{ elevation: 15 }}
