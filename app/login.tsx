@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Image, KeyboardAvoidingView, Platform, ScrollView, Modal, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useToast } from "@/src/context/ToastContext";
+import { useAuth } from '@/src/context/AuthContext';
 import { AuthService } from '@/src/services/authService';
 import { SoundService } from '@/src/services/soundService';
 
@@ -12,6 +13,7 @@ const Icon = ({ emoji }: { emoji: string }) => (
 export default function LoginScreen() {
   const router = useRouter();
   const { showToast } = useToast();
+  const { cerrarSesion } = useAuth();
   const [showQuickAccess, setShowQuickAccess] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -78,7 +80,20 @@ export default function LoginScreen() {
         return;
       }
 
-      // 4. SONIDO DE ÉXITO + ROUTING DINÁMICO USANDO EL SERVICIO
+      // 4. VERIFICAR ESTADO DE CUENTA ANTES DE NAVEGAR
+      const rolActual = perfil.perfil.trim().toLowerCase();
+
+      // Clientes pendientes de aprobación no pueden ingresar aún
+      if (rolActual === 'pendiente') {
+        setLoading(false);
+        SoundService.reproducir('error');
+        // Cerramos la sesión para que no quede activa sin pantalla de destino
+        await cerrarSesion();
+        showToast("info", "Aprobación pendiente", "Se necesita aprobación del administrador para poder ingresar.");
+        return;
+      }
+
+      // 5. SONIDO DE ÉXITO + ROUTING DINÁMICO USANDO EL SERVICIO
       await SoundService.reproducir('exito');
 
       try {

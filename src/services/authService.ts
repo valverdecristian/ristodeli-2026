@@ -2,8 +2,13 @@
 // Migración de auth.service.ts (Angular/Ionic) → servicio puro de funciones para Expo React Native.
 // Usa el cliente de Supabase ya configurado. El estado reactivo vive en AuthContext.tsx.
 
+import { createClient } from '@supabase/supabase-js';
 import { supabase } from './SupabaseClient';
 import { DetalleRegistro, UsuarioPerfil } from '../models/usuario.model';
+
+// Credenciales para crear el cliente temporal de registro de empleados
+const SUPABASE_URL = process.env.EXPO_PUBLIC_SUPABASE_URL as string;
+const SUPABASE_ANON_KEY = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY as string;
 
 export const AuthService = {
 
@@ -55,6 +60,55 @@ export const AuthService = {
     if (profileError) throw profileError;
 
     return { authData, profileData };
+  },
+
+  /**
+   * Registra un empleado nuevo desde el panel del Admin/Supervisor.
+   * 
+   * DIFERENCIA CLAVE con registrar():
+   * Usa un cliente Supabase TEMPORAL sin persistencia de sesión para el signUp.
+   * Esto evita que la sesión del admin sea reemplazada por la del empleado recién creado.
+   * El insert en `usuarios` sigue usando el cliente principal (sesión del admin) que tiene permisos.
+   */
+  async registrarEmpleado(password: string, detalles: DetalleRegistro) {
+    // 1. Cliente temporal sin storage — no toca la sesión del admin
+    const supabaseTemp = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      auth: {
+        persistSession: false,
+        autoRefreshToken: false,
+        detectSessionInUrl: false,
+      },
+    });
+
+    // 2. Crear el usuario en auth.users con el cliente temporal
+    const { data: authData, error: authError } = await supabaseTemp.auth.signUp({
+      email: detalles.email.trim(),
+      password,
+    });
+
+    if (authError) throw authError;
+    if (!authData.user) throw new Error('No se devolvió un usuario tras el registro del empleado.');
+
+    // 3. Insertar el perfil en public.usuarios con el cliente PRINCIPAL (sesión admin activa)
+    const nuevoPerfil = {
+      id: authData.user.id,
+      email: detalles.email.trim().toLowerCase(),
+      nombres: detalles.nombres.trim(),
+      apellidos: detalles.apellidos.trim(),
+      dni: detalles.dni.trim(),
+      cuil: detalles.cuil.trim(),
+      perfil: detalles.perfil, // Rol definido por el admin al momento de crear
+      foto_url: detalles.foto_url || null,
+      push_token: null,
+    };
+
+    const { error: profileError } = await supabase
+      .from('usuarios')
+      .insert([nuevoPerfil]);
+
+    if (profileError) throw profileError;
+
+    return { authData };
   },
 
   /**

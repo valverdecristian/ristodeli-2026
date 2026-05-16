@@ -28,22 +28,6 @@ export default function RegistroScreen() {
     const [password, setPassword] = useState('');
     const [fotoUri, setFotoUri] = useState<string | null>(null);
 
-    // const reproducirSonidoError = async () => {
-    //     try {
-    //     const { sound } = await Audio.Sound.createAsync(
-    //         require('@/assets/sounds/error_alert.mp3') 
-    //     );
-    //     await sound.playAsync();
-    //     sound.setOnPlaybackStatusUpdate((status) => {
-    //         if (status.isLoaded && status.didJustFinish) {
-    //         sound.unloadAsync();
-    //         }
-    //     });
-    //     } catch (error) {
-    //     console.log('Error de audio:', error);
-    //     }
-    // };
-
     const dispararAlertaError = (titulo: string, mensaje: string) => {
         SoundService.reproducir('error');
         showToast("error", titulo, mensaje);
@@ -176,7 +160,7 @@ export default function RegistroScreen() {
             apellidos,
             dni,
             cuil,
-            perfil: 'cliente', // Estado inicial por defecto para autoregistro
+            perfil: 'pendiente', // Requiere aprobación del admin/supervisor antes de ingresar
             foto_url: resultadoSubida.url,
         });
 
