@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Image, KeyboardAvoidingView, Platform, ScrollView, Modal, ActivityIndicator } from 'react-native';
-import { useRouter } from 'expo-router';
 import { useToast } from "@/src/context/ToastContext";
 import { AuthService } from '@/src/services/authService';
 import { ImageService } from '@/src/services/imageService';
-import { Ionicons } from '@expo/vector-icons';
 import { SoundService } from '@/src/services/soundService';
+import { Ionicons } from '@expo/vector-icons';
 import { CameraView, useCameraPermissions } from 'expo-camera';
+import { useRouter } from 'expo-router';
+import React, { useState } from 'react';
+import { ActivityIndicator, Image, KeyboardAvoidingView, Modal, Platform, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 export default function RegistroScreen() {
     const router = useRouter();
@@ -160,7 +160,7 @@ export default function RegistroScreen() {
             apellidos,
             dni,
             cuil,
-            perfil: 'pendiente', // Requiere aprobación del admin/supervisor antes de ingresar
+            perfil: 'cliente_pendiente', 
             foto_url: resultadoSubida.url,
         });
 
@@ -169,7 +169,9 @@ export default function RegistroScreen() {
         // 🔊 ¡REGISTRO CORRECTO!
         await SoundService.reproducir('exito');
         showToast("success", "Registro enviado", "Cuenta creada. Aguarda la aprobación del Supervisor.");
-        router.replace('/login');
+        
+        // Te corregí la ruta a '/' si usás Expo Router index, o dejala en '/login' si es una pantalla separada
+        router.replace('/'); 
 
         } catch (error: any) {
         setLoading(false);

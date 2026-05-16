@@ -1,12 +1,12 @@
+import { AuthProvider } from '@/src/context/AuthContext';
+import { ToastProvider } from '@/src/context/ToastContext';
 import { DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { Stack } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
+import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { ToastProvider } from '@/src/context/ToastContext';
-import { AuthProvider } from '@/src/context/AuthContext';
 
 // Importamos el administrador de sonidos nativos
 import { SoundService } from '@/src/services/soundService';

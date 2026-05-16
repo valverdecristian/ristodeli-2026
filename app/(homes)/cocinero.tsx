@@ -5,8 +5,9 @@ export default function HomeCocinero() {
     const router = useRouter();
 
     const accionesCocinero = [
-        { title: 'Agregar plato', icon: 'fast-food-outline', onPress: () => console.log('Navegar a Agregar plato') },
+        { title: 'Agregar producto', icon: 'fast-food-outline', onPress: () => router.push("/(homes)/cocinero/alta")},
         { title: 'Pedidos pendientes', icon: 'people-outline', onPress: () => console.log('Navegar a ver pedidos pendientes') },
+        { title: 'Catalogo de productos', icon: 'people-outline', onPress: () => router.push("/(homes)/cocinero/menu")},
     ];
 
     return (
