@@ -1,11 +1,10 @@
+import { useAuth } from '@/src/context/AuthContext';
 import { useToast } from "@/src/context/ToastContext";
+import { SoundService } from '@/src/services/soundService';
 import { supabase } from '@/src/services/SupabaseClient';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { ActivityIndicator, Image, KeyboardAvoidingView, Modal, Platform, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
-
-// Importamos el administrador de estímulos multimedia
-import { SoundService } from '@/src/services/soundService';
 
 const Icon = ({ emoji }: { emoji: string }) => (
   <Text className="text-primary text-3xl mb-1">{emoji}</Text>
@@ -14,6 +13,7 @@ const Icon = ({ emoji }: { emoji: string }) => (
 export default function LoginScreen() {
   const router = useRouter();
   const { showToast } = useToast();
+  const { cerrarSesion } = useAuth();
   const [showQuickAccess, setShowQuickAccess] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -118,6 +118,7 @@ export default function LoginScreen() {
 
       // Si pasa los bloqueos, apagamos la carga y ejecutamos el bip de éxito
       setLoading(false);
+
       await SoundService.reproducir('exito');
 
       // 4. ROUTING DINÁMICO SEGÚN EL ROL AUTORIZADO

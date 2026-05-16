@@ -28,22 +28,6 @@ export default function RegistroScreen() {
     const [password, setPassword] = useState('');
     const [fotoUri, setFotoUri] = useState<string | null>(null);
 
-    // const reproducirSonidoError = async () => {
-    //     try {
-    //     const { sound } = await Audio.Sound.createAsync(
-    //         require('@/assets/sounds/error_alert.mp3') 
-    //     );
-    //     await sound.playAsync();
-    //     sound.setOnPlaybackStatusUpdate((status) => {
-    //         if (status.isLoaded && status.didJustFinish) {
-    //         sound.unloadAsync();
-    //         }
-    //     });
-    //     } catch (error) {
-    //     console.log('Error de audio:', error);
-    //     }
-    // };
-
     const dispararAlertaError = (titulo: string, mensaje: string) => {
         SoundService.reproducir('error');
         showToast("error", titulo, mensaje);
@@ -176,7 +160,6 @@ export default function RegistroScreen() {
             apellidos,
             dni,
             cuil,
-            // 🌟 CAMBIO CLAVE ACÁ: Entra como pendiente para que el Supervisor/Dueño lo apruebe
             perfil: 'cliente_pendiente', 
             foto_url: resultadoSubida.url,
         });
