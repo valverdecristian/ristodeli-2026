@@ -85,7 +85,7 @@ export default function LoginScreen() {
       // 3. CONSULTAR EL PERFIL EN LA TABLA PUBLIC.USUARIOS usando la FK
       const { data: userProfile, error: profileError } = await supabase
         .from('usuarios')
-        .select('perfil')
+        .select('id, perfil, nombres, foto_url') // 🌟 AGREGAMOS 'id, nombre, foto' para poder pasárselos al Home
         .eq('id', authData.user.id)
         .single();
 
@@ -101,9 +101,8 @@ export default function LoginScreen() {
       // 🌟 LÓGICA DE CONTROL EXCLUYENTE PARA REBOTAR SOLICITUDES NO APROBADAS
       if (currentRole === "cliente_pendiente") {
         setLoading(false);
-        // Deslogueamos la instancia de Auth inmediatamente para limpiar credenciales
         await supabase.auth.signOut(); 
-        SoundService.reproducir('error'); // Activa sonido + vibración por error
+        SoundService.reproducir('error');
         showToast("error", "Acceso Retenido", "Tu cuenta está registrada pero aguarda la aprobación de un Supervisor.");
         return;
       }
@@ -143,8 +142,15 @@ export default function LoginScreen() {
           router.replace("/(homes)/cocinero");
           break;
         case "cliente":
-          // Clientes aprobados van directo al flujo operativo de las mesas
-          router.replace("/");
+          // 🔗 LINKEO CLAVE CORREGIDO: Usamos 'userProfile' que es tu variable real
+          router.replace({
+            pathname: "/home",
+            params: {
+              usuarioId: userProfile.id,       
+              usuarioNombre: userProfile.nombres,
+              usuarioFoto: userProfile.foto_url || ''
+            }
+          });
           break;
         default:
           router.replace("/");
@@ -234,7 +240,7 @@ export default function LoginScreen() {
               </TouchableOpacity>
 
               <TouchableOpacity
-                onPress={() => console.log("Ir a Registro Anónimo")}
+                onPress={() => router.push('/registroAnonimo')}
                 className="bg-purple w-[48%] rounded-full py-3 shadow-md active:opacity-80"
               >
                 <Text className="text-center font-bold text-primary text-sm uppercase">
