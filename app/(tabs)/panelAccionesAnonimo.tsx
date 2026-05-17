@@ -9,9 +9,12 @@ export default function PanelAccionesAnonimoScreen() {
     const { anonimoId, anonimoNombre, anonimoFoto } = useLocalSearchParams();
 
     const handleEscanearMesaAsignada = () => {
-        // Al estar en esta pantalla, el flag enListaEspera va true porque ya pasó el control del QR de entrada
-        showToast("info", "Escáner de Mesa", "Abriendo escáner para vincularse a la mesa asignada por el Metre.");
-        // router.push("/(tabs)/escanerMesaReal");
+        showToast("info", "Escáner de Mesa", "Abriendo cámara para vincular tu usuario a la mesa asignada por el Metre.");
+    
+        router.push({
+            pathname: "/(tabs)/mesa/escanearMesa",
+            params: { clienteAnonimoId: anonimoId } 
+        });
     };
 
     return (
