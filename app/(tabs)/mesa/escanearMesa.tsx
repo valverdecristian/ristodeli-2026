@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import { supabase } from '@/src/services/SupabaseClient';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
@@ -15,40 +15,48 @@ export default function EscanearMesaScreen() {
     const [mesaEsperadaId, setMesaEsperadaId] = useState<string | null>(null);
     const [numeroMesaEsperada, setNumeroMesaEsperada] = useState<string | null>(null);
     const [clienteId, setClienteId] = useState<string | null>(null);
-
+    const { clienteAnonimoId } = useLocalSearchParams<{ clienteAnonimoId?: string }>();
+    
     useEffect(() => {
         obtenerAsignacionMesa();
     }, []);
 
     const obtenerAsignacionMesa = async () => {
         try {
-        const { data: { session } } = await supabase.auth.getSession();
-        const idUsuario = session?.user?.id; 
-        if (!idUsuario) return;
-        setClienteId(idUsuario);
+            let idUsuario: string | null | undefined = null;
+        
+            if (clienteAnonimoId) {
+                idUsuario = clienteAnonimoId;
+            } else {
+                const { data: { session } } = await supabase.auth.getSession();
+                idUsuario = session?.user?.id;
+            }
             
-        const { data: asignacion, error } = await supabase
-            .from('lista_espera')
-            .select('mesa_asignada, estado')
-            .eq('cliente_id', idUsuario)
-            .eq('estado', 'asignado')
-            .order('created_at', { ascending: false })
-            .limit(1)
-            .maybeSingle();
-
-        if (asignacion && asignacion.mesa_asignada) {
-            setMesaEsperadaId(asignacion.mesa_asignada);
-
-            const { data: mesa } = await supabase
-            .from('mesas')
-            .select('numero')
-            .eq('id', asignacion.mesa_asignada)
-            .single();
+            if (!idUsuario) return;
+            setClienteId(idUsuario);
             
-            if (mesa) setNumeroMesaEsperada(mesa.numero.toString());
-        }
+            const { data: asignacion, error } = await supabase
+                .from('lista_espera')
+                .select('mesa_asignada, estado')
+                .eq('cliente_id', idUsuario)
+                .eq('estado', 'asignado')
+                .order('created_at', { ascending: false })
+                .limit(1)
+                .maybeSingle();
+            
+            if (asignacion && asignacion.mesa_asignada) {
+                setMesaEsperadaId(asignacion.mesa_asignada);
+                
+                const { data: mesa } = await supabase
+                    .from('mesas')
+                    .select('numero')
+                    .eq('id', asignacion.mesa_asignada)
+                    .single();
+                
+                if (mesa) setNumeroMesaEsperada(mesa.numero.toString());
+            }
         } catch (error) {
-        console.error("Error buscando asignación de mesa:", error);
+            console.error("Error buscando asignación de mesa:", error);
         }
     };
 
