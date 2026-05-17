@@ -58,7 +58,7 @@ export default function LoginScreen() {
 
       const { data: userProfile, error: profileError } = await supabase
         .from('usuarios')
-        .select('id, perfil, nombres, foto_url') // 🌟 AGREGAMOS 'id, nombre, foto' para poder pasárselos al Home
+        .select('id, perfil, nombres, foto_url')
         .eq('id', authData.user.id)
         .single();
 
@@ -74,7 +74,6 @@ export default function LoginScreen() {
       if (currentRole === "cliente_pendiente" || currentRole === "cliente_rechazado") {
         setLoading(false);
         await supabase.auth.signOut(); 
-
         SoundService.reproducir('error');
         showToast("error", "Acceso Retenido", "Tu cuenta está registrada pero aguarda la aprobación de un Supervisor.");
         return;
@@ -197,7 +196,6 @@ export default function LoginScreen() {
               </TouchableOpacity>
 
               <TouchableOpacity
-
                 onPress={() => router.push('/registroAnonimo')}
                 className="bg-purple w-[48%] rounded-full py-3 shadow-md active:opacity-80"
               >
