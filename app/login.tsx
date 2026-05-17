@@ -79,10 +79,10 @@ export default function LoginScreen() {
         showToast("error", "Acceso Retenido", "Tu cuenta está registrada pero aguarda la aprobación de un Supervisor.");
         return;
       }
-
       if (currentRole === "cliente_rechazado") {
         setLoading(false);
         await supabase.auth.signOut();
+
         SoundService.reproducir('error');
         showToast("error", "Acceso Retenido", "Tu cuenta requiere aprobación o fue denegada.");
         return;
