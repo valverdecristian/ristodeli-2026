@@ -50,7 +50,7 @@ export default function AprobacionClientesScreen() {
         setLoadingText(decision === 'aprobar' ? 'Aprobando cuenta...' : 'Rechazando cuenta...');
         setLoading(true);
     
-        const nuevoPerfil = decision === 'aprobar' ? 'cliente' : 'cliente_rechazado'; //
+        const nuevoPerfil = decision === 'aprobar' ? 'cliente_registrado' : 'cliente_rechazado'; //
     
         try {
           // Ejecutamos el update y le pedimos que nos devuelva la fila afectada (.select())
