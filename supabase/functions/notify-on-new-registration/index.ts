@@ -54,8 +54,10 @@ serve(async (req) => {
   const payload = await req.json();
   console.log("Payload recibido:", JSON.stringify(payload));
   
-  // 1. Mandar correo al cliente registrado (solo si es cliente_reg)
-  if (payload.record?.email && payload.record?.perfil === 'cliente_reg') {
+  // 1. AJUSTE: Estandarizamos el estado inicial a 'cliente_pendiente'
+  const isNuevoCliente = payload.record?.perfil === 'cliente_pendiente' || payload.record?.perfil === 'cliente_registrado';
+
+  if (payload.record?.email && isNuevoCliente) {
     const htmlAvisoPendiente = `
     <div style="font-family: Tahoma, sans-serif; max-width: 600px; margin: 0 auto; background-color: #F8EECB; border-radius: 12px; overflow: hidden; border: 1px solid #31603D;">
       <div style="background-color: #31603D; padding: 25px; text-align: center;">
@@ -76,6 +78,7 @@ serve(async (req) => {
     </div>
     `;
     console.log("Enviando correo de aviso al cliente: " + payload.record.email);
+    // [cite: 188] Se enviará automáticamente un correo informando la situación.
     await sendBrevoEmail(payload.record.email, payload.record.nombres, "Tu registro en Ristodeli está en revisión", htmlAvisoPendiente);
   }
 
@@ -84,7 +87,7 @@ serve(async (req) => {
     Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
   );
   
-  // Fetch admins and supervisors
+  // 2. AJUSTE: Agregamos 'dueño' a la consulta de notificaciones push
   const { data: admins, error: dbError } = await supabaseClient
     .from('usuarios')
     .select('perfil, push_token')
@@ -98,14 +101,12 @@ serve(async (req) => {
     return new Response(JSON.stringify({ message: "No admins to notify" }), { headers: { "Content-Type": "application/json" } });
   }
 
-  // Si no es un cliente registrado, no notificamos a los administradores por push
-  const perfilesValidos = ['pendiente', 'cliente_reg', 'rechazado'];
-  // Si no es un cliente registrado, no notificamos a los administradores por push
+  // 3. AJUSTE: Filtramos por los roles válidos de la nueva app
+  const perfilesValidos = ['cliente_pendiente', 'cliente_registrado', 'cliente_rechazado'];
   if (!perfilesValidos.includes(payload.record?.perfil)) {
     return new Response(JSON.stringify({ message: "El perfil no requiere aprobación ni notificación push." }), { headers: { "Content-Type": "application/json" } });
   }
 
-  // extract tokens and filter nulls or empties
   const tokens = admins.map(a => a.push_token).filter(t => t && t.trim().length > 0);
   console.log("Tokens encontrados para enviar:", tokens);
   

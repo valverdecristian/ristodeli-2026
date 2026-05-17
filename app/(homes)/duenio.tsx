@@ -30,11 +30,6 @@ export default function HomeDuenio() {
       icon: "people-outline",
       onPress: () => router.push("/visualizar-encuestas"),
     },
-    {
-      title: "Test Cámara",
-      icon: "camera-outline",
-      onPress: () => router.push("/test-camera"),
-    },
   ];
 
   return <HomeBase roleTitle="Dueño" buttons={accionesDueno} />;
