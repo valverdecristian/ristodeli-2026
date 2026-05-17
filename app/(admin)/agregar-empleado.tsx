@@ -80,7 +80,7 @@ export default function AgregarEmpleadoScreen() {
     }
   };
 
-  // 2. FUNCIÓN SIMPLIFICADA QUE RECIBE LA DATA DEL COMPONENTE SCANNERDNI
+  // FUNCIÓN SIMPLIFICADA QUE RECIBE LA DATA DEL COMPONENTE SCANNERDNI
   const procesarDniEscaneado = (data: string) => {
     setShowScanner(false);
     try {
@@ -154,7 +154,7 @@ export default function AgregarEmpleadoScreen() {
     }
   };
 
-  // 3. INYECTAMOS EL COMPONENTE MODULAR DEL ESCÁNER
+  // INYECTAMOS EL COMPONENTE MODULAR DEL ESCÁNER
   if (showScanner) {
     return (
       <ScannerDNI
@@ -215,12 +215,12 @@ export default function AgregarEmpleadoScreen() {
 
         {paso === 2 && (
           <ScrollView contentContainerStyle={{ flexGrow: 1 }} className="px-8 pt-8" showsVerticalScrollIndicator={false}>
-            {/* Formulario Paso 2 (Igual que antes) */}
+            {/* Formulario  (Igual que antes) */}
             <CustomInput placeholder="Correo electrónico" value={email} onChangeText={setEmail} autoCapitalize="none" keyboardType="email-address" />
             <CustomInput placeholder="Contraseña temporal" secureTextEntry value={password} onChangeText={setPassword} />
             <CustomInput placeholder="Confirmar contraseña" secureTextEntry value={confirmPassword} onChangeText={setConfirmPassword} marginBottom="mb-8" />
 
-            {/* NUESTRO ACORDEÓN MODULARIZADO */}
+            {/* NUESTRO ACORDEON MODULARIZADO */}
             <SelectorDeRol
               roles={ROLES_EMPLEADO}
               rolSeleccionado={rolSeleccionado}

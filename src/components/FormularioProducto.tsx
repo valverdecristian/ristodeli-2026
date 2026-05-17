@@ -31,12 +31,10 @@ interface FormularioProductoProps {
         showToast("error", titulo, mensaje);
     };
 
-    // Captura de foto individual (0, 1 o 2) permitiendo optar por cámara o galería
+    // Captura de foto individual (0, 1 o 2) permitiendo camara o galería
     const gestionarFoto = async (index: number) => {
         try {
-        // Usamos el ImageService. Tomamos foto o dejamos elegir de galería según pida el flujo
-        // Para platos/bebidas el enunciado permite optar por la galería de fotos
-        const foto = await ImageService.takePhoto(); // O ImageService.selectFromGallery() si lo tienen armado
+        const foto = await ImageService.takePhoto();
         if (foto) {
             const nuevasFotos = [...fotosUris];
             nuevasFotos[index] = foto.uri;
@@ -48,13 +46,12 @@ interface FormularioProductoProps {
     };
 
     const handleGuardarProducto = async () => {
-        // 1. VALIDACIONES EXIGIDAS
+        // VALIDACIONES 
         if (!nombre.trim() || !descripcion.trim() || !tiempo || !precio || !tipoSeleccionado) {
         dispararError("Campos incompletos", "Por favor, completa toda la información básica.");
         return;
         }
 
-        // Verificar que esten las 3 fotos obligatorias cargadas individualmente
         if (fotosUris.some(f => f === null)) {
         dispararError("Fotos faltantes", "Es obligatorio cargar las tres (3) fotos del producto.");
         return;
@@ -77,12 +74,10 @@ interface FormularioProductoProps {
         const urlsPublicas: string[] = [];
 
         try {
-        // 2. SUBIR LAS 3 FOTOS AL BUCKET "AVATARES" (O "PRODUCTOS" SI CREAN UNO NUEVO)
         for (let i = 0; i < fotosUris.length; i++) {
             setLoadingText(`Subiendo imagen ${i + 1} de 3...`);
             const uri = fotosUris[i]!;
             
-            // Identificador único para evitar colisiones en el storage
             const nombreArchivo = `prod_${nombre.toLowerCase().replace(/\s+/g, '_')}_${Date.now()}_${i}`;
             const resultadoSubida = await ImageService.uploadToSupabase(uri, "avatares", "productos", nombreArchivo);
 
@@ -92,7 +87,6 @@ interface FormularioProductoProps {
             urlsPublicas.push(resultadoSubida.url);
         }
 
-        // 3. INSERCIÓN EN LA TABLA PRODUCTOS
         setLoadingText('Registrando producto en la carta...');
         const { error: dbError } = await supabase
             .from('productos')
@@ -102,7 +96,7 @@ interface FormularioProductoProps {
                 descripcion: descripcion.trim(),
                 tiempo_elaboracion: tiempoNum,
                 precio: precioNum,
-                fotos: urlsPublicas, // Enviamos el array de URLs
+                fotos: urlsPublicas,
                 tipo: tipoSeleccionado,
                 estado: 'disponible'
             }
@@ -111,7 +105,6 @@ interface FormularioProductoProps {
         setLoading(false);
 
         if (dbError) {
-            // Captura el constraint UNIQUE (nombre, tipo) si ya existe en el menú
             if (dbError.code === '23505') {
             dispararError("Producto existente", "Ya existe un producto con ese nombre bajo la misma categoría.");
             } else {
@@ -120,7 +113,6 @@ interface FormularioProductoProps {
             return;
         }
 
-        // Éxito total
         await SoundService.reproducir('exito');
         showToast("success", "¡Alta exitosa!", `${nombre} se agregó correctamente al menú.`);
         onExito();
@@ -201,7 +193,7 @@ interface FormularioProductoProps {
             </View>
             )}
 
-            {/* SECCIÓN MULTIPHOTO INDIVIDUAL Y CENTRADA (3 CONTENEDORES EXIGIDOS) */}
+            {/* SECCIÓN MULTIFOTO INDIVIDUAL Y CENTRADA */}
             <Text className="text-secondary font-bold text-xs uppercase tracking-wider mb-3 px-2">
             Fotos obligatorias del producto (3)
             </Text>

@@ -1,10 +1,3 @@
-// src/models/usuario.model.ts
-// Modelos de datos espejados desde la tabla public.usuarios de Supabase
-
-/**
- * Representa un registro completo de la tabla `usuarios`.
- * Los campos coinciden 1:1 con las columnas de la DB.
- */
 export interface UsuarioPerfil {
   id: string;
   email: string;

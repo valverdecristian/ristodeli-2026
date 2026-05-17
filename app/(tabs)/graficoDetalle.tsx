@@ -1,10 +1,10 @@
-import { supabase } from '@/src/services/SupabaseClient';
-import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Dimensions, ScrollView, Text, TouchableOpacity, View } from 'react-native';
-// import { BarChart, PieChart, LineChart } from 'react-native-chart-kit';
-import { SoundService } from '@/src/services/soundService';
+import { View, Text, ActivityIndicator, Dimensions, ScrollView, TouchableOpacity } from 'react-native';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { supabase } from '@/src/services/SupabaseClient';
+import { BarChart, PieChart, LineChart } from 'react-native-gifted-charts';
 import { Ionicons } from '@expo/vector-icons';
+import { SoundService } from '@/src/services/soundService';
 
 const screenWidth = Dimensions.get("window").width;
 
@@ -21,9 +21,7 @@ export default function GraficoDetalleScreen() {
     const fetchEncuestas = async () => {
         try {
         setLoading(true);
-        const { data, error } = await supabase
-            .from('encuestas')
-            .select('*');
+        const { data, error } = await supabase.from('encuestas').select('*');
         if (error) throw error;
         setDatosEncuestas(data || []);
         } catch (e) {
@@ -33,47 +31,39 @@ export default function GraficoDetalleScreen() {
         }
     };
 
-    // --- 🌟 CONFIGURACIÓN DE LOS GRÁFICOS DE RISTODELI ---
-    const chartConfig = {
-        backgroundGradientFrom: "#31603D", // Tu verde 'primary' institucional
-        backgroundGradientTo: "#1E3D25",
-        decimalPlaces: 1,
-        color: (opacity = 1) => `rgba(245, 192, 101, ${opacity})`, // Tu ocre/amarillo 'tertiary'
-        labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-        style: { borderRadius: 16 },
-        propsForDots: { r: "6", strokeWidth: "2", stroke: "#F5C065" }
-    };
-
-    // --- 🛠️ 1. PROCESADOR DATA: SATISFACCIÓN (BarChart) ---
+    // SATISFACCIÓN 
     const renderGraficoSatisfaccion = () => {
-        const conteo = [0, 0, 0, 0, 0]; // Para niveles del 1 al 5
+        const conteo = [0, 0, 0, 0, 0];
         datosEncuestas.forEach(e => {
         if (e.satisfaccion >= 1 && e.satisfaccion <= 5) conteo[e.satisfaccion - 1]++;
         });
 
-        const data = {
-        labels: ["1⭐", "2⭐", "3⭐", "4⭐", "5⭐"],
-        datasets: [{ data: conteo }]
-        };
+        const barData = [
+        { value: conteo[0], label: '1⭐', frontColor: '#F5C065' },
+        { value: conteo[1], label: '2⭐', frontColor: '#F5C065' },
+        { value: conteo[2], label: '3⭐', frontColor: '#F5C065' },
+        { value: conteo[3], label: '4⭐', frontColor: '#F5C065' },
+        { value: conteo[4], label: '5⭐', frontColor: '#31603D' },
+        ];
 
         return (
-        <View className="items-center bg-secondary p-4 rounded-3xl border border-tertiary/10 shadow-sm">
-            <Text className="text-primary font-bold uppercase text-center mb-4">Puntuación General de Satisfacción</Text>
+        <View className="bg-secondary p-4 rounded-3xl border border-tertiary/10 shadow-sm items-center">
+            <Text className="text-primary font-bold uppercase text-center mb-6">Puntuación de Satisfacción</Text>
             <BarChart
-            data={data}
-            width={screenWidth - 64}
-            height={240}
-            yAxisLabel=""
-            yAxisSuffix=" v"
-            chartConfig={chartConfig}
-            verticalLabelRotation={0}
-            style={{ borderRadius: 16 }}
+            data={barData}
+            barWidth={32}
+            capThickness={2}
+            capColor={'#1E3D25'}
+            rulesColor={'rgba(49, 96, 61, 0.1)'} 
+            xAxisLabelTextStyle={{ color: '#31603D', fontWeight: 'bold' }}
+            yAxisTextStyle={{ color: '#31603D' }}
+            noOfSections={4}
             />
         </View>
         );
     };
 
-    // --- 🛠️ 2. PROCESADOR DATA: RECOMENDACIÓN (PieChart) ---
+    // RECOMENDACIÓN 
     const renderGraficoRecomendacion = () => {
         let siRecomienda = 0;
         let noRecomienda = 0;
@@ -82,29 +72,32 @@ export default function GraficoDetalleScreen() {
         else noRecomienda++;
         });
 
-        const data = [
-        { name: "Sí Recomienda", population: siRecomienda, color: "#F5C065", legendFontColor: "#31603D", legendFontSize: 12 },
-        { name: "No Recomienda", population: noRecomienda, color: "#E76F51", legendFontColor: "#31603D", legendFontSize: 12 }
+        const pieData = [
+        { value: siRecomienda, color: '#31603D', text: `Sí (${siRecomienda})` },
+        { value: noRecomienda, color: '#E76F51', text: `No (${noRecomienda})` }
         ];
 
         return (
-        <View className="bg-secondary p-4 rounded-3xl border border-tertiary/10 shadow-sm">
-            <Text className="text-primary font-bold uppercase text-center mb-4">¿Recomendarían Ristodeli?</Text>
+        <View className="bg-secondary p-4 rounded-3xl border border-tertiary/10 shadow-sm items-center">
+            <Text className="text-primary font-bold uppercase text-center mb-6">¿Recomendarían el Restaurante?</Text>
             <PieChart
-            data={data}
-            width={screenWidth - 64}
-            height={220}
-            chartConfig={chartConfig}
-            accessor={"population"}
-            backgroundColor={"transparent"}
-            paddingLeft={"15"}
-            absolute
+            data={pieData}
+            donut
+            showText
+            textColor="white"
+            radius={100}
+            innerRadius={60}
+            innerCircleColor="#F4F4F9"
             />
+            <View className="flex-row justify-center space-x-6 mt-6">
+            <View className="flex-row items-center mr-4"><View className="w-3 h-3 bg-primary rounded-full mr-2" /><Text className="text-xs text-primary font-semibold">Recomienda</Text></View>
+            <View className="flex-row items-center"><View className="w-3 h-3 bg-red-500 rounded-full mr-2" /><Text className="text-xs text-primary font-semibold">No Recomienda</Text></View>
+            </View>
         </View>
         );
     };
 
-    // --- 🛠️ 3. PROCESADOR DATA: LIMPIEZA (BarChart Adaptado) ---
+    // LIMPIEZA 
     const renderGraficoLimpieza = () => {
         let excelente = 0, bueno = 0, regular = 0;
         datosEncuestas.forEach(e => {
@@ -114,57 +107,57 @@ export default function GraficoDetalleScreen() {
         else regular++;
         });
 
-        const data = {
-        labels: ["Excelente", "Bueno", "Regular"],
-        datasets: [{ data: [excelente, bueno, regular] }]
-        };
+        const barData = [
+        { value: excelente, label: 'Excelente', frontColor: '#31603D' },
+        { value: bueno, label: 'Bueno', frontColor: '#F5C065' },
+        { value: regular, label: 'Regular', frontColor: '#E76F51' }
+        ];
 
         return (
-        <View className="items-center bg-secondary p-4 rounded-3xl border border-tertiary/10 shadow-sm">
-            <Text className="text-primary font-bold uppercase text-center mb-4">Nivel de Higiene del Salón</Text>
+        <View className="bg-secondary p-4 rounded-3xl border border-tertiary/10 shadow-sm items-center">
+            <Text className="text-primary font-bold uppercase text-center mb-6">Nivel de Higiene del Salón</Text>
             <BarChart
-            data={data}
-            width={screenWidth - 64}
-            height={240}
-            yAxisLabel=""
-            yAxisSuffix=" respuestas"
-            chartConfig={chartConfig}
-            style={{ borderRadius: 16 }}
+            data={barData}
+            barWidth={40}
+            xAxisLabelTextStyle={{ color: '#31603D', fontSize: 11, fontWeight: 'bold' }}
+            yAxisTextStyle={{ color: '#31603D' }}
+            rulesColor={'rgba(49, 96, 61, 0.1)'}
             />
         </View>
         );
     };
 
-    // --- 🛠️ 4. PROCESADOR DATA: PILARES DE SERVICIO (LineChart) ---
+    // PILARES DE SERVICIO
     const renderGraficoPilares = () => {
-        // Promediamos las últimas 5 encuestas cargadas para ver la evolución del servicio
         const ultimasEncuestas = datosEncuestas.slice(-5);
-        const labels = ultimasEncuestas.map((_, index) => `E${index + 1}`);
-        const dataAtencion = ultimasEncuestas.map(e => Number(e.atencion || 5));
-        const dataComida = ultimasEncuestas.map(e => Number(e.comida || 5));
-        const dataAmbiente = ultimasEncuestas.map(e => Number(e.ambiente || 5));
-
-        const data = {
-        labels: labels.length > 0 ? labels : ["Sin datos"],
-        datasets: [
-            { data: dataAtencion.length > 0 ? dataAtencion : [5], color: (opacity = 1) => `rgba(245, 192, 101, ${opacity})` }, // Atención (Ocre)
-            { data: dataComida.length > 0 ? dataComida : [5], color: (opacity = 1) => `rgba(231, 111, 81, ${opacity})` },   // Comida (Naranja)
-            { data: dataAmbiente.length > 0 ? dataAmbiente : [5], color: (opacity = 1) => `rgba(74, 144, 226, ${opacity})` }   // Ambiente (Azul)
-        ],
-        legend: ["Atención", "Comida", "Ambiente"]
-        };
+        
+        // Gifted Charts para múltiples líneas requiere un array de objetos por cada línea independiente
+        const lineDataAtencion = ultimasEncuestas.map(e => ({ value: Number(e.atencion || 5) }));
+        const lineDataComida = ultimasEncuestas.map(e => ({ value: Number(e.comida || 5) }));
+        const lineDataAmbiente = ultimasEncuestas.map(e => ({ value: Number(e.ambiente || 5) }));
 
         return (
-        <View className="items-center bg-secondary p-4 rounded-3xl border border-tertiary/10 shadow-sm">
-            <Text className="text-primary font-bold uppercase text-center mb-4">Historial Operativo (Escala 1-5)</Text>
+        <View className="bg-secondary p-4 rounded-3xl border border-tertiary/10 shadow-sm items-center">
+            <Text className="text-primary font-bold uppercase text-center mb-4">Evolución del Servicio</Text>
             <LineChart
-            data={data}
-            width={screenWidth - 64}
-            height={250}
-            chartConfig={chartConfig}
-            bezier
-            style={{ borderRadius: 16 }}
+            data={lineDataAtencion}      
+            data2={lineDataComida}       
+            data3={lineDataAmbiente}     
+            color1="#F5C065"            
+            color2="#E76F51"             
+            color3="#4A90E2"             
+            thickness={3}
+            dataPointsColor1="#F5C065"
+            dataPointsColor2="#E76F51"
+            dataPointsColor3="#4A90E2"
+            noOfSections={4}
+            yAxisTextStyle={{ color: '#31603D' }}
             />
+            <View className="flex-row justify-center space-x-4 mt-4">
+            <Text className="text-[10px] font-bold text-orange-500">● Atención</Text>
+            <Text className="text-[10px] font-bold text-red-400">● Comida</Text>
+            <Text className="text-[10px] font-bold text-blue-500">● Ambiente</Text>
+            </View>
         </View>
         );
     };

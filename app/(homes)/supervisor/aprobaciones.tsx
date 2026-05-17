@@ -2,8 +2,8 @@ import { useToast } from "@/src/context/ToastContext";
 import { supabase } from '@/src/services/SupabaseClient';
 import { SoundService } from '@/src/services/soundService';
 import { Ionicons } from '@expo/vector-icons';
-import { useFocusEffect, useRouter } from 'expo-router'; // 🌟 Importamos useFocusEffect
-import React, { useCallback, useState } from 'react'; // 🌟 Importamos useCallback
+import { useFocusEffect, useRouter } from 'expo-router'; 
+import React, { useCallback, useState } from 'react'; 
 import { ActivityIndicator, FlatList, Image, Modal, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -22,76 +22,68 @@ export default function AprobacionClientesScreen() {
     const [loading, setLoading] = useState(false);
     const [loadingText, setLoadingText] = useState('');
 
-    // 1. CARGAR CLIENTES PENDIENTES DE APROBACIÓN
+    // CARGAR CLIENTES PENDIENTES
     const obtenerClientesPendientes = async () => {
         try {
-          const { data, error } = await supabase
-            .from('usuarios')
-            .select('id, nombres, apellidos, foto_url, email')
-            .eq('perfil', 'cliente_pendiente'); // Filtramos por rol pendiente
-    
-          if (error) throw error;
-          setClientes(data || []);
-        } catch (error) {
-          console.error(error);
+            const { data, error } = await supabase
+                .from('usuarios')
+                .select('id, nombres, apellidos, foto_url, email')
+                .eq('perfil', 'cliente_pendiente'); 
+        
+            if (error) throw error;
+            setClientes(data || []);
+            } catch (error) {
+            console.error(error);
         }
     };
-    
-    // 🌟 EL TRUCO CLAVE: useFocusEffect se ejecuta SIEMPRE que el usuario entra a la pantalla,
-    // incluso si vuelve de atrás usando router.back()
     useFocusEffect(
         useCallback(() => {
             obtenerClientesPendientes();
         }, [])
     );
     
-    // 2. PROCESAMOS EL CAMBIO DE PERFIL (APROBAR O RECHAZAR)
+    // CAMBIO DE PERFIL (APROBAR O RECHAZAR)
     const procesarCliente = async (cliente: ClientePendiente, decision: 'aprobar' | 'rechazar') => {
         setLoadingText(decision === 'aprobar' ? 'Aprobando cuenta...' : 'Rechazando cuenta...');
         setLoading(true);
     
-        const nuevoPerfil = decision === 'aprobar' ? 'cliente_registrado' : 'cliente_rechazado'; //
+        const nuevoPerfil = decision === 'aprobar' ? 'cliente_registrado' : 'cliente_rechazado'; 
     
         try {
-          // Ejecutamos el update y le pedimos que nos devuelva la fila afectada (.select())
-          const { data, error: dbError } = await supabase
-            .from('usuarios')
-            .update({ perfil: nuevoPerfil }) //
-            .eq('id', cliente.id)
-            .select(); // 🌟 CLAVE: Obliga a Supabase a retornar el registro modificado
-    
-          if (dbError) throw dbError;
+            const { data, error: dbError } = await supabase
+                .from('usuarios')
+                .update({ perfil: nuevoPerfil }) //
+                .eq('id', cliente.id)
+                .select(); 
+        
+            if (dbError) throw dbError;
 
-          // 🚨 SI DATA VIENE VACÍO, ES PORQUE EL RLS BLOQUEÓ LA ACTUALIZACIÓN
-          if (!data || data.length === 0) {
-            throw new Error("Permiso denegado por políticas RLS. El registro no se modificó.");
-          }
+            if (!data || data.length === 0) {
+                throw new Error("Permiso denegado por políticas RLS. El registro no se modificó.");
+            }
+        
+            await SoundService.reproducir('exito');
+            
+            showToast(
+                "success", 
+                decision === 'aprobar' ? "Cliente Aceptado" : "Cliente Rechazado", 
+                `${cliente.apellidos}, ${cliente.nombres} ahora tiene perfil de ${nuevoPerfil}.`
+            );
     
-          // 🔊 Feedback multimedia de éxito si pasó el RLS
-          await SoundService.reproducir('exito');
-          
-          showToast(
-            "success", 
-            decision === 'aprobar' ? "Cliente Aceptado" : "Cliente Rechazado", 
-            `${cliente.apellidos}, ${cliente.nombres} ahora tiene perfil de ${nuevoPerfil}.`
-          );
-    
-          // Refrescamos la lista local inmediatamente
-          setClientes(prev => prev.filter(c => c.id !== cliente.id));
+            setClientes(prev => prev.filter(c => c.id !== cliente.id));
     
         } catch (error: any) {
-          // 🔊 Si falla, chilla el celular con sonido de error y vibración
-          SoundService.reproducir('error'); 
-          showToast("error", "Error de operación", error.message || "No se pudo actualizar el perfil.");
-          console.error("Detalle del fallo:", error);
+            SoundService.reproducir('error'); 
+            showToast("error", "Error de operación", error.message || "No se pudo actualizar el perfil.");
+            console.error("Detalle del fallo:", error);
         } finally {
-          setLoading(false);
+            
         }
     };
 
     return (
         <SafeAreaView className="flex-1 bg-primary px-6 pt-4">
-        {/* MODAL DE ESPERA REQUERIDO CON LOGO */}
+        {/* MODAL DE ESPERA CON LOGO */}
         <Modal transparent visible={loading} animationType="fade">
             <View className="flex-1 justify-center items-center bg-black/60">
             <View className="bg-primary p-10 rounded-3xl items-center border-2 border-tertiary shadow-2xl w-[80%]">

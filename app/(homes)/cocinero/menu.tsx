@@ -11,7 +11,6 @@ export default function MenuCocineroScreen() {
 
     return (
         <SafeAreaView className="flex-1 bg-primary px-6 pt-4">
-        {/* 🌟 CORREGIDO: View nativa en vez de div */}
         <View className="flex-row items-center mb-6">
             <TouchableOpacity onPress={() => router.back()} className="mr-3 p-1">
             <Ionicons name="arrow-back-outline" size={28} color="#31603D" />
@@ -21,7 +20,6 @@ export default function MenuCocineroScreen() {
             </Text>
         </View>
 
-        {/* 🌟 CORREGIDO: View nativa en vez de div */}
         <View className="flex-row justify-between mb-6">
             <TouchableOpacity
             onPress={() => setCategoriaActual('plato')}

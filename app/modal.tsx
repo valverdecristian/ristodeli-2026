@@ -3,7 +3,6 @@ import { View, Text } from 'react-native';
 
 export default function ModalScreen() {
   return (
-    // bg-background aplica tu vainilla. flex-1 hace que ocupe toda la pantalla.
     <View className="flex-1 items-center justify-center bg-background px-6">
       
       {/* text-primary aplica el retro-green. text-3xl aumenta el tamaño. */}
@@ -25,12 +24,12 @@ export default function ModalScreen() {
 
       {/* Una tarjeta de alerta para probar el color danger y orange */}
       <View className="mt-12 p-5 border-2 border-danger rounded-xl bg-secondary w-full">
-         <Text className="text-danger font-bold text-lg text-center mb-1">
-           ¡Atención!
-         </Text>
-         <Text className="text-orange font-semibold text-center">
-           No te olvides del 20% de descuento en los juegos.
-         </Text>
+          <Text className="text-danger font-bold text-lg text-center mb-1">
+            ¡Atención!
+          </Text>
+          <Text className="text-orange font-semibold text-center">
+            No te olvides del 20% de descuento en los juegos.
+          </Text>
       </View>
 
     </View>

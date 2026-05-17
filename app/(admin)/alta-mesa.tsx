@@ -6,44 +6,17 @@ import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
 import React, { useCallback, useState } from "react";
-import {
-  ActivityIndicator,
-  Alert,
-  Image,
-  KeyboardAvoidingView,
-  Modal,
-  Platform,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import {ActivityIndicator,Alert,Image,KeyboardAvoidingView,Modal,Platform,ScrollView,StyleSheet,Text,
+        TextInput,TouchableOpacity,View} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 const styles = StyleSheet.create({
-  tabButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderRadius: 16,
-    flex: 1,
-    alignItems: "center",
-  },
-  tabButtonActive: {
-    backgroundColor: "#F5C065",
-  },
-  tabText: {
-    fontWeight: "bold",
-    fontSize: 11,
-    textTransform: "uppercase",
-  },
-  tabTextActive: {
-    color: "#31603D",
-  },
-  tabTextInactive: {
-    color: "rgba(49, 96, 61, 0.4)",
-  },
+  tabButton: {paddingHorizontal: 16,paddingVertical: 12,borderRadius: 16,flex: 1,alignItems: "center",},
+  tabButtonActive: {backgroundColor: "#F5C065",},
+  tabText: {fontWeight: "bold",fontSize: 11,textTransform: "uppercase",},
+  tabTextActive: {color: "#31603D",},
+  tabTextInactive: {color: "rgba(49, 96, 61, 0.4)",},
 });
+
 const normalizarTipo = (tipo: string) => {
   return tipo
     .toLowerCase()

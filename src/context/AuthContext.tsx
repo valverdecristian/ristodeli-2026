@@ -1,18 +1,12 @@
-// src/context/AuthContext.tsx
-// Equivalente reactivo al AuthService de Angular con signals.
-// Usa useState + useEffect para manejar currentUser y currentSession de forma global.
-
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { Session } from '@supabase/supabase-js';
 import { supabase } from '../services/SupabaseClient';
 import { AuthService } from '../services/authService';
 import { UsuarioPerfil } from '../models/usuario.model';
 
-// 1. Definimos la forma del contexto
 interface AuthContextData {
   currentUser: UsuarioPerfil | null;
   currentSession: Session | null;
-  /** true mientras se verifica la sesión inicial al arrancar la app */
   isLoading: boolean;
   ingresar: (email: string, clave: string) => Promise<{ user: any; session: Session | null }>;
   cerrarSesion: () => Promise<void>;
@@ -21,7 +15,6 @@ interface AuthContextData {
 
 const AuthContext = createContext<AuthContextData | undefined>(undefined);
 
-// 2. Proveedor del contexto — envuelve toda la app en _layout.tsx
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [currentUser, setCurrentUser] = useState<UsuarioPerfil | null>(null);
   const [currentSession, setCurrentSession] = useState<Session | null>(null);
@@ -43,7 +36,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   useEffect(() => {
-    // A. Verificamos la sesión existente al arrancar (equivalente a inicializarAuth())
     const inicializar = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
@@ -57,14 +49,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     inicializar();
 
-    // B. Suscripción reactiva a los cambios de sesión (login, logout, token refresh)
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (_event, session) => {
         await actualizarEstado(session);
       }
     );
 
-    // C. Limpieza al desmontar
     return () => subscription.unsubscribe();
   }, []);
 
@@ -74,8 +64,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const cerrarSesion = async () => {
     await AuthService.cerrarSesion();
-    // El listener onAuthStateChange también limpiará el estado,
-    // pero lo hacemos inmediato para mejor UX
     setCurrentUser(null);
     setCurrentSession(null);
   };
@@ -96,7 +84,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
-// 3. Hook para consumir el contexto en cualquier componente
+// Hook para consumir el contexto en cualquier componente
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) throw new Error('useAuth debe usarse dentro de AuthProvider');

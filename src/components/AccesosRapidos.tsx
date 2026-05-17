@@ -18,7 +18,6 @@ export default function AccesosRapidos({ onSelect }: AccesosRapidosProps) {
     { id: "cocinero", label: "Cocinero", emoji: "👨‍🍳", email: "cocinero1@ristodeli.com", pass: "12345678", desc: "Gestión de pedidos" }
   ];
 
-  // Función que llena los datos y cierra el modal automáticamente
   const handleSelection = (email: string, pass: string) => {
     onSelect(email, pass);
     setModalVisible(false);
@@ -26,7 +25,6 @@ export default function AccesosRapidos({ onSelect }: AccesosRapidosProps) {
 
   return (
     <>
-      {/* BOTÓN DISPARADOR (Se queda en el Login) */}
       <TouchableOpacity
         onPress={() => setModalVisible(true)}
         className="mt-8 flex-row items-center justify-center bg-secondary/10 border border-secondary/30 rounded-full py-4 px-6 shadow-md active:bg-secondary/20"

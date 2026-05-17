@@ -5,9 +5,8 @@ export default function HomeMetre() {
     const router = useRouter();
 
     const accionesMetre = [
-        { title: 'Lista de espera', icon: 'people-outline', onPress: () => console.log('Navegar a Lista de espera') },
-        { title: 'Asignar mesa', icon: 'person-add-outline', onPress: () => console.log('Navegar a Asignar mesa') },
-        { title: 'Estado de mesas', icon: 'person-add-outline', onPress: () => console.log('Ver Estado de mesas') },
+        { title: 'Asignar mesa', icon: 'person-add-outline', onPress: () => router.push('/(tabs)/metre/asignarMesa')},
+        { title: 'Estado de mesas', icon: 'person-add-outline', onPress: () => router.push('/(tabs)/metre/estadoMesas')},
     ];
 
     return (

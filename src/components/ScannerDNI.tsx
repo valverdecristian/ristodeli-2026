@@ -13,7 +13,7 @@ export default function ScannerDNI({ onScan, onCancel }: ScannerDNIProps) {
   const handleBarCodeScanned = ({ data }: { type: string; data: string }) => {
     if (scanned) return;
     setScanned(true);
-    onScan(data); // Le pasamos la data pura al componente padre
+    onScan(data);
   };
 
   return (
@@ -25,7 +25,7 @@ export default function ScannerDNI({ onScan, onCancel }: ScannerDNIProps) {
         onBarcodeScanned={scanned ? undefined : handleBarCodeScanned}
       />
       
-      {/* Guía en pantalla para el DNI */}
+      {/* Guia en pantalla para el DNI */}
       <View className="w-[85%] h-44 border-2 border-tertiary rounded-2xl mb-6 bg-transparent" />
       
       <Text className="text-secondary font-bold text-center mb-8 px-6 bg-black/70 py-3 rounded-2xl mx-4 text-xs uppercase tracking-wider">

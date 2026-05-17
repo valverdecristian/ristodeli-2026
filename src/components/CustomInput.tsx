@@ -1,7 +1,6 @@
 import { TextInput, TextInputProps } from 'react-native';
 
 interface CustomInputProps extends TextInputProps {
-  // Le pasamos un margen inferior opcional por si el último input necesita más espacio
   marginBottom?: string; 
 }
 

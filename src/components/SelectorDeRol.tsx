@@ -35,7 +35,7 @@ export default function SelectorDeRol({ roles, rolSeleccionado, onSelect }: Sele
         />
       </TouchableOpacity>
 
-      {/* MODAL SUPERPUESTO (Bottom Sheet) */}
+      {/* MODAL SUPERPUESTO */}
       <Modal
         visible={isOpen}
         transparent={true}

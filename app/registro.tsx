@@ -46,14 +46,13 @@ export default function RegistroScreen() {
         }
     };
 
-    // 🛠️ MÁGICA DEL ESCÁNER DE DNI (PDF417 ARGENTINO) USANDO EXPO-CAMERA
+    // ESCÁNER DE DNI 
     const handleBarCodeScanned = ({ data }: { type: string; data: string }) => {
         if (scanned) return;
         setScanned(true);
         setShowScanner(false);
 
         try {
-        // El formato de la tarjeta DNI argentina separa los strings con '@'
         if (data && data.includes('@')) {
             const datosDni = data.split('@');
             
@@ -66,7 +65,6 @@ export default function RegistroScreen() {
             setNombres(scannedNombre.trim());
             setDni(scannedDni.trim());
             
-            // Pre-armado de CUIL sugerido inicial de 11 dígitos
             if (scannedDni.length === 8) {
                 setCuil(`20${scannedDni}7`);
             }
@@ -98,7 +96,7 @@ export default function RegistroScreen() {
     const handleRegistro = async () => {
         const emailRegex = /\S+@\S+\.\S+/;
 
-        // 1. VALIDACIONES EXIGIDAS POR EL REQUERIMIENTO DEL TFI
+        // VALIDACIONES 
         if (!nombres || !apellidos || !dni || !cuil || !email || !password) {
         dispararAlertaError("Campos incompletos", "Por favor, completa todos los campos del formulario.");
         return;
@@ -137,7 +135,7 @@ export default function RegistroScreen() {
         setLoading(true);
 
         try {
-        // 2. SUBIDA DE IMAGEN AL STORAGE REAL EN EL BUCKET "AVATARES"
+        // SUBIDA DE IMAGEN 
         setLoadingText('Subiendo foto de perfil...');
         const resultadoSubida = await ImageService.uploadToSupabase(
             fotoUri,
@@ -152,7 +150,7 @@ export default function RegistroScreen() {
             return;
         }
 
-        // 3. REGISTRO COMPLETO usando AuthService (auth.users + tabla usuarios en 1 llamada)
+        // REGISTRO COMPLETO 
         setLoadingText('Creando tu cuenta en Ristodeli...');
         await AuthService.registrar(password, {
             email,
@@ -166,16 +164,12 @@ export default function RegistroScreen() {
 
         setLoading(false);
 
-        // 🔊 ¡REGISTRO CORRECTO!
         await SoundService.reproducir('exito');
         showToast("success", "Registro enviado", "Cuenta creada. Aguarda la aprobación del Supervisor.");
-        
-        // Te corregí la ruta a '/' si usás Expo Router index, o dejala en '/login' si es una pantalla separada
         router.replace('/'); 
 
         } catch (error: any) {
         setLoading(false);
-        // Manejo diferenciado de errores conocidos de Supabase
         if (error?.message?.includes('duplicate') || error?.code === '23505') {
             dispararAlertaError("Datos duplicados", "El DNI, CUIL o Email ya se encuentran registrados.");
         } else if (error?.message?.includes('Password')) {
@@ -186,7 +180,7 @@ export default function RegistroScreen() {
         }
     };
 
-    // 📹 VISTA DEL MODO CÁMARA ACTIVO PARA EL ESCÁNER
+    // VISTA DEL MODO CÁMARA ACTIVO PARA EL ESCANER
     if (showScanner) {
         return (
         <View className="flex-1 bg-black justify-center items-center">
@@ -199,7 +193,7 @@ export default function RegistroScreen() {
             onBarcodeScanned={scanned ? undefined : handleBarCodeScanned}
             />
             
-            {/* Guía en pantalla para encuadrar la barra horizontal del DNI */}
+            {/* Guia encuadrar la barra horizontal del DNI */}
             <View className="w-[85%] h-44 border-2 border-tertiary rounded-2xl mb-6 bg-transparent shadow-2xl" />
             
             <Text className="text-secondary font-bold text-center mb-8 px-6 bg-black/70 py-3 rounded-2xl mx-4 text-xs uppercase tracking-wider">
@@ -243,7 +237,7 @@ export default function RegistroScreen() {
                 <Text className="text-primary font-bold text-xs uppercase tracking-wider">Escanear Tarjeta DNI</Text>
             </TouchableOpacity>
 
-            {/* Círculo de captura de Foto Obligatoria */}
+            {/* Circulo de captura de Foto  */}
             <View className="items-center mb-6">
                 <TouchableOpacity 
                 onPress={tomarFotoPerfil}

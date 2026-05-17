@@ -75,7 +75,7 @@ export default function VisorProductos({ categoriasFiltradas }: VisorProductosPr
             renderItem={({ item }) => (
                 <View className="bg-secondary rounded-[25px] p-5 mb-5 border border-tertiary/20 shadow-md w-full">
                 
-                {/* Encabezado: Nombre y Precio */}
+                {/* Nombre y Precio */}
                 <View className="flex-row justify-between items-center mb-2">
                     <Text className="text-primary font-bold text-lg uppercase flex-1 mr-2" numberOfLines={1}>
                     {item.nombre}
@@ -85,12 +85,12 @@ export default function VisorProductos({ categoriasFiltradas }: VisorProductosPr
                     </Text>
                 </View>
 
-                {/* Descripción */}
+                {/* Descripcion */}
                 <Text className="text-gray-700 font-medium text-sm mb-3 text-justify">
                     {item.descripcion}
                 </Text>
 
-                {/* Detalles de Elaboración y Estado */}
+                {/* Detalles */}
                 <View className="flex-row flex-wrap gap-2 mb-4">
                     <View className="flex-row items-center bg-primary/30 px-3 py-1.5 rounded-full">
                     <Ionicons name="time-outline" size={16} color="#31603D" style={{ marginRight: 5 }} />
@@ -99,7 +99,7 @@ export default function VisorProductos({ categoriasFiltradas }: VisorProductosPr
                     </Text>
                     </View>
 
-                    {/* Badge para el estado */}
+                    {/* el estado */}
                     <View className={`flex-row items-center px-3 py-1.5 rounded-full ${item.estado === 'disponible' ? 'bg-green-100' : 'bg-red-100'}`}>
                     <View className={`w-2 h-2 rounded-full mr-2 ${item.estado === 'disponible' ? 'bg-green-600' : 'bg-red-600'}`} />
                     <Text className={`font-bold text-xs uppercase ${item.estado === 'disponible' ? 'text-green-800' : 'text-red-800'}`}>
@@ -108,7 +108,7 @@ export default function VisorProductos({ categoriasFiltradas }: VisorProductosPr
                     </View>
                 </View>
 
-                {/* 📸 Galería de imágenes individuales mapeadas desde el array */}
+                {/* Galeria de imagenes individuales mapeadas desde el array */}
                 <Text className="text-primary/70 font-bold text-[10px] uppercase tracking-wider mb-2">
                     Galería de imágenes individuales
                 </Text>

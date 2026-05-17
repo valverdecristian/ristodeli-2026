@@ -15,7 +15,6 @@ export default function CapturaFoto({
   size = 'normal' 
 }: CapturaFotoProps) {
   
-  // Clases dinámicas dependiendo del tamaño que le pidamos
   const circleSizeClass = size === 'grande' ? 'w-56 h-56' : 'w-28 h-28';
   const iconSize = size === 'grande' ? 52 : 42;
 

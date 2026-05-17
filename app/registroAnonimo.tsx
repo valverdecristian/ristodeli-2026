@@ -14,10 +14,9 @@ export default function RegistroAnonimoScreen() {
     const [foto, setFoto] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
 
-    // 🌟 2. FUNCIÓN CORREGIDA PARA ABRIR LA CÁMARA REAL DEL DISPOSITIVO
+    // FUNCION CORREGIDA PARA ABRIR LA CAMARA REAL DEL DISPOSITIVO
     const tomarFotoPersonal = async () => {
         try {
-            // Solicitamos permisos de hardware en caliente
             const { status } = await ImagePicker.requestCameraPermissionsAsync();
             
             if (status !== 'granted') {
@@ -26,15 +25,13 @@ export default function RegistroAnonimoScreen() {
                 return;
             }
 
-            // Abrimos la cámara nativa de forma explícita
             const result = await ImagePicker.launchCameraAsync({
-                mediaTypes: ImagePicker.MediaTypeOptions.Images, // Solo fotos, no video
-                allowsEditing: true,  // Permite al usuario recortar/centrar su cara
-                aspect: [1, 1],       // Fuerza relación de aspecto cuadrada perfecta para el perfil
-                quality: 0.5,         // Comprime un toque la foto para que no pese 10MB al subirla a Supabase
+                mediaTypes: ImagePicker.MediaTypeOptions.Images, 
+                allowsEditing: true, 
+                aspect: [1, 1],       
+                quality: 0.5,        
             });
 
-            // Si el usuario no canceló la toma de la foto, guardamos la URI local en el estado
             if (!result.canceled && result.assets && result.assets.length > 0) {
                 setFoto(result.assets[0].uri);
             }
@@ -46,7 +43,7 @@ export default function RegistroAnonimoScreen() {
 
     const handleRegistroAnonimo = async () => {
         if (!nombre.trim() || !foto) {
-            SoundService.reproducir('error'); // Activa sonido + vibración por error
+            SoundService.reproducir('error'); 
             showToast("error", "Campos incompletos", "Por favor, introduce tu nombre y tómate la fotografía obligatoria.");
             return;
         }
@@ -54,15 +51,11 @@ export default function RegistroAnonimoScreen() {
         setLoading(true);
 
         try {
-            // 🌟 3. NOTA PARA EXPO GO / EMULADORES:
-            // Para la entrega o testing veloz podés mandar la URI local ('foto') directo a la columna text de tu base de datos.
-            // Si el Metre en el celular 1 necesita renderizarla desde otro dispositivo, recordá que idealmente
-            // deberías subir primero este archivo al Storage de Supabase y guardar la URL pública acá.
             const { data, error } = await supabase
                 .from('anonimos')
                 .insert([{ 
                     nombre: nombre.trim(), 
-                    foto: foto, // Setea la URI real capturada en el momento
+                    foto: foto, 
                     push_token: null 
                 }])
                 .select()
@@ -72,8 +65,7 @@ export default function RegistroAnonimoScreen() {
 
             await SoundService.reproducir('exito');
             showToast("success", "Acceso Concedido", `¡Hola ${data.nombre}! Perfil temporal creado.`);
-
-            // 4. Viajamos al Home enviando los datos limpios para la lista de espera
+            
             router.replace({
                 pathname: "/(tabs)/homeAnonimo",
                 params: { 

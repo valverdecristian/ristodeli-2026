@@ -6,19 +6,16 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 export default function SplashScreenCustom() {
   const router = useRouter();
 
-  // 2. Creamos el "motor" de la animación (arranca en el valor 0)
   const rotateValue = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    // 3. Encendemos el motor para que vaya de 0 a 1 exactamente en 3 segundos
     Animated.timing(rotateValue, {
       toValue: 1, 
       duration: 3000, 
-      easing: Easing.linear, // linear hace que el giro sea constante, sin acelerar ni frenar
-      useNativeDriver: true, // Optimización nativa para que no trabe la pantalla
+      easing: Easing.linear,
+      useNativeDriver: true, 
     }).start();
 
-    // A los 3 segundos saltamos al Login
     const timer = setTimeout(() => {
       router.replace('/login'); 
     }, 3000);
@@ -26,7 +23,6 @@ export default function SplashScreenCustom() {
     return () => clearTimeout(timer);
   }, [router, rotateValue]);
 
-  // 4. "Traducimos" ese valor de 0 a 1 a grados reales (de 0 a 360 grados)
   const spin = rotateValue.interpolate({
     inputRange: [0, 1],
     outputRange: ['0deg', '360deg'],
@@ -50,14 +46,13 @@ export default function SplashScreenCustom() {
 
       {/* SECCIÓN CENTRAL: Logo Animado */}
       <View className="items-center justify-center shadow-2xl">
-        {/* 5. Cambiamos la etiqueta <Image> por <Animated.Image> y le inyectamos el giro */}
         <Animated.Image 
           source={require('@/assets/images/icon.png')} 
           style={{ 
             width: 220, 
             height: 220, 
             borderRadius: 110,
-            transform: [{ rotate: spin }] // <-- Acá aplicamos la magia de la rotación
+            transform: [{ rotate: spin }]
           }}
           resizeMode="contain"
         />

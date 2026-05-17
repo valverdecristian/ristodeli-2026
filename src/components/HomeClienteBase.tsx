@@ -30,7 +30,6 @@ export default function HomeClienteBase({
     return (
         <View className="flex-1 bg-primary px-6 justify-center items-center w-full">
         
-        {/* 👤 Card de Perfil del Cliente (Muestra los datos planos de tu tabla) */}
         <View className="bg-secondary rounded-[30px] p-5 w-full items-center mb-8 border border-tertiary/20 shadow-md flex-row">
             <View className="w-16 h-16 rounded-full border-2 border-tertiary overflow-hidden mr-4 bg-primary justify-center items-center">
             {fotoUrl ? (
@@ -51,10 +50,8 @@ export default function HomeClienteBase({
             </View>
         </View>
 
-        {/* 🧭 PANEL DE ACCIONES (Botones Reutilizables) */}
         <View className="w-full space-y-4">
             
-            {/* Botón 2: Vincular Mesa (Bloqueado dinámicamente si no está en la lista) */}
             <TouchableOpacity 
             onPress={onEscanearMesa}
             className={`w-full py-5 rounded-[25px] flex-row items-center justify-center border shadow-md mb-4 ${enListaEspera ? 'bg-secondary border-tertiary/20 active:opacity-90' : 'bg-gray-400 border-gray-500 active:opacity-100'}`}
@@ -65,7 +62,6 @@ export default function HomeClienteBase({
             </Text>
             </TouchableOpacity>
 
-            {/* Botón 3: Resultados de Encuestas Previas */}
             <TouchableOpacity 
             onPress={onVerEncuestas}
             className="w-full bg-secondary py-5 rounded-[25px] flex-row items-center justify-center border border-tertiary/20 shadow-md active:opacity-90 mb-4"
@@ -76,7 +72,6 @@ export default function HomeClienteBase({
             </Text>
             </TouchableOpacity>
 
-            {/* 🌟 SLOT DINÁMICO: Botón extra opcional si el cliente registrado tiene más funciones */}
             {tipoCliente === 'registrado' && onAccionAdicional && (
             <TouchableOpacity 
                 onPress={onAccionAdicional}

@@ -111,9 +111,10 @@ export default function LoginScreen() {
         case "cocinero":
           router.replace("/(homes)/cocinero");
           break;
+        case "cliente_registrado":
         case "cliente":
           router.replace({
-            pathname: "/home",
+            pathname: "/(tabs)/home",
             params: {
               usuarioId: userProfile.id,       
               usuarioNombre: userProfile.nombres,

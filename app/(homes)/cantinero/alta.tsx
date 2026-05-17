@@ -19,7 +19,7 @@ export default function AltaProductoCantinero() {
             </Text>
         </View>
 
-        {/* El cantinero está restringido puramente a bebidas */}
+        {/* El cantinero esta restringido a bebidas */}
         <FormularioProducto 
             tiposPermitidos={['bebida']} 
             onExito={() => router.replace('/(homes)/cantinero')} 

@@ -10,7 +10,7 @@ export default function MenuCantineroScreen() {
 
     return (
         <SafeAreaView className="flex-1 bg-primary px-6 pt-4">
-        {/* Encabezado con botón de regreso */}
+        {/* Encabezado con boton de regreso */}
         <View className="flex-row items-center mb-6">
             <TouchableOpacity onPress={() => router.back()} className="mr-3 p-1 active:opacity-70">
             <Ionicons name="arrow-back-outline" size={28} color="#31603D" />
@@ -20,7 +20,6 @@ export default function MenuCantineroScreen() {
             </Text>
         </View>
 
-        {/* 🌟 REVISÁ ACÁ: Tenés que pasarle solo 'bebida' de forma estática */}
         <VisorProductos categoriasFiltradas={['bebida']} />
         </SafeAreaView>
     );

@@ -9,7 +9,7 @@ export default function HomeSupervisor() {
         { title: 'Alta mesa', icon: 'people-outline', onPress: () => router.push('/alta-mesa') },
         { title: 'Listado de mesas', icon: 'people-outline', onPress: () => router.push('/listado-mesas')  },
         { title: 'Aprobar clientes', icon: 'person-add-outline',onPress: () => router.push("/(homes)/supervisor/aprobaciones")},
-        { title: 'Visualizar encuestas', icon: 'person-add-outline', onPress: () => router.push('/visualizar-encuestas')},
+        { title: 'Visualizar encuestas', icon: 'person-add-outline', onPress: () => router.push('/encuestasPrevias')},
     ];
 
     return (

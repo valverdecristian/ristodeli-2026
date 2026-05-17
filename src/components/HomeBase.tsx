@@ -29,7 +29,6 @@ export default function HomeBase({ roleTitle, buttons }: HomeBaseProps) {
 
     try {
       await SoundService.reproducir('cierre');
-      // cerrarSesion() hace signOut + limpia el contexto global (currentUser, currentSession)
       await cerrarSesion();
     } catch (error) {
       console.log("Fallo multimedia o de red en el deslogueo:", error);
@@ -42,11 +41,10 @@ export default function HomeBase({ roleTitle, buttons }: HomeBaseProps) {
   return (
     <SafeAreaView edges={['bottom', 'left', 'right']} className="flex-1 bg-primary">
       
-      {/* 1. INDICADOR VISUAL (SPINNER) DE CIERRE */}
+      {/* SPINNER DE CIERRE */}
       <Modal transparent={true} visible={isLoggingOut} animationType="fade">
         <View className="flex-1 justify-center items-center bg-black/60">
           <View className="bg-primary p-10 rounded-3xl items-center border-2 border-tertiary shadow-2xl">
-            {/* Logo de la empresa en la espera [cite: 51] */}
             <View className="bg-secondary rounded-full p-2 mb-4 border border-tertiary">
               <Image 
                 source={require('../../assets/images/icon.png')} 
@@ -62,7 +60,7 @@ export default function HomeBase({ roleTitle, buttons }: HomeBaseProps) {
         </View>
       </Modal>
 
-      {/* 2. ENCABEZADO SUPERIOR */}
+      {/* ENCABEZADO SUPERIOR */}
       <View className="bg-tertiary px-6 pt-12 pb-4 flex-row justify-between items-center shadow-md">
         <Text className="text-primary font-bold text-2xl uppercase tracking-tight">
           {roleTitle}
@@ -77,7 +75,7 @@ export default function HomeBase({ roleTitle, buttons }: HomeBaseProps) {
         className="px-6"
         showsVerticalScrollIndicator={false}
       >
-        {/* 3. LOGO CENTRAL */}
+        {/* LOGO CENTRAL */}
         <View className="items-center my-8">
           <View className="bg-secondary/10 rounded-full p-4 border border-secondary/20 shadow-sm">
             <Image 
@@ -88,7 +86,7 @@ export default function HomeBase({ roleTitle, buttons }: HomeBaseProps) {
           </View>
         </View>
 
-        {/* 4. GRILLA DE BOTONES (2 COLUMNAS) */}
+        {/* GRILLA DE BOTONES */}
         <View className="flex-row flex-wrap justify-between pb-10">
           {buttons.map((btn, index) => (
             <TouchableOpacity
