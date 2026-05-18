@@ -71,19 +71,19 @@ export default function LoginScreen() {
 
       const currentRole = userProfile.perfil.toLowerCase().trim();
 
-      if (currentRole === "cliente_pendiente" || currentRole === "cliente_rechazado") {
+      if (currentRole === "cliente_pendiente") {
         setLoading(false);
-        await supabase.auth.signOut(); 
+        await supabase.auth.signOut();
         SoundService.reproducir('error');
         showToast("error", "Acceso Retenido", "Tu cuenta está registrada pero aguarda la aprobación de un Supervisor.");
         return;
       }
+
       if (currentRole === "cliente_rechazado") {
         setLoading(false);
         await supabase.auth.signOut();
-
         SoundService.reproducir('error');
-        showToast("error", "Acceso Retenido", "Tu cuenta requiere aprobación o fue denegada.");
+        showToast("error", "Acceso Denegado", "Tu solicitud de acceso fue rechazada. Contactá con el Supervisor.");
         return;
       }
 
