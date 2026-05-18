@@ -113,6 +113,65 @@ export const AuthService = {
   },
 
   /**
+   * Registra un usuario anónimo usando signInAnonymously() de Supabase.
+   * Crea el auth user, luego inserta el perfil en public.usuarios.
+   * Solo requiere nombre y foto_url (ya subida a Storage).
+   */
+  async registrarAnonimo(nombre: string, fotoUrl: string) {
+    console.log('[AUTH_SVC] signInAnonymously...');
+    const { data, error } = await supabase.auth.signInAnonymously();
+    if (error) {
+      console.log('[AUTH_SVC] Error en signInAnonymously:', error);
+      throw error;
+    }
+    console.log('[AUTH_SVC] signInAnonymously OK, user id:', data.user?.id);
+
+    if (!data.user) throw new Error('No se devolvió un usuario anónimo.');
+
+    console.log('[AUTH_SVC] Verificando si el usuario ya existe en usuarios...');
+    const { data: existente } = await supabase
+      .from('usuarios')
+      .select('id')
+      .eq('id', data.user.id)
+      .maybeSingle();
+    console.log('[AUTH_SVC] Usuario existente:', existente);
+
+    if (existente) {
+      console.log('[AUTH_SVC] El usuario ya existe, solo retornamos.');
+      return data;
+    }
+
+    const nuevoPerfil = {
+      id: data.user.id,
+      nombres: nombre.trim(),
+      foto_url: fotoUrl,
+      perfil: 'cliente_anonimo',
+      email: null,
+      apellidos: null,
+      dni: null,
+      cuil: null,
+      push_token: null,
+    };
+
+    console.log('[AUTH_SVC] Insertando en usuarios:', JSON.stringify(nuevoPerfil));
+    const { error: profileError } = await supabase
+      .from('usuarios')
+      .insert([nuevoPerfil]);
+
+    if (profileError) {
+      console.log('[AUTH_SVC] Error al insertar en usuarios:', profileError);
+      console.log('[AUTH_SVC] Error code:', profileError.code);
+      console.log('[AUTH_SVC] Error message:', profileError.message);
+      console.log('[AUTH_SVC] Error details:', profileError.details);
+      console.log('[AUTH_SVC] Error hint:', profileError.hint);
+      throw profileError;
+    }
+
+    console.log('[AUTH_SVC] Inserción OK en usuarios');
+    return data;
+  },
+
+  /**
    * Cierra la sesión activa en Supabase.
    * Antes del signOut, limpia el push token del dispositivo en la DB
    * para que el usuario no reciba notificaciones en un dispositivo donde ya salió.
@@ -198,10 +257,11 @@ export const AuthService = {
         return '/(homes)/cantinero';
       case 'cocinero':
         return '/(homes)/cocinero';
+      case 'cliente_anonimo':
+        return '/(tabs)/homeAnonimo';
       case 'cliente':
       case 'cliente_reg':
-        // TODO: Crear pantalla /(homes)/cliente cuando esté lista
-        return '/login';
+        return '/(tabs)/home';
       default:
         throw new Error(`Perfil no reconocido para la navegación: '${role}'`);
     }
