@@ -1,5 +1,5 @@
 import { useToast } from "@/src/context/ToastContext";
-import { supabase } from '@/src/services/SupabaseClient';
+import { ListaEsperaService } from '@/src/services/listaEsperaService';
 import { SoundService } from '@/src/services/soundService';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -56,20 +56,11 @@ export default function HomeClienteRegistradoScreen() {
 
         setLoading(true);
         try {
-        // Insertamos en la lista de espera unificada cumpliendo tus restricciones
-        const { error } = await supabase
-            .from('lista_espera')
-            .insert([{ 
-            nombre: usuarioNombre || 'Cliente Registrado',
-            foto: usuarioFoto || '',
-            estado: 'pendiente',      
-            tipo: 'registrado',       // 🌟 IMPORTANTE: Pasamos 'registrado' (tu check constraint lo exige)
-            cliente_id: usuarioId,    // ID de la tabla usuarios
-            mesa_asignada: null,
-            qr_mesa_escaneado: false
-            }]);
-
-        if (error) throw error;
+        await ListaEsperaService.agregarClienteRegistrado({
+            nombre: String(usuarioNombre || 'Cliente Registrado'),
+            foto: String(usuarioFoto || ''),
+            clienteId: String(usuarioId),
+        });
 
         await SoundService.reproducir('exito');
         showToast("success", "¡Anunciado!", "Te has unido a la lista de espera. El Metre te asignará una mesa pronto.");

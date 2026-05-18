@@ -3,7 +3,8 @@ import { supabase } from '@/src/services/SupabaseClient';
 import { SoundService } from '@/src/services/soundService';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import LoadingModal from '@/src/components/LoadingModal';
 
 type EstadoEstadia = 'inicial' | 'en_preparacion' | 'pedido_rechazado' | 'pedido_listo' | 'comido';
 
@@ -46,7 +47,7 @@ export default function PanelMesaClienteScreen() {
     const adaptarEstadoFlujo = (estadoDB: string) => { /* ... mapeo de lógica ... */ };
 
     if (loading) {
-        return <ActivityIndicator size="large" color="#F5C065" />;
+        return <LoadingModal visible={true} message="Cargando tu mesa..." />;
     }
 
     return (

@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
-import { supabase } from '@/src/services/SupabaseClient';
+import { View, Text, FlatList, TouchableOpacity, Image } from 'react-native';
+import { supabase } from '@/src/services/SupabaseClient'; // necesario para Realtime
+import { MesaService } from '@/src/services/mesaService';
+import LoadingModal from '@/src/components/LoadingModal';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import * as Haptics from 'expo-haptics';
@@ -27,19 +29,8 @@ export default function EstadoMesasScreen() {
     const fetchEstadoMesas = async () => {
         try {
           setLoading(true);
-          
-          // 🌟 Consulta de diagnóstico: Traemos TODO sin ordenar ni filtrar
-          const { data, error } = await supabase
-            .from('mesas')
-            .select('*');
-    
-          if (error) {
-            console.error("❌ ERROR DIRECTO DE SUPABASE:", error);
-            throw error;
-          }
-          
-          console.log("📊 MESAS ENCONTRADAS:", data);
-          setMesas(data || []);
+          const data = await MesaService.obtenerTodas();
+          setMesas(data);
         } catch (error: any) {
           console.error("Error al cargar los estados de las mesas:", error.message);
         } finally {
@@ -75,11 +66,9 @@ export default function EstadoMesasScreen() {
         <Text className="text-white text-2xl font-black uppercase tracking-wider mb-2">Estado del Salón</Text>
         <Text className="text-tertiary text-xs uppercase font-bold mb-6 tracking-widest">Monitoreo de Ocupación</Text>
 
-        {loading && mesas.length === 0 ? (
-            <View className="flex-1 justify-center items-center">
-            <ActivityIndicator size="large" color="#F5C065" />
-            </View>
-        ) : (
+        <LoadingModal visible={loading && mesas.length === 0} message="Cargando estado del salón..." />
+
+        {(!loading || mesas.length > 0) && (
             <FlatList
             data={mesas}
             keyExtractor={(item) => item.id}

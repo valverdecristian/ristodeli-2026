@@ -1,5 +1,5 @@
 import { useToast } from "@/src/context/ToastContext";
-import { supabase } from '@/src/services/SupabaseClient';
+import { ListaEsperaService } from '@/src/services/listaEsperaService';
 import { SoundService } from '@/src/services/soundService';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -57,19 +57,11 @@ export default function HomeAnonimoScreen() {
         // Si el QR es el correcto, procedemos al alta en la lista de espera
         setLoading(true);
         try {
-        const { error } = await supabase
-            .from('lista_espera')
-            .insert([{ 
-            nombre: anonimoNombre,
-            foto: anonimoFoto,
-            estado: 'pendiente',      // Restricción CHECK real de tu base de datos
-            tipo: 'anonimo',          // Tipo exigido obligatoriamente por tu CHECK
-            cliente_id: anonimoId,    
-            mesa_asignada: null,
-            qr_mesa_escaneado: false
-            }]);
-
-        if (error) throw error;
+        await ListaEsperaService.agregarClienteAnonimo({
+            nombre: String(anonimoNombre),
+            foto: String(anonimoFoto),
+            clienteId: String(anonimoId),
+        });
 
         await SoundService.reproducir('exito');
         showToast("success", "¡Anunciado!", "Te has unido a la lista de espera con éxito.");

@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity, Modal, ActivityIndicator, Alert } from 'react-native';
-import { supabase } from '@/src/services/SupabaseClient';
+import { View, Text, FlatList, TouchableOpacity, Modal, Alert } from 'react-native';
+import { supabase } from '@/src/services/SupabaseClient'; // necesario para Realtime
+import { MesaService } from '@/src/services/mesaService';
+import { ListaEsperaService } from '@/src/services/listaEsperaService';
+import LoadingModal from '@/src/components/LoadingModal';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import * as Haptics from 'expo-haptics';
@@ -33,58 +36,11 @@ export default function AsignarMesaScreen() {
     const fetchListaEspera = async () => {
         try {
         setLoading(true);
-        
-        // 1. Buscamos registros 'pendiente' en tu tabla real lista_espera
-        const { data: esperaData, error: errEspera } = await supabase
-            .from('lista_espera')
-            .select('id, cliente_id, nombre, tipo, estado')
-            .eq('estado', 'pendiente');
+        const listaFormateada = await ListaEsperaService.obtenerPendientes();
+        setEsperaList(listaFormateada);
 
-        if (errEspera) throw errEspera;
-
-        if (!esperaData || esperaData.length === 0) {
-            setEsperaList([]);
-        } else {
-            // Separamos clientes registrados para buscar sus apellidos reales si hiciera falta
-            const idsRegistrados = esperaData.filter(e => e.tipo === 'registrado').map(e => e.cliente_id);
-            
-            let usuariosData: any[] = [];
-            if (idsRegistrados.length > 0) {
-            const { data: users } = await supabase
-                .from('usuarios')
-                .select('id, nombres, apellidos')
-                .in('id', idsRegistrados);
-            usuariosData = users || [];
-            }
-
-            // Armamos la lista unificada combinando los strings de tu DB
-            const listaFormateada = esperaData.map(item => {
-            if (item.tipo === 'registrado') {
-                const u = usuariosData.find(user => user.id === item.cliente_id);
-                return {
-                ...item,
-                nombreCompleto: u ? `${u.nombres} ${u.apellidos}` : item.nombre,
-                };
-            }
-            return {
-                ...item,
-                nombreCompleto: `${item.nombre} (Anónimo)`,
-            };
-            });
-
-            setEsperaList(listaFormateada);
-        }
-
-        // 2. Traer mesas con tu estado exacto 'Libre'
-        const { data: mesas, error: errMesas } = await supabase
-            .from('mesas')
-            .select('id, numero, comensales, tipo')
-            .eq('estado', 'Libre')
-            .order('numero', { ascending: true });
-
-        if (errMesas) throw errMesas;
-        setMesasLibres(mesas || []);
-
+        const mesas = await MesaService.obtenerLibres();
+        setMesasLibres(mesas);
         } catch (error: any) {
         console.error("Error cargando datos del salón:", error.message);
         } finally {
@@ -98,24 +54,8 @@ export default function AsignarMesaScreen() {
         try {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
         
-        // 1. Modificar la mesa elegida a 'Ocupada'
-        const { error: errorMesa } = await supabase
-            .from('mesas')
-            .update({ estado: 'Ocupada' })
-            .eq('id', mesa.id);
-
-        if (errorMesa) throw errorMesa;
-
-        // 2. Modificar la lista de espera: pasa a 'asignado' e inyectamos el UUID de la mesa en mesa_asignada
-        const { error: errorLista } = await supabase
-            .from('lista_espera')
-            .update({ 
-            estado: 'asignado',
-            mesa_asignada: mesa.id // Guardamos la vinculación por UUID
-            })
-            .eq('id', clienteSeleccionado.id);
-
-        if (errorLista) throw errorLista;
+        await MesaService.actualizarEstado(mesa.id, 'Ocupada');
+        await ListaEsperaService.asignarMesa(clienteSeleccionado.id, mesa.id);
 
         SoundService.reproducir('exito');
         Alert.alert("Mesa Asignada", `La mesa número ${mesa.numero} fue otorgada con éxito.`);
@@ -143,11 +83,9 @@ export default function AsignarMesaScreen() {
         <Text className="text-white text-2xl font-black uppercase tracking-wider mb-2">Asignación de Mesas</Text>
         <Text className="text-tertiary text-xs uppercase font-bold mb-6 tracking-widest">Panel de Control - Metre</Text>
 
-        {loading ? (
-            <View className="flex-1 justify-center items-center">
-            <ActivityIndicator size="large" color="#F5C065" />
-            </View>
-        ) : (
+        <LoadingModal visible={loading} message="Cargando lista de espera..." />
+
+        {!loading && (
             <FlatList
             data={esperaList}
             keyExtractor={(item) => item.id}

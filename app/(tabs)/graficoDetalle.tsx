@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, ActivityIndicator, Dimensions, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, Dimensions, ScrollView, TouchableOpacity } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { supabase } from '@/src/services/SupabaseClient';
+import { EncuestaService } from '@/src/services/encuestaService';
 import { BarChart, PieChart, LineChart } from 'react-native-gifted-charts';
 import { Ionicons } from '@expo/vector-icons';
 import { SoundService } from '@/src/services/soundService';
+import LoadingModal from '@/src/components/LoadingModal';
 
 const screenWidth = Dimensions.get("window").width;
 
@@ -21,9 +22,8 @@ export default function GraficoDetalleScreen() {
     const fetchEncuestas = async () => {
         try {
         setLoading(true);
-        const { data, error } = await supabase.from('encuestas').select('*');
-        if (error) throw error;
-        setDatosEncuestas(data || []);
+        const data = await EncuestaService.obtenerTodas();
+        setDatosEncuestas(data);
         } catch (e) {
         console.error("Error cargando estadísticas: ", e);
         } finally {
@@ -183,6 +183,8 @@ export default function GraficoDetalleScreen() {
 
     return (
         <ScrollView className="flex-1 bg-primary px-6 pt-12">
+        <LoadingModal visible={loading} message="Procesando Métricas..." />
+
         <TouchableOpacity 
             onPress={() => { SoundService.reproducir('exito'); router.back(); }}
             className="flex-row items-center mb-6 bg-secondary py-2 px-4 rounded-full self-start border border-tertiary/20"
@@ -191,12 +193,7 @@ export default function GraficoDetalleScreen() {
             <Text className="text-primary font-bold text-xs uppercase">Volver al Menú</Text>
         </TouchableOpacity>
 
-        {loading ? (
-            <View className="flex-1 py-20 justify-center items-center">
-            <ActivityIndicator size="large" color="#F5C065" />
-            <Text className="text-secondary font-bold uppercase text-xs mt-4">Procesando Métricas...</Text>
-            </View>
-        ) : (
+        {!loading && (
             <View className="pb-12">
             {obtenerContenidoGrafico()}
             </View>

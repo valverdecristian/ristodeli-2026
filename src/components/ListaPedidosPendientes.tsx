@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity, ActivityIndicator } from 'react-native';
-import { supabase } from '@/src/services/SupabaseClient';
+import { View, Text, FlatList, TouchableOpacity } from 'react-native';
+import { supabase } from '@/src/services/SupabaseClient'; // necesario para Realtime
+import { PedidoService } from '@/src/services/pedidoService';
+import LoadingModal from '@/src/components/LoadingModal';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { SoundService } from '@/src/services/soundService';
@@ -29,25 +31,11 @@ export default function ListaPedidosPendientes({ sector }: ListaPedidosProps) {
     const fetchPedidosPendientes = async () => {
         try {
         setLoading(true);
-
-        // pedidos en estado 'Pendiente'
-        let query = supabase.from('pedidos').select('*').eq('estado', 'Pendiente');
-
-        // filtro
-        if (sector === 'bar') {
-            
-            query = query.eq('categoria', 'bebida');
-        } else {
-            query = query.neq('categoria', 'bebida');
-        }
-
-        const { data, error } = await query.order('created_at', { ascending: true });
-        if (error) throw error;
+        const data = await PedidoService.obtenerPendientesPorSector(sector);
         
-        // AGRUPACIoN POR MESA 
+        // AGRUPACIÓN POR MESA 
         const grupos: { [key: number]: any } = {};
-        
-        data?.forEach((item) => {
+        data.forEach((item) => {
             if (!grupos[item.mesa_numero]) {
             grupos[item.mesa_numero] = {
                 mesa: item.mesa_numero,
@@ -57,7 +45,6 @@ export default function ListaPedidosPendientes({ sector }: ListaPedidosProps) {
             }
             grupos[item.mesa_numero].items.push(item);
         });
-
         setPedidosAgrupados(Object.values(grupos));
         } catch (error: any) {
         console.error("Error al recuperar comandas pendientes:", error.message);
@@ -72,18 +59,11 @@ export default function ListaPedidosPendientes({ sector }: ListaPedidosProps) {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
         
         const idsAModificar = items.map(i => i.id);
-
         const nuevoEstado = sector === 'cocina' ? 'Listo Cocina' : 'Listo Bar';
 
-        const { error } = await supabase
-            .from('pedidos')
-            .update({ estado: nuevoEstado })
-            .in('id', idsAModificar);
-
-        if (error) throw error;
+        await PedidoService.actualizarEstado(idsAModificar, nuevoEstado);
 
         await SoundService.reproducir('exito');
-        
         fetchPedidosPendientes();
 
         } catch (error: any) {
@@ -92,15 +72,9 @@ export default function ListaPedidosPendientes({ sector }: ListaPedidosProps) {
         }
     };
 
-    if (loading && pedidosAgrupados.length === 0) {
-        return (
-        <View className="flex-1 justify-center items-center">
-            <ActivityIndicator size="large" color="#F5C065" />
-        </View>
-        );
-    }
-
     return (
+        <>
+        <LoadingModal visible={loading && pedidosAgrupados.length === 0} message="Cargando comandas..." />
         <FlatList
         data={pedidosAgrupados}
         keyExtractor={(item) => item.mesa.toString()}
@@ -165,5 +139,6 @@ export default function ListaPedidosPendientes({ sector }: ListaPedidosProps) {
             );
         }}
         />
+        </>
     );
 }

@@ -6,7 +6,8 @@ import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
 import React, { useCallback, useState } from "react";
-import {ActivityIndicator,Alert,Image,KeyboardAvoidingView,Modal,Platform,ScrollView,StyleSheet,Text,
+import LoadingModal from "@/src/components/LoadingModal";
+import {Alert,KeyboardAvoidingView,Platform,ScrollView,StyleSheet,Text,Image,
         TextInput,TouchableOpacity,View} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 const styles = StyleSheet.create({
@@ -129,23 +130,7 @@ export default function AltaMesa() {
             Alta De Mesa
           </Text>
         </View>
-        <Modal transparent visible={isLoading} animationType="fade">
-          <View className="flex-1 justify-center items-center bg-black/60">
-            <View className="bg-primary p-10 rounded-3xl items-center border-2 border-tertiary shadow-2xl w-[80%]">
-              <View className="bg-secondary rounded-full p-2 mb-4 border border-tertiary">
-                <Image
-                  source={require("../../assets/images/icon.png")}
-                  className="w-12 h-12"
-                  resizeMode="contain"
-                />
-              </View>
-              <ActivityIndicator size="large" color="#F5C065" />
-              <Text className="text-secondary font-bold mt-4 text-base text-center">
-                {loadingText}
-              </Text>
-            </View>
-          </View>
-        </Modal>
+        <LoadingModal visible={isLoading} message={loadingText} />
         <ScrollView
           contentContainerStyle={{ flexGrow: 1 }}
           className="px-10 pt-8"

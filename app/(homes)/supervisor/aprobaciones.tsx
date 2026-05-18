@@ -1,10 +1,11 @@
 import { useToast } from "@/src/context/ToastContext";
-import { supabase } from '@/src/services/SupabaseClient';
+import { AuthService } from '@/src/services/authService';
 import { SoundService } from '@/src/services/soundService';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect, useRouter } from 'expo-router'; 
 import React, { useCallback, useState } from 'react'; 
-import { ActivityIndicator, FlatList, Image, Modal, Text, TouchableOpacity, View } from 'react-native';
+import { FlatList, Image, Text, TouchableOpacity, View } from 'react-native';
+import LoadingModal from '@/src/components/LoadingModal';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 interface ClientePendiente {
@@ -25,14 +26,9 @@ export default function AprobacionClientesScreen() {
     // CARGAR CLIENTES PENDIENTES
     const obtenerClientesPendientes = async () => {
         try {
-            const { data, error } = await supabase
-                .from('usuarios')
-                .select('id, nombres, apellidos, foto_url, email')
-                .eq('perfil', 'cliente_pendiente'); 
-        
-            if (error) throw error;
-            setClientes(data || []);
-            } catch (error) {
+            const data = await AuthService.obtenerClientesPendientes();
+            setClientes(data);
+        } catch (error) {
             console.error(error);
         }
     };
@@ -50,17 +46,7 @@ export default function AprobacionClientesScreen() {
         const nuevoPerfil = decision === 'aprobar' ? 'cliente_registrado' : 'cliente_rechazado'; 
     
         try {
-            const { data, error: dbError } = await supabase
-                .from('usuarios')
-                .update({ perfil: nuevoPerfil }) //
-                .eq('id', cliente.id)
-                .select(); 
-        
-            if (dbError) throw dbError;
-
-            if (!data || data.length === 0) {
-                throw new Error("Permiso denegado por políticas RLS. El registro no se modificó.");
-            }
+            await AuthService.procesarAprobacion(cliente.id, decision);
         
             await SoundService.reproducir('exito');
             
@@ -84,17 +70,7 @@ export default function AprobacionClientesScreen() {
     return (
         <SafeAreaView className="flex-1 bg-primary px-6 pt-4">
         {/* MODAL DE ESPERA CON LOGO */}
-        <Modal transparent visible={loading} animationType="fade">
-            <View className="flex-1 justify-center items-center bg-black/60">
-            <View className="bg-primary p-10 rounded-3xl items-center border-2 border-tertiary shadow-2xl w-[80%]">
-                <View className="bg-secondary rounded-full p-2 mb-4 border border-tertiary">
-                <Image source={require('@/assets/images/icon.png')} className="w-12 h-12" resizeMode="contain" />
-                </View>
-                <ActivityIndicator size="large" color="#F5C065" />
-                <Text className="text-secondary font-bold mt-4 text-base text-center">{loadingText}</Text>
-            </View>
-            </View>
-        </Modal>
+        <LoadingModal visible={loading} message={loadingText} />
 
         {/* ENCABEZADO CON BOTÓN DE REGRESO */}
         <View className="flex-row items-center mb-6">
