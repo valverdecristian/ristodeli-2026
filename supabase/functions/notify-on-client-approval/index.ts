@@ -1,5 +1,4 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.7.1"
 import { initializeApp, cert } from "npm:firebase-admin/app";
 import { getMessaging } from "npm:firebase-admin/messaging";
 
@@ -54,12 +53,13 @@ serve(async (req) => {
   const payload = await req.json();
   console.log("Payload recibido:", JSON.stringify(payload));
   
-  // Verify it's an update marking the user as 'cliente_reg' or 'rechazado' from 'pendiente'
-  if (payload.type === 'UPDATE' && payload.old_record?.perfil === 'pendiente') {
+  // AJUSTE 1: Escuchamos cuando el perfil viejo era 'cliente_pendiente'
+  if (payload.type === 'UPDATE' && payload.old_record?.perfil === 'cliente_pendiente') {
     
     const nuevoPerfil = payload.record?.perfil;
 
-    if (nuevoPerfil === 'cliente_reg') {
+    // AJUSTE 2: Si el nuevo perfil es 'cliente_registrado'
+    if (nuevoPerfil === 'cliente_registrado') {
       // --- LOGICA DEL APROBADO ---
 
       // 1. Enviar correo de Bienvenida
@@ -67,7 +67,6 @@ serve(async (req) => {
         const htmlAprobado = `
         <div style="font-family: Tahoma, sans-serif; max-width: 600px; margin: 0 auto; background-color: #F8EECB; border-radius: 12px; overflow: hidden; border: 1px solid #31603D;">
           <div style="background-color: #31603D; padding: 25px; text-align: center;">
-            <!-- LOGO CIRCULAR -->
             <img src="https://wtjylfdfdwowzzvunlpa.supabase.co/storage/v1/object/public/avatares/icon.png" alt="Ristodeli" style="width: 90px; height: 90px; border-radius: 50%; border: 3px solid #F5C065; object-fit: cover; margin-bottom: 15px; background-color: #F8EECB;" />
             <h1 style="color: #F5C065; margin: 0; letter-spacing: 2px;">RISTODELI</h1>
           </div>
@@ -105,7 +104,9 @@ serve(async (req) => {
           console.error("Error en FCM:", error);
         }
       }
-    } else if (nuevoPerfil === 'rechazado') {
+
+    // AJUSTE 3: Si el nuevo perfil es 'cliente_rechazado'
+    } else if (nuevoPerfil === 'cliente_rechazado') {
       // --- LOGICA DEL RECHAZO ---
 
       // 1. Enviar correo de Rechazo
@@ -113,7 +114,6 @@ serve(async (req) => {
         const htmlRechazado = `
         <div style="font-family: Tahoma, sans-serif; max-width: 600px; margin: 0 auto; background-color: #F8EECB; border-radius: 12px; overflow: hidden; border: 1px solid #D23D2D;">
           <div style="background-color: #D23D2D; padding: 25px; text-align: center;">
-            <!-- LOGO CIRCULAR -->
             <img src="https://wtjylfdfdwowzzvunlpa.supabase.co/storage/v1/object/public/avatares/icon.png" alt="Ristodeli" style="width: 90px; height: 90px; border-radius: 50%; border: 3px solid #F8EECB; object-fit: cover; margin-bottom: 15px; background-color: #F8EECB;" />
             <h1 style="color: #F8EECB; margin: 0; letter-spacing: 2px;">RISTODELI</h1>
           </div>

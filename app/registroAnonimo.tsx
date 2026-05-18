@@ -1,0 +1,123 @@
+import { useToast } from "@/src/context/ToastContext";
+import { AuthService } from '@/src/services/authService';
+import { NotificationService } from '@/src/services/notificationService';
+import { SoundService } from '@/src/services/soundService';
+import { Ionicons } from '@expo/vector-icons';
+import * as ImagePicker from 'expo-image-picker';
+import { useRouter } from 'expo-router';
+import React, { useState } from 'react';
+import { Image, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import LoadingModal from '@/src/components/LoadingModal';
+
+export default function RegistroAnonimoScreen() {
+    const router = useRouter();
+    const { showToast } = useToast();
+    const [nombre, setNombre] = useState('');
+    const [foto, setFoto] = useState<string | null>(null);
+    const [loading, setLoading] = useState(false);
+
+    // FUNCION CORREGIDA PARA ABRIR LA CAMARA REAL DEL DISPOSITIVO
+    const tomarFotoPersonal = async () => {
+        try {
+            const { status } = await ImagePicker.requestCameraPermissionsAsync();
+            
+            if (status !== 'granted') {
+                SoundService.reproducir('error');
+                showToast("error", "Permiso Denegado", "Ristodeli necesita acceso a la cámara para el registro express.");
+                return;
+            }
+
+            const result = await ImagePicker.launchCameraAsync({
+                mediaTypes: ImagePicker.MediaTypeOptions.Images, 
+                allowsEditing: true, 
+                aspect: [1, 1],       
+                quality: 0.5,        
+            });
+
+            if (!result.canceled && result.assets && result.assets.length > 0) {
+                setFoto(result.assets[0].uri);
+            }
+        } catch (err) {
+            SoundService.reproducir('error');
+            showToast("error", "Error de Cámara", "No se pudo inicializar el hardware de captura.");
+        }
+    };
+
+    const handleRegistroAnonimo = async () => {
+        if (!nombre.trim() || !foto) {
+            SoundService.reproducir('error'); 
+            showToast("error", "Campos incompletos", "Por favor, introduce tu nombre y tómate la fotografía obligatoria.");
+            return;
+        }
+
+        setLoading(true);
+
+        try {
+            const data = await AuthService.registrarAnonimo(nombre, foto!);
+
+            // Registrar push token para el cliente anónimo (tabla 'anonimos')
+            NotificationService.registrar(data.id, 'anonimos');
+
+            await SoundService.reproducir('exito');
+            showToast("success", "Acceso Concedido", `¡Hola ${data.nombre}! Perfil temporal creado.`);
+            
+            router.replace({
+                pathname: "/(tabs)/homeAnonimo",
+                params: { 
+                    anonimoId: data.id,
+                    anonimoNombre: data.nombre,
+                    anonimoFoto: data.foto
+                }
+            });
+
+        } catch (error: any) {
+            SoundService.reproducir('error');
+            showToast("error", "Error de base de datos", error.message || "No se pudo registrar el usuario anónimo.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return (
+        <View className="flex-1 bg-primary px-8 justify-center items-center">
+        <LoadingModal visible={loading} message="Generando credenciales temporales..." />
+
+            <Text className="text-secondary font-bold text-2xl uppercase mb-8 tracking-tight text-center">
+                Registro Anónimo
+            </Text>
+
+            <TouchableOpacity 
+                onPress={tomarFotoPersonal} 
+                className="w-44 h-44 bg-secondary rounded-[30px] mb-8 border-2 border-tertiary justify-center items-center overflow-hidden shadow-lg"
+            >
+                {foto ? (
+                    <Image source={{ uri: foto }} className="w-full h-full" resizeMode="cover" />
+                ) : (
+                    <View className="items-center p-4">
+                        <Ionicons name="camera-outline" size={44} color="#31603D" />
+                        <Text className="text-primary font-bold text-[10px] uppercase text-center mt-2">
+                            Capturar Foto Personal
+                        </Text>
+                    </View>
+                )}
+            </TouchableOpacity>
+
+            <TextInput
+                placeholder="Escribe tu nombre"
+                placeholderTextColor="#555"
+                value={nombre}
+                onChangeText={setNombre}
+                className="w-full bg-secondary rounded-full px-6 py-4 text-center text-lg shadow-md mb-8 text-primary font-semibold"
+            />
+
+            <TouchableOpacity 
+                onPress={handleRegistroAnonimo} 
+                className="w-full bg-tertiary rounded-full py-4 shadow-lg border-b-4 border-orange active:opacity-90"
+            >
+                <Text className="text-center font-bold text-primary text-lg uppercase tracking-wider">
+                    Ingresar al local
+                </Text>
+            </TouchableOpacity>
+        </View>
+    );
+}

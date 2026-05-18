@@ -3,7 +3,7 @@
 <br>
 
 <p align="center">
-  <img src="assets/icon.png" alt="Logo de la App" width="200">
+  <img src="assets/images//icon.png" alt="Logo de la App" width="200">
 </p>
 
 Este proyecto consiste en el desarrollo de una aplicación móvil para la gestión integral de un restaurante, enfocada en la experiencia del usuario (clientes y empleados).
@@ -12,9 +12,9 @@ Este proyecto consiste en el desarrollo de una aplicación móvil para la gesti�
 
 ## 👥 Integrantes
 
-* **Valverde, Cristian Jorge** (Alfa): rama `dev-alfa`
-* **Chavez, Alejo** (Beta): rama `dev-beta`
-* **Trkmic Torres, Ignacio** (Gamma): rama `dev-gamma`
+* **Valverde, Cristian Jorge** (Alfa): rama `feature/dev-alfa`
+* **Chavez, Alejo** (Beta): rama `feature/dev-beta`
+* **Trkmic Torres, Ignacio** (Gamma): rama `/feature/dev-gamma`
 
 <br>
 
@@ -76,13 +76,13 @@ De acuerdo a los requerimientos de la cátedra, se detallan las tareas asignadas
 
 ## 🚀 Roadmap de Entregas
 
-| Funcionalidad | Perfiles | Estado | Fecha |
+| Funcionalidad | Perfiles | Estado | Fecha - Profe |
 | :--- | :--- | :--- | :--- |
-| 1. Agregar un empleado | dueño o supervisor | 🚀 Listo para Demo |  |
-| 2. Agregar un nuevo plato | cocinero | 🛠️ En Pruebas |  |
-| 3. Agregar una nueva bebida | cantinero | 🛠️ En Pruebas |  |
+| 1. Agregar un empleado | dueño o supervisor | ✅ Corregido | 16/05/2026 - Octavio |
+| 2. Agregar un nuevo plato | cocinero | ✅ Corregido | 16/05/2026 - Octavio |
+| 3. Agregar una nueva bebida | cantinero | ✅ Corregido | 16/05/2026 - Octavio |
 | 4. Agregar una nueva mesa | dueño o supervisor | 🚀 Listo para Demo |  |
-| 5. Crear un cliente registrado | cliente o metre | 🚀 Listo para Demo |  |
+| 5. Crear un cliente registrado | cliente o metre | ✅ Corregido | 16/05/2026 - Octavio |
 | 6. Verificar ingreso del cliente registrado | dueño o supervisor | 🚀 Listo para Demo |  |
 | 7. Rechazar a un cliente registrado | dueño o supervisor | 🚀 Listo para Demo |  |
 | 8. Aceptar a un cliente registrado | dueño o supervisor | 🚀 Listo para Demo |  |
@@ -131,36 +131,46 @@ De acuerdo a los requerimientos de la cátedra, se detallan las tareas asignadas
 
 <br>
 
-## 🎨 Diseño y Prototipado (UI/UX)
-
-[Ver Prototipo Interactivo en Canva](https://canva.link/2kf3z7wq2apab4s)
-
-<br>
-
-## 📂 Arquitectura del proyecto
+## 📂 Estructura del proyecto
 
 ```jsx
-src/
-└── app/
-    ├── core/                 <-- (Lo que se carga una vez: Servicios globales)
-    │   ├── services/
-    │   ├── models/
-    │   └── guards/
-    │
-    ├── shared/               <-- (Componentes reutilizables en toda la app)
-    │   ├── components/
-    │   └── pipes/
-    │
-    ├── features/             <-- (Módulos lógicos del negocio / Entregas)
-assets/
-docs/
-environments/
-theme/
+ristodeli/
+├── app/                       # Rutas de Expo Router
+│   ├── _layout.tsx            # Layout raíz (ToastProvider + SoundService de inicio)
+│   ├── index.tsx              # Splash screen animado (3s → redirige a /login)
+│   ├── login.tsx              # Login completo con acceso rápido por roles
+│   ├── registro.tsx           # Registro de cliente con scanner DNI + foto obligatoria
+│   ├── (homes)/               # Homes por rol (usan HomeBase como base compartida)
+│   │   ├── duenio.tsx
+│   │   ├── supervisor.tsx
+│   │   ├── metre.tsx
+│   │   ├── mozo.tsx
+│   │   ├── cantinero.tsx
+│   │   └── cocinero.tsx
+│   └── (admin)/               # Pantallas de administración
+│       ├── alta-mesa.tsx      # Crear mesa con foto y tipo
+│       ├── listado-mesas.tsx  # Lista de mesas (datos estáticos por ahora)
+│       ├── agregar-empleado.tsx
+│       ├── aprobar-clientes.tsx  (vacío)
+│       └── visualizar-encuestas.tsx (vacío)
+├── src/
+│   ├── services/
+│   │   ├── SupabaseClient.ts  # Cliente Supabase (EXPO_PUBLIC_ env vars)
+│   │   ├── imageService.ts    # Servicio de fotos (cámara + upload)
+│   │   └── soundService.ts    # Servicio de audio (inicio, error, éxito, cierre)
+│   ├── context/
+│   │   └── ToastContext.tsx   # Toast personalizado + vibración haptic
+│   ├── components/
+│   │   └── HomeBase.tsx       # Componente base compartido para todos los homes de rol
+│   ├── constants/
+│   │   └── theme.ts           # Colors y Fonts (referencia, no usada activamente)
+│   └── hooks/                 # use-color-scheme y use-theme-color
+└── assets/
+    └── sounds/
+        ├── app_start.mp3
+        ├── error_alert.mp3
+        └── success_bip.mp3
 ```
-
-**core/**: Aquí van los servicios que manejan datos globales. <br>
-**shared/**: Componentes que se usan en más de una pantalla. <br>
-**features/**: Aquí va la lógica de cada punto funcional. <br>
 
 <br>
 
@@ -176,23 +186,58 @@ Se utiliza una rama intermedia para asegurar la estabilidad antes de las entrega
 
 ## ⚙️ Stack Tecnológico
 
-* Frontend Framework: Angular v20 utilizando la arquitectura de Standalone Components para optimizar el rendimiento y la carga del bundle.
-* Mobile UI Framework: Ionic v8, permitiendo una experiencia de usuario fluida y consistente con los estándares de diseño móvil actuales.
+### Framework Principal
 
-* Backend & Infraestructura (BaaS): Supabase integrado vía @supabase/supabase-js para la gestión de:
-  - Autenticación: Manejo seguro de sesiones y perfiles de usuario.
-  - Base de Datos: PostgreSQL para la persistencia de la lógica de negocio (usuarios, pedidos, mesas).
-  - Storage: Gestión de archivos multimedia (avatares y fotos de productos) mediante Buckets.
-  - Firebase Cloud Messaging (FCM): Proveedor de mensajería push.
-  - Supabase Edge Functions: Para disparar eventos automáticos (Webhooks) hacia Firebase y procesamiento backend.
-  - Brevo (anteriormente Sendinblue): Servicio transaccional utilizado vía API para el envío de correos electrónicos automáticos (ej. aceptación o rechazo de clientes).
+* **React Native** `0.81` con **Expo** `~54` como plataforma de desarrollo y build.
+* **Expo Router** `~6` para navegación basada en sistema de archivos (file-based routing).
+* **TypeScript** `~5.9` como lenguaje principal.
 
-* Capacitor & Hardware Integration (v8):
-  - Escaneo de DNI: @capacitor-mlkit/barcode-scanning para la carga automatizada de datos desde el documento nacional de identidad.
-  - Cámara: @capacitor/camera para la captura de fotos obligatoria en registros.
-  - Feedback Háptico: @capacitor/haptics para notificar errores mediante vibraciones.
-  - Notificaciones Push: @capacitor/push-notifications para notificaciones en tiempo real.
+### Estilos & UI
 
-* Utilidades Específicas:
-  - QR Generation: angularx-qrcode para la generación dinámica de códigos identificadores de mesas.
-  - Iconografía: ionicons v7 para una interfaz visual intuitiva.
+* **NativeWind** `^4` + **TailwindCSS** `^3.4` para estilos utilitarios sobre React Native.
+* **@expo/vector-icons** `^15` para iconografía.
+* **expo-linear-gradient** para gradientes visuales.
+* **expo-image** para renderizado optimizado de imágenes.
+
+### Navegación
+
+* **@react-navigation/native** `^7` con **@react-navigation/bottom-tabs** `^7` para la navegación entre vistas.
+* **react-native-screens** y **react-native-safe-area-context** para integración nativa.
+* **react-native-gesture-handler** `~2.28` para gestos táctiles.
+
+### Backend & Infraestructura (BaaS): Supabase
+
+Integrado vía `@supabase/supabase-js ^2` para la gestión de:
+- **Autenticación**: Manejo seguro de sesiones y perfiles de usuario (`expo-auth-session`).
+- **Base de Datos**: PostgreSQL para la persistencia de la lógica de negocio (usuarios, pedidos, mesas).
+- **Storage**: Gestión de archivos multimedia (avatares y fotos de productos) mediante Buckets.
+- **Notificaciones Push**: `expo-notifications` para notificaciones en tiempo real.
+- **Email Transaccional**: Brevo (anteriormente Sendinblue) vía API para envío de correos automáticos (aceptación/rechazo de clientes).
+
+### Hardware & Capacidades Nativas (Expo SDK)
+
+| Módulo | Versión | Uso |
+| :--- | :--- | :--- |
+| `expo-camera` | `~17` | Captura de fotos en registros |
+| `expo-image-picker` | `~17` | Selección de imágenes desde galería |
+| `expo-media-library` | `~18` | Acceso a la biblioteca de medios |
+| `expo-haptics` | `~15` | Feedback háptico (vibraciones) |
+| `expo-file-system` | `~19` | Gestión de archivos locales |
+| `expo-av` | `~16` | Reproducción de audio y video |
+| `expo-sensors` | `~15` | Acceso a sensores del dispositivo |
+
+### Utilidades Específicas
+
+* **react-native-qrcode-svg** `^6` — Generación dinámica de códigos QR para mesas.
+* **react-native-maps** `1.20` — Mapas y geolocalización.
+* **react-native-gifted-chat** `^3` — Componente de chat reutilizable.
+* **react-native-gifted-charts** `^1.4` — Gráficos para dashboards y encuestas.
+* **react-native-reanimated** `~4` — Animaciones fluidas de alto rendimiento.
+* **react-native-svg** `15` — Soporte de gráficos vectoriales.
+* **@react-native-async-storage/async-storage** `2.2` — Persistencia de datos local.
+* **expo-sharing** y **expo-print** — Compartir y generar documentos PDF.
+
+### Build & Distribución
+
+* **Expo Dev Client** `~6` para builds de desarrollo con módulos nativos personalizados.
+* **EAS Build** para generación de APKs de desarrollo y producción (Android).
