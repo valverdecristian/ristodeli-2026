@@ -11,6 +11,7 @@ interface AuthContextData {
   ingresar: (email: string, clave: string) => Promise<{ user: any; session: Session | null }>;
   cerrarSesion: () => Promise<void>;
   resolverRutaPorPerfil: (perfil: string) => string;
+  refrescarPerfil: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextData | undefined>(undefined);
@@ -68,6 +69,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setCurrentSession(null);
   };
 
+  const refrescarPerfil = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session?.user) {
+      const perfil = await AuthService.obtenerPerfil(session.user.id);
+      setCurrentUser(perfil);
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -77,6 +86,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         ingresar,
         cerrarSesion,
         resolverRutaPorPerfil: AuthService.resolverRutaPorPerfil,
+        refrescarPerfil,
       }}
     >
       {children}

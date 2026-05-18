@@ -1,11 +1,11 @@
 export interface UsuarioPerfil {
   id: string;
-  email: string;
+  email?: string | null;
   nombres: string;
-  apellidos: string;
-  dni: string;
-  cuil: string;
-  /** Rol del usuario: 'admin', 'supervisor', 'metre', 'mozo', 'cantinero', 'cocinero', 'cliente' */
+  apellidos?: string | null;
+  dni?: string | null;
+  cuil?: string | null;
+  /** Rol del usuario: 'admin', 'supervisor', 'metre', 'mozo', 'cantinero', 'cocinero', 'cliente', 'cliente_anonimo' */
   perfil: string;
   foto_url: string | null;
   push_token: string | null;
