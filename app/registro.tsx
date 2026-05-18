@@ -6,7 +6,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { ActivityIndicator, Image, KeyboardAvoidingView, Modal, Platform, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, ScrollView, Text, TextInput, TouchableOpacity, View, Image } from 'react-native';
+import LoadingModal from '@/src/components/LoadingModal';
 
 export default function RegistroScreen() {
     const router = useRouter();
@@ -212,14 +213,7 @@ export default function RegistroScreen() {
 
     return (
         <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} className="flex-1">
-        <Modal transparent visible={loading} animationType="fade">
-            <View className="flex-1 justify-center items-center bg-black/60">
-            <View className="bg-primary p-10 rounded-3xl items-center border-2 border-tertiary shadow-2xl w-[80%]">
-                <ActivityIndicator size="large" color="#F5C065" />
-                <Text className="text-secondary font-bold mt-4 text-base text-center">{loadingText}</Text>
-            </View>
-            </View>
-        </Modal>
+        <LoadingModal visible={loading} message={loadingText} />
 
         <ScrollView contentContainerStyle={{ flexGrow: 1 }} className="bg-primary">
             <View className="flex-1 items-center justify-center px-8 pt-12 pb-8">

@@ -1,10 +1,11 @@
 import { useToast } from "@/src/context/ToastContext";
-import { supabase } from '@/src/services/SupabaseClient';
+import { ProductoService } from '@/src/services/productoService';
 import { ImageService } from '@/src/services/imageService';
 import { SoundService } from '@/src/services/soundService';
 import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
-import { ActivityIndicator, Image, Modal, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ScrollView, Text, TextInput, TouchableOpacity, View, Image } from 'react-native';
+import LoadingModal from '@/src/components/LoadingModal';
 
 interface FormularioProductoProps {
     tiposPermitidos: ('plato' | 'bebida' | 'postre')[];
@@ -88,30 +89,26 @@ interface FormularioProductoProps {
         }
 
         setLoadingText('Registrando producto en la carta...');
-        const { error: dbError } = await supabase
-            .from('productos')
-            .insert([
-            {
-                nombre: nombre.trim(),
-                descripcion: descripcion.trim(),
-                tiempo_elaboracion: tiempoNum,
-                precio: precioNum,
-                fotos: urlsPublicas,
-                tipo: tipoSeleccionado,
-                estado: 'disponible'
-            }
-            ]);
+        try {
+          await ProductoService.crear({
+            nombre: nombre.trim(),
+            descripcion: descripcion.trim(),
+            tiempo_elaboracion: tiempoNum,
+            precio: precioNum,
+            fotos: urlsPublicas,
+            tipo: tipoSeleccionado,
+          });
+        } catch (dbError: any) {
+          setLoading(false);
+          if (dbError.code === '23505') {
+            dispararError("Producto existente", "Ya existe un producto con ese nombre bajo la misma categoría.");
+          } else {
+            dispararError("Error de base de datos", dbError.message);
+          }
+          return;
+        }
 
         setLoading(false);
-
-        if (dbError) {
-            if (dbError.code === '23505') {
-            dispararError("Producto existente", "Ya existe un producto con ese nombre bajo la misma categoría.");
-            } else {
-            dispararError("Error de base de datos", dbError.message);
-            }
-            return;
-        }
 
         await SoundService.reproducir('exito');
         showToast("success", "¡Alta exitosa!", `${nombre} se agregó correctamente al menú.`);
@@ -126,17 +123,7 @@ interface FormularioProductoProps {
     return (
         <ScrollView contentContainerStyle={{ flexGrow: 1 }} showsVerticalScrollIndicator={false}>
         {/* SPINNER OBLIGATORIO CON LOGO EN LAS ESPERAS */}
-        <Modal transparent={true} visible={loading} animationType="fade">
-            <View className="flex-1 justify-center items-center bg-black/60">
-            <View className="bg-primary p-10 rounded-3xl items-center border-2 border-tertiary shadow-2xl w-[80%]">
-                <View className="bg-secondary rounded-full p-2 mb-4 border border-tertiary">
-                <Image source={require('../../assets/images/icon.png')} className="w-12 h-12" resizeMode="contain" />
-                </View>
-                <ActivityIndicator size="large" color="#F5C065" />
-                <Text className="text-secondary font-bold mt-4 text-base text-center">{loadingText}</Text>
-            </View>
-            </View>
-        </Modal>
+        <LoadingModal visible={loading} message={loadingText} />
 
         {/* Inputs del formulario */}
         <View className="w-full pt-4">

@@ -4,7 +4,8 @@ import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { ActivityIndicator, Image, Modal, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import LoadingModal from '@/src/components/LoadingModal';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 interface HomeButton {
@@ -41,24 +42,7 @@ export default function HomeBase({ roleTitle, buttons }: HomeBaseProps) {
   return (
     <SafeAreaView edges={['bottom', 'left', 'right']} className="flex-1 bg-primary">
       
-      {/* SPINNER DE CIERRE */}
-      <Modal transparent={true} visible={isLoggingOut} animationType="fade">
-        <View className="flex-1 justify-center items-center bg-black/60">
-          <View className="bg-primary p-10 rounded-3xl items-center border-2 border-tertiary shadow-2xl">
-            <View className="bg-secondary rounded-full p-2 mb-4 border border-tertiary">
-              <Image 
-                source={require('../../assets/images/icon.png')} 
-                className="w-12 h-12" 
-                resizeMode="contain" 
-              />
-            </View>
-            <ActivityIndicator size="large" color="#F5C065" />
-            <Text className="text-secondary font-bold mt-4 text-lg text-center">
-              Cerrando sesión de forma segura...
-            </Text>
-          </View>
-        </View>
-      </Modal>
+      <LoadingModal visible={isLoggingOut} message="Cerrando sesión de forma segura..." />
 
       {/* ENCABEZADO SUPERIOR */}
       <View className="bg-tertiary px-6 pt-12 pb-4 flex-row justify-between items-center shadow-md">

@@ -197,4 +197,61 @@ export const AuthService = {
         throw new Error(`Perfil no reconocido para la navegación: '${role}'`);
     }
   },
+
+  /**
+   * Registra un cliente anónimo en la tabla `anonimos`.
+   * A diferencia de registrar(), este flujo NO crea un usuario en auth.users.
+   * Devuelve el registro creado con su id generado.
+   */
+  async registrarAnonimo(nombre: string, foto: string) {
+    const { data, error } = await supabase
+      .from('anonimos')
+      .insert([{
+        nombre: nombre.trim(),
+        foto: foto,
+        push_token: null,
+      }])
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
+  /**
+   * Obtiene todos los usuarios con perfil 'cliente_pendiente'.
+   * Usada por la pantalla de aprobaciones del Supervisor/Dueño.
+   */
+  async obtenerClientesPendientes(): Promise<{ id: string; nombres: string; apellidos: string; foto_url: string; email: string }[]> {
+    const { data, error } = await supabase
+      .from('usuarios')
+      .select('id, nombres, apellidos, foto_url, email')
+      .eq('perfil', 'cliente_pendiente');
+
+    if (error) throw error;
+    return data || [];
+  },
+
+  /**
+   * Aprueba o rechaza un cliente pendiente actualizando su perfil en `usuarios`.
+   * - 'aprobar' → cambia perfil a 'cliente_registrado'
+   * - 'rechazar' → cambia perfil a 'cliente_rechazado'
+   * Lanza un error si las políticas RLS impiden la modificación.
+   */
+  async procesarAprobacion(clienteId: string, decision: 'aprobar' | 'rechazar') {
+    const nuevoPerfil = decision === 'aprobar' ? 'cliente_registrado' : 'cliente_rechazado';
+
+    const { data, error } = await supabase
+      .from('usuarios')
+      .update({ perfil: nuevoPerfil })
+      .eq('id', clienteId)
+      .select();
+
+    if (error) throw error;
+    if (!data || data.length === 0) {
+      throw new Error('Permiso denegado por políticas RLS. El registro no se modificó.');
+    }
+
+    return data[0];
+  },
 };

@@ -1,11 +1,12 @@
 import { useToast } from "@/src/context/ToastContext";
-import { supabase } from '@/src/services/SupabaseClient';
+import { AuthService } from '@/src/services/authService';
 import { SoundService } from '@/src/services/soundService';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { ActivityIndicator, Image, Modal, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Image, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import LoadingModal from '@/src/components/LoadingModal';
 
 export default function RegistroAnonimoScreen() {
     const router = useRouter();
@@ -51,17 +52,7 @@ export default function RegistroAnonimoScreen() {
         setLoading(true);
 
         try {
-            const { data, error } = await supabase
-                .from('anonimos')
-                .insert([{ 
-                    nombre: nombre.trim(), 
-                    foto: foto, 
-                    push_token: null 
-                }])
-                .select()
-                .single();
-
-            if (error) throw error;
+            const data = await AuthService.registrarAnonimo(nombre, foto!);
 
             await SoundService.reproducir('exito');
             showToast("success", "Acceso Concedido", `¡Hola ${data.nombre}! Perfil temporal creado.`);
@@ -85,19 +76,7 @@ export default function RegistroAnonimoScreen() {
 
     return (
         <View className="flex-1 bg-primary px-8 justify-center items-center">
-            <Modal transparent visible={loading} animationType="fade">
-                <View className="flex-1 justify-center items-center bg-black/60">
-                    <View className="bg-primary p-10 rounded-3xl items-center border-2 border-tertiary shadow-2xl">
-                        <View className="bg-secondary rounded-full p-2 mb-4 border border-tertiary">
-                            <Image source={require("@/assets/images/icon.png")} className="w-12 h-12" resizeMode="contain" />
-                        </View>
-                        <ActivityIndicator size="large" color="#F5C065" />
-                        <Text className="text-secondary font-bold mt-4 text-center uppercase text-sm">
-                            Generando credenciales temporales...
-                        </Text>
-                    </View>
-                </View>
-            </Modal>
+        <LoadingModal visible={loading} message="Generando credenciales temporales..." />
 
             <Text className="text-secondary font-bold text-2xl uppercase mb-8 tracking-tight text-center">
                 Registro Anónimo
