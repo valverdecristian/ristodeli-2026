@@ -3,6 +3,8 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { supabase } from '@/src/services/SupabaseClient';
+import { MesaService } from '@/src/services/mesaService';
+import { ListaEsperaService } from '@/src/services/listaEsperaService';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { SoundService } from '@/src/services/soundService';
@@ -35,25 +37,12 @@ export default function EscanearMesaScreen() {
             if (!idUsuario) return;
             setClienteId(idUsuario);
             
-            const { data: asignacion, error } = await supabase
-                .from('lista_espera')
-                .select('mesa_asignada, estado')
-                .eq('cliente_id', idUsuario)
-                .eq('estado', 'asignado')
-                .order('created_at', { ascending: false })
-                .limit(1)
-                .maybeSingle();
+            const mesaAsignadaId = await ListaEsperaService.obtenerAsignacionActiva(idUsuario);
             
-            if (asignacion && asignacion.mesa_asignada) {
-                setMesaEsperadaId(asignacion.mesa_asignada);
-                
-                const { data: mesa } = await supabase
-                    .from('mesas')
-                    .select('numero')
-                    .eq('id', asignacion.mesa_asignada)
-                    .single();
-                
-                if (mesa) setNumeroMesaEsperada(mesa.numero.toString());
+            if (mesaAsignadaId) {
+                setMesaEsperadaId(mesaAsignadaId);
+                const numero = await MesaService.obtenerNumeroPorId(mesaAsignadaId);
+                if (numero !== null) setNumeroMesaEsperada(numero.toString());
             }
         } catch (error) {
             console.error("Error buscando asignación de mesa:", error);
@@ -66,13 +55,9 @@ export default function EscanearMesaScreen() {
         setMensajeError(null);
 
         try {
-        const { data: mesaEscaneada, error } = await supabase
-            .from('mesas')
-            .select('id, numero')
-            .eq('qr_data', data)
-            .single();
+        const mesaEscaneada = await MesaService.obtenerPorQR(data);
 
-        if (error || !mesaEscaneada) {
+        if (!mesaEscaneada) {
             throw new Error("El código QR no pertenece a ninguna mesa del sistema.");
         }
 
@@ -92,11 +77,9 @@ export default function EscanearMesaScreen() {
 
         await SoundService.reproducir('exito');
         
-        await supabase
-            .from('lista_espera')
-            .update({ qr_mesa_escaneado: true })
-            .eq('cliente_id', clienteId)
-            .eq('estado', 'asignado');
+        if (clienteId) {
+            await ListaEsperaService.confirmarEscaneoMesa(clienteId);
+        }
 
         router.replace({
             pathname: "/(tabs)/mesa/panelMesaCliente",

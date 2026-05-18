@@ -1,6 +1,6 @@
 import { useAuth } from "@/src/context/AuthContext";
 import { useToast } from "@/src/context/ToastContext";
-import { supabase } from '@/src/services/SupabaseClient';
+import { ListaEsperaService } from '@/src/services/listaEsperaService';
 import { SoundService } from '@/src/services/soundService';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { useRouter } from 'expo-router';

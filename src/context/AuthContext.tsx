@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { Session } from '@supabase/supabase-js';
 import { supabase } from '../services/SupabaseClient';
 import { AuthService } from '../services/authService';
+import { NotificationService } from '../services/notificationService';
 import { UsuarioPerfil } from '../models/usuario.model';
 
 interface AuthContextData {
@@ -31,6 +32,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     if (session?.user) {
       const perfil = await AuthService.obtenerPerfil(session.user.id);
       setCurrentUser(perfil);
+
+      // Registrar push token en segundo plano — no bloquea ni interrumpe el login
+      NotificationService.registrar(session.user.id, 'usuarios');
     } else {
       setCurrentUser(null);
     }

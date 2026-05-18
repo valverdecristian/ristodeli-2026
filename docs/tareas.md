@@ -9,9 +9,9 @@
 3. Agregar una nueva bebida desde el cantinero. ✅
 * Una vez credo la bebida verificar su existencia en el catálogo. ✅
 ---
-4. Agregar una nueva mesa desde supervisor. ⏳
-* Una vez que se crea la mesa mostrar el QR correspondiente. ⏳
-* Verificar la existencia de la nueva mesa. ⏳
+4. Agregar una nueva mesa desde supervisor. ✅
+* Una vez que se crea la mesa mostrar el QR correspondiente. ✅
+* Verificar la existencia de la nueva mesa. ✅
 ---
 **PUNTOS 5-6-7-8 SE MUESTRAN JUNTOS** <br>
 
