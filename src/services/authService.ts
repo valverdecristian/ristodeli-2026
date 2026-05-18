@@ -4,6 +4,7 @@
 
 import { createClient } from '@supabase/supabase-js';
 import { supabase } from './SupabaseClient';
+import { NotificationService } from './notificationService';
 import { DetalleRegistro, UsuarioPerfil } from '../models/usuario.model';
 
 // Credenciales para crear el cliente temporal de registro de empleados
@@ -113,8 +114,16 @@ export const AuthService = {
 
   /**
    * Cierra la sesión activa en Supabase.
+   * Antes del signOut, limpia el push token del dispositivo en la DB
+   * para que el usuario no reciba notificaciones en un dispositivo donde ya salió.
    */
   async cerrarSesion() {
+    // Obtener el userId ANTES de invalidar la sesión
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session?.user?.id) {
+      await NotificationService.limpiarToken(session.user.id, 'usuarios');
+    }
+
     const { error } = await supabase.auth.signOut();
     if (error) throw error;
   },

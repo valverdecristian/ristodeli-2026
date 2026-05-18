@@ -1,6 +1,7 @@
 import { useToast } from "@/src/context/ToastContext";
 import { AuthService } from '@/src/services/authService';
 import { ImageService } from '@/src/services/imageService';
+import { NotificationService } from '@/src/services/notificationService';
 import { SoundService } from '@/src/services/soundService';
 import { Ionicons } from '@expo/vector-icons';
 import { CameraView, useCameraPermissions } from 'expo-camera';
@@ -164,6 +165,9 @@ export default function RegistroScreen() {
         });
 
         setLoading(false);
+
+        // Notificar a admins y supervisores sobre el nuevo cliente pendiente
+        NotificationService.notificarNuevoClientePendiente(`${nombres} ${apellidos}`);
 
         await SoundService.reproducir('exito');
         showToast("success", "Registro enviado", "Cuenta creada. Aguarda la aprobación del Supervisor.");

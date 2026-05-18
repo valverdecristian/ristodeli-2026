@@ -1,5 +1,6 @@
 import { useToast } from "@/src/context/ToastContext";
 import { AuthService } from '@/src/services/authService';
+import { NotificationService } from '@/src/services/notificationService';
 import { SoundService } from '@/src/services/soundService';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
@@ -53,6 +54,9 @@ export default function RegistroAnonimoScreen() {
 
         try {
             const data = await AuthService.registrarAnonimo(nombre, foto!);
+
+            // Registrar push token para el cliente anónimo (tabla 'anonimos')
+            NotificationService.registrar(data.id, 'anonimos');
 
             await SoundService.reproducir('exito');
             showToast("success", "Acceso Concedido", `¡Hola ${data.nombre}! Perfil temporal creado.`);
