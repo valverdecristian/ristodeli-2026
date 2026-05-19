@@ -3,7 +3,6 @@ import { useAuth } from '@/src/context/AuthContext';
 import { useToast } from "@/src/context/ToastContext";
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React from 'react';
-// 🌟 CORRECCIÓN 1: Importamos 'Text' que faltaba de react-native
 import { ActivityIndicator, Text, View } from 'react-native';
 
 export default function PanelAccionesAnonimoScreen() {
@@ -11,10 +10,9 @@ export default function PanelAccionesAnonimoScreen() {
     const { showToast } = useToast();
     const { currentUser } = useAuth();
     
-    // 🌟 Capturamos el clienteId y el nombre que arrastramos desde el escáner de entrada
-    const { clienteId, nombre } = useLocalSearchParams<{ clienteId?: string; nombre?: string }>();
+    // 🌟 Atrapamos clienteId, nombre y foto
+    const { clienteId, nombre, foto } = useLocalSearchParams<{ clienteId?: string; nombre?: string; foto?: string }>();
 
-    // Control de seguridad por si se pierde el ID en el enrutamiento
     if (!clienteId) {
         return (
             <View className="flex-1 bg-primary justify-center items-center">
@@ -26,8 +24,6 @@ export default function PanelAccionesAnonimoScreen() {
 
     const handleEscanearMesaAsignada = () => {
         showToast("info", "Escáner de Mesa", "Abriendo cámara para vincular tu usuario a la mesa asignada por el Metre.");
-
-        // 🌟 CORRECCIÓN 3: Mandamos el 'clienteId' correcto y 'tipoCliente' para el escáner de mesa
         router.push({
             pathname: "/(tabs)/mesa/escanearMesa" as any,
             params: { 
@@ -37,11 +33,13 @@ export default function PanelAccionesAnonimoScreen() {
         });
     };
 
+    // 🌟 Generamos una URL por defecto por si el anónimo no tiene foto (El iconito de Ristodeli)
+    const fotoSegura = foto || currentUser?.foto_url || 'https://wtjylfdfdwowzzvunlpa.supabase.co/storage/v1/object/public/avatares/icon.png';
+
     return (
         <HomeClienteBase
-            // 🌟 CORRECCIÓN 2: Usamos el nombre que vino por params para no depender de currentUser
-            nombre={nombre || currentUser?.nombres || 'Cliente Express'}
-            fotoUrl={currentUser?.foto_url || ''}
+            nombre={nombre || currentUser?.nombres || 'Cliente Anónimo'}
+            fotoUrl={fotoSegura}
             tipoCliente="anonimo"
             enListaEspera={true}
             onEscanearEntrada={() => showToast("info", "Ya registrado", "Ya te encuentras anotado en la lista de espera.")}
