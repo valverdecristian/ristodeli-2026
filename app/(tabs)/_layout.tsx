@@ -6,7 +6,6 @@ export default function TabsLayout() {
     <Stack screenOptions={{ headerShown: false }}>
       {/* 🌟 REGISTRAMOS EXPLICITAMENTE CADA PANTALLA DE ESTA SUB-CARPETA */}
       <Stack.Screen name="home" />
-      <Stack.Screen name="homeAnonimo" />
       <Stack.Screen name="panelAccionesAnonimo" />
       
       {/* 🌟 Mapeamos las subcarpetas internas como la de la mesa */}

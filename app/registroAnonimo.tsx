@@ -90,7 +90,7 @@ export default function RegistroAnonimoScreen() {
             // 🚀 REDIRECCIÓN MANUAL FORZADA A TU HOME ANONIMO (LA PUERTA)
             // Quitamos de en medio al resolverRutaPorPerfil para que no te tire a la mesa por descarte
             router.replace({
-                pathname: "/(tabs)/homeAnonimo" as any, 
+                pathname: "/(tabs)/home" as any, 
                 params: { 
                     clienteId: registroAnonimoCreado.id,
                     nombre: nombre.trim()
