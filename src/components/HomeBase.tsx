@@ -35,7 +35,7 @@ export default function HomeBase({ roleTitle, buttons }: HomeBaseProps) {
       console.log("Fallo multimedia o de red en el deslogueo:", error);
     } finally {
       setIsLoggingOut(false);
-      router.replace('/'); 
+      router.replace('/login'); 
     }
   };
 
