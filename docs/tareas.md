@@ -29,7 +29,7 @@
 7. Rechazar a un cliente registrado desde admin. ✅
 * Al realizar esta acción, al usuario le llega un correo electronico indicando que su solicitud ha sido rechazada. ✅
 * Mostramos el correo recibido y que se visualiza claramente su rechazo y el logo de la empresa. ✅
-* Mostramos que el cliente intente ingresar a la app y se le indique que no puede ingresar debido al rechazo. ⏳
+* Mostramos que el cliente intente ingresar a la app y se le indique que no puede ingresar debido al rechazo. ✅
 ---
 8. Aceptar a un cliente registrado desde admin. ✅
 * Para agilizar este punto se cambia el estado del cliente rechazado anteriormente a "cliente_pendiente" en la base de datos. ✅

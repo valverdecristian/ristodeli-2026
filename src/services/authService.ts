@@ -255,7 +255,7 @@ export const AuthService = {
       case 'cocinero':
         return '/(homes)/cocinero';
       case 'cliente_anonimo':
-        return '/(tabs)/homeAnonimo';
+        return '/(tabs)/home';
       case 'cliente':
       case 'cliente_reg':
         return '/(tabs)/home';

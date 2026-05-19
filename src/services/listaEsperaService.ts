@@ -32,7 +32,7 @@ export const ListaEsperaService = {
 
   /**
    * Agrega un cliente anónimo a la lista de espera con estado 'pendiente'.
-   * Usada por homeAnonimo.tsx al escanear el QR de entrada.
+   * Usada por home.tsx al escanear el QR de entrada.
    */
   async agregarClienteAnonimo(params: {
     nombre: string;
