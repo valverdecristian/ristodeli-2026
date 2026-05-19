@@ -11,7 +11,7 @@ type EstadoPedidoCliente = 'inicial' | 'en_preparacion' | 'Rechazado Mozo' | 'pe
 export default function PanelMesaClienteScreen() {
     const router = useRouter();
     const { showToast } = useToast();
-    const { mesaId, clienteId, tipoCliente } = useLocalSearchParams();
+    const { mesaId, clienteId, tipoCliente, numeroMesa, sesion_id } = useLocalSearchParams();
 
     const [estado, setEstado] = useState<EstadoPedidoCliente>('inicial');
     const [loading, setLoading] = useState(true);
@@ -76,7 +76,10 @@ export default function PanelMesaClienteScreen() {
             </TouchableOpacity>
 
             <TouchableOpacity 
-                onPress={() => router.push("/(tabs)/mesa/chatMozo")}
+                onPress={() => router.push({ 
+                    pathname: "/(tabs)/mesa/chatMozo",
+                    params: { mesaId, numeroMesa, id_usuario: clienteId, sesion_id, tipoCliente }
+                })}
                 className="w-full bg-secondary py-5 rounded-[25px] items-center border border-tertiary/20"
             >
                 <Text className="text-primary font-bold uppercase">Consultar al Mozo (Chat)</Text>

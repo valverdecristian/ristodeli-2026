@@ -1,69 +1,189 @@
 import { supabase } from '@/src/services/SupabaseClient';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, FlatList, Text, TouchableOpacity, View } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native';
 
-interface MesaDB {
-    id: string;        
-    numero: number;    
+interface SesionActiva {
+    sesion_id: string;
+    mesa_id: string;
+    numero_mesa: number;
+    ultimo_mensaje: string;
+    ultima_actividad: string;
 }
 
 export default function ConsultasClientesScreen() {
     const router = useRouter();
     const [loading, setLoading] = useState(true);
-    const [mesas, setMesas] = useState<MesaDB[]>([]);
-    const [mesasConMensajes, setMesasConMensajes] = useState<string[]>([]); // Guarda UUIDs de mesas con actividad
+    const [sesiones, setSesiones] = useState<SesionActiva[]>([]);
+    const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
 
-    useEffect(() => {
-        inicializarPantalla();
-
-        const channel = supabase
-            .channel('realtime_consultas_central')
-            .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'consultas' }, () => {
-                obtenerMesasConActividad();
-            })
-            .subscribe();
-
-        return () => { supabase.removeChannel(channel); };
-    }, []);
-
-    const inicializarPantalla = async () => {
+    const cargarSesionesActivas = async () => {
         try {
             setLoading(true);
-            // 1. Traemos la lista real de mesas de tu base de datos organizada por número
-            const { data: dataMesas, error: errorMesas } = await supabase
-                .from('mesas')
-                .select('id, numero')
-                .order('numero', { ascending: true });
 
-            if (errorMesas) throw errorMesas;
-            setMesas(dataMesas || []);
+            const { data: listaData, error: listaError } = await supabase
+                .from('lista_espera')
+                .select('sesion_id, mesa_asignada')
+                .eq('estado', 'asignado')
+                .eq('qr_mesa_escaneado', true);
 
-            // 2. Escaneamos la actividad de chats
-            await obtenerMesasConActividad();
+            if (listaError) throw listaError;
+            if (!listaData || listaData.length === 0) {
+                setSesiones([]);
+                return;
+            }
+
+            const sesionesData = await Promise.all(
+                listaData.map(async (item) => {
+                    const [mesaResult, msgResult] = await Promise.all([
+                        supabase.from('mesas').select('numero').eq('id', item.mesa_asignada).single(),
+                        supabase.from('consultas').select('mensaje, created_at').eq('sesion_id', item.sesion_id).order('created_at', { ascending: false }).limit(1).maybeSingle(),
+                    ]);
+
+                    return {
+                        sesion_id: item.sesion_id,
+                        mesa_id: item.mesa_asignada,
+                        numero_mesa: mesaResult.data?.numero || 0,
+                        ultimo_mensaje: msgResult.data?.mensaje || '',
+                        ultima_actividad: msgResult.data?.created_at || '',
+                    };
+                })
+            );
+
+            setSesiones(sesionesData);
         } catch (error) {
-            console.error("Error al cargar mesas de DB:", error);
+            console.error("Error al cargar sesiones activas:", error);
         } finally {
             setLoading(false);
         }
     };
 
-    const obtenerMesasConActividad = async () => {
-        try {
-            const { data, error } = await supabase
-                .from('consultas')
-                .select('mesa_id')
-                .order('created_at', { ascending: false });
+    useEffect(() => {
+        cargarSesionesActivas();
 
-            if (error) throw error;
+        const channelName = `realtime_consultas_${Date.now()}`;
+        const channel = supabase
+            .channel(channelName)
+            .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'consultas' }, () => {
+                cargarSesionesActivas();
+            })
+            .subscribe();
+        channelRef.current = channel;
 
-            // Almacenamos los UUIDs únicos de las mesas con historial de consultas
-            const uuidsActivos = Array.from(new Set(data?.map(m => m.mesa_id).filter(Boolean))) as string[];
-            setMesasConMensajes(uuidsActivos);
-        } catch (error) {
-            console.error(error);
+        return () => { supabase.removeChannel(channel); };
+    }, []);
+
+    const formatearTimestamp = (ts: string) => {
+        if (!ts) return '';
+        const d = new Date(ts);
+        const ahora = new Date();
+        const diffMs = ahora.getTime() - d.getTime();
+        const diffMin = Math.floor(diffMs / 60000);
+        if (diffMin < 1) return 'Ahora';
+        if (diffMin < 60) return `hace ${diffMin} min`;
+        const diffHoras = Math.floor(diffMin / 60);
+        if (diffHoras < 24) return `hace ${diffHoras}h`;
+        return d.toLocaleDateString();
+    };
+
+    const cantidad = sesiones.length;
+
+    const navegarAChat = (item: SesionActiva) => {
+        router.push({
+            pathname: "/(homes)/mozo/chatMozo",
+            params: { mesaId: item.mesa_id, numeroMesa: item.numero_mesa, sesion_id: item.sesion_id }
+        });
+    };
+
+    const renderContenido = () => {
+        if (cantidad === 0) {
+            return (
+                <View className="flex-1 justify-center items-center">
+                    <View className="bg-secondary/30 p-6 rounded-full mb-4">
+                        <Ionicons name="chatbubbles-outline" size={48} color="#31603D" style={{ opacity: 0.3 }} />
+                    </View>
+                    <Text className="text-primary/40 font-bold text-sm uppercase">Sin consultas activas</Text>
+                </View>
+            );
         }
+
+        if (cantidad <= 2) {
+            return (
+                <View className="px-2">
+                    {sesiones.map((item) => (
+                        <TouchableOpacity
+                            key={item.sesion_id}
+                            onPress={() => navegarAChat(item)}
+                            className="bg-primary border border-tertiary/30 p-5 rounded-[24px] mb-4"
+                        >
+                            <View className="flex-row items-center mb-2">
+                                <View className="bg-tertiary/20 p-3 rounded-full mr-3">
+                                    <Ionicons name="chatbubble-ellipses" size={20} color="#F5C065" />
+                                </View>
+                                <Text className="text-white font-black text-base uppercase">Mesa N° {item.numero_mesa}</Text>
+                            </View>
+                            {item.ultimo_mensaje ? (
+                                <Text className="text-white/60 text-xs ml-2" numberOfLines={2}>{item.ultimo_mensaje}</Text>
+                            ) : (
+                                <Text className="text-white/30 text-xs ml-2 italic">Sin mensajes aún</Text>
+                            )}
+                            {item.ultima_actividad && (
+                                <Text className="text-tertiary/60 text-[9px] mt-1 ml-2 uppercase font-bold">{formatearTimestamp(item.ultima_actividad)}</Text>
+                            )}
+                        </TouchableOpacity>
+                    ))}
+                </View>
+            );
+        }
+
+        if (cantidad <= 6) {
+            return (
+                <View className="flex-row flex-wrap justify-between px-1">
+                    {sesiones.map((item) => (
+                        <TouchableOpacity
+                            key={item.sesion_id}
+                            onPress={() => navegarAChat(item)}
+                            className="w-[48%] bg-primary border border-tertiary/30 p-4 rounded-[24px] mb-4 items-center"
+                        >
+                            <View className="bg-tertiary/20 p-3 rounded-full mb-2">
+                                <Ionicons name="chatbubble-ellipses" size={22} color="#F5C065" />
+                            </View>
+                            <Text className="text-white font-black text-sm uppercase mb-1">Mesa N° {item.numero_mesa}</Text>
+                            <View className="bg-tertiary px-2 py-0.5 rounded-full">
+                                <Text className="text-primary font-bold text-[8px] uppercase">Activo</Text>
+                            </View>
+                        </TouchableOpacity>
+                    ))}
+                </View>
+            );
+        }
+
+        return (
+            <View className="px-1">
+                {sesiones.map((item) => (
+                    <TouchableOpacity
+                        key={item.sesion_id}
+                        onPress={() => navegarAChat(item)}
+                        className="flex-row items-center bg-primary border border-tertiary/20 p-4 rounded-[20px] mb-3"
+                    >
+                        <View className="w-10 h-10 bg-tertiary/20 rounded-full items-center justify-center mr-3">
+                            <Text className="text-tertiary font-black text-sm">{item.numero_mesa}</Text>
+                        </View>
+                        <View className="flex-1">
+                            {item.ultimo_mensaje ? (
+                                <Text className="text-white font-medium text-xs" numberOfLines={1}>{item.ultimo_mensaje}</Text>
+                            ) : (
+                                <Text className="text-white/30 text-xs italic">Sin mensajes aún</Text>
+                            )}
+                        </View>
+                        {item.ultima_actividad && (
+                            <Text className="text-tertiary/60 text-[9px] uppercase font-bold ml-2">{formatearTimestamp(item.ultima_actividad)}</Text>
+                        )}
+                    </TouchableOpacity>
+                ))}
+            </View>
+        );
     };
 
     return (
@@ -73,53 +193,18 @@ export default function ConsultasClientesScreen() {
                     <Ionicons name="arrow-back" size={18} color="#31603D" />
                 </TouchableOpacity>
                 <View>
-                    <Text className="text-white text-xl font-black uppercase tracking-wider">Chats por Mesa</Text>
-                    <Text className="text-tertiary text-[10px] uppercase font-bold tracking-widest">Consultas activas en salón</Text>
+                    <Text className="text-white text-xl font-black uppercase tracking-wider">Consultas</Text>
+                    <Text className="text-tertiary text-[10px] uppercase font-bold tracking-widest">Sesiones activas en salón</Text>
                 </View>
             </View>
 
             <View className="flex-1 bg-secondary rounded-t-[32px] p-6 border-t border-tertiary/20">
-                {loading && mesas.length === 0 ? (
-                    <View className="flex-1 justify-center items-center"><ActivityIndicator size="large" color="#F5C065" /></View>
+                {loading ? (
+                    <View className="flex-1 justify-center items-center">
+                        <ActivityIndicator size="large" color="#F5C065" />
+                    </View>
                 ) : (
-                    <FlatList
-                        data={mesas}
-                        keyExtractor={(item) => item.id}
-                        numColumns={2}
-                        columnWrapperStyle={{ justifyContent: 'space-between' }}
-                        showsVerticalScrollIndicator={false}
-                        renderItem={({ item }) => {
-                            const tieneMensajes = mesasConMensajes.includes(item.id);
-                            return (
-                                <TouchableOpacity
-                                    onPress={() => router.push({
-                                        pathname: "/(homes)/mozo/chatMozo" as any,
-                                        params: { mesaId: item.id, numeroMesa: item.numero } // 🌟 Mandamos los dos identificadores
-                                    })}
-                                    style={{ elevation: 2 }}
-                                    className={`w-[47%] p-6 rounded-[24px] mb-4 items-center justify-center border ${
-                                        tieneMensajes ? 'bg-primary border-tertiary/40' : 'bg-secondary border-primary/10'
-                                    }`}
-                                >
-                                    <View className={`p-3 rounded-full mb-2 ${tieneMensajes ? 'bg-tertiary/20' : 'bg-primary/5'}`}>
-                                        <Ionicons 
-                                            name={tieneMensajes ? "chatbubble-ellipses" : "restaurant-outline"} 
-                                            size={24} 
-                                            color={tieneMensajes ? "#F5C065" : "#31603D"} 
-                                        />
-                                    </View>
-                                    <Text className={`font-black text-sm uppercase ${tieneMensajes ? 'text-white' : 'text-primary'}`}>
-                                        Mesa N° {item.numero}
-                                    </Text>
-                                    {tieneMensajes && (
-                                        <View className="bg-tertiary px-2 py-0.5 rounded-full mt-1">
-                                            <Text className="text-primary font-bold text-[8px] uppercase">Activo</Text>
-                                        </View>
-                                    )}
-                                </TouchableOpacity>
-                            );
-                        }}
-                    />
+                    renderContenido()
                 )}
             </View>
         </View>

@@ -85,12 +85,14 @@ export default function EscanearMesaScreen() {
             // ----------------------------------------------------------------------
             if (!mesaEsperadaId) {
                 await SoundService.reproducir('exito');
+                const sesionIdBypass = clienteId ? await ListaEsperaService.obtenerSesionActiva(mesaEscaneada.id) : null;
                 router.replace({
                     pathname: "/(tabs)/mesa/panelMesaCliente",
                     params: { 
                         mesaId: mesaEscaneada.id, 
                         numeroMesa: mesaEscaneada.numero,
-                        clienteId: clienteId || paramClienteId
+                        clienteId: clienteId || paramClienteId,
+                        sesion_id: sesionIdBypass || undefined
                     }
                 });
                 return;
@@ -104,11 +106,13 @@ export default function EscanearMesaScreen() {
             }
 
             await SoundService.reproducir('exito');
-            if (clienteId) await ListaEsperaService.confirmarEscaneoMesa(clienteId);
+                if (clienteId) await ListaEsperaService.confirmarEscaneoMesa(clienteId);
+
+            const sesionId = clienteId ? await ListaEsperaService.obtenerSesionActiva(mesaEscaneada.id) : null;
 
             router.replace({
                 pathname: "/(tabs)/mesa/panelMesaCliente",
-                params: { mesaId: mesaEscaneada.id, numeroMesa: mesaEscaneada.numero, clienteId }
+                params: { mesaId: mesaEscaneada.id, numeroMesa: mesaEscaneada.numero, clienteId, sesion_id: sesionId || undefined }
             });
 
         } catch (err: any) {
