@@ -1,3 +1,4 @@
+import LoadingModal from "@/src/components/LoadingModal";
 import { useToast } from "@/src/context/ToastContext";
 import { ImageService } from "@/src/services/imageService";
 import { SoundService } from "@/src/services/soundService";
@@ -6,16 +7,19 @@ import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
 import React, { useCallback, useState } from "react";
-import LoadingModal from "@/src/components/LoadingModal";
-import {Alert,KeyboardAvoidingView,Platform,ScrollView,StyleSheet,Text,Image,
-        TextInput,TouchableOpacity,View} from "react-native";
+import {
+  Alert,
+  Image,
+  KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text,
+  TextInput, TouchableOpacity, View
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 const styles = StyleSheet.create({
-  tabButton: {paddingHorizontal: 16,paddingVertical: 12,borderRadius: 16,flex: 1,alignItems: "center",},
-  tabButtonActive: {backgroundColor: "#F5C065",},
-  tabText: {fontWeight: "bold",fontSize: 11,textTransform: "uppercase",},
-  tabTextActive: {color: "#31603D",},
-  tabTextInactive: {color: "rgba(49, 96, 61, 0.4)",},
+  tabButton: { paddingHorizontal: 16, paddingVertical: 12, borderRadius: 16, flex: 1, alignItems: "center", },
+  tabButtonActive: { backgroundColor: "#F5C065", },
+  tabText: { fontWeight: "bold", fontSize: 11, textTransform: "uppercase", },
+  tabTextActive: { color: "#31603D", },
+  tabTextInactive: { color: "rgba(49, 96, 61, 0.4)", },
 });
 
 const normalizarTipo = (tipo: string) => {
@@ -83,7 +87,7 @@ export default function AltaMesa() {
         throw new Error("Error al subir la foto de la mesa");
       }
       setLoadingText("Guardando mesa...");
-      const qrData = `ristodeli://mesa/${numeroMesa}`;
+      const qrData = `MESA_${numeroMesa}`;
       const tipoNormalizado = normalizarTipo(tipoMesa);
       const { error: dbError } = await supabase.from("mesas").insert([
         {
