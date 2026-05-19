@@ -52,7 +52,7 @@ export default function HomeEntradaScreen() {
       await AuthService.cerrarSesion();
 
       // 3. Volvemos a la pantalla principal de la app (Index)
-      router.replace("/");
+      router.replace("/login");
     } catch (error) {
       console.error("Error al cerrar sesión:", error);
       showToast("error", "Error", "No se pudo cerrar la sesión correctamente.");
