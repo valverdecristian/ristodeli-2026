@@ -255,7 +255,7 @@ export const AuthService = {
       case 'cocinero':
         return '/(homes)/cocinero';
       case 'cliente_anonimo':
-        return '/(tabs)/homeAnonimo';
+        return '/(tabs)/home';
       case 'cliente':
       case 'cliente_reg':
         return '/(tabs)/home';
@@ -269,20 +269,20 @@ export const AuthService = {
    * A diferencia de registrar(), este flujo NO crea un usuario en auth.users.
    * Devuelve el registro creado con su id generado.
    */
-  async registrarAnonimo(nombre: string, foto: string) {
-    const { data, error } = await supabase
-      .from('anonimos')
-      .insert([{
-        nombre: nombre.trim(),
-        foto: foto,
-        push_token: null,
-      }])
-      .select()
-      .single();
+  // async registrarAnonimo(nombre: string, foto: string) {
+  //   const { data, error } = await supabase
+  //     .from('anonimos')
+  //     .insert([{
+  //       nombre: nombre.trim(),
+  //       foto: foto,
+  //       push_token: null,
+  //     }])
+  //     .select()
+  //     .single();
 
-    if (error) throw error;
-    return data;
-  },
+  //   if (error) throw error;
+  //   return data;
+  // },
 
   /**
    * Obtiene todos los usuarios con perfil 'cliente_pendiente'.

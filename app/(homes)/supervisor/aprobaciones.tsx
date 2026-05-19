@@ -63,7 +63,7 @@ export default function AprobacionClientesScreen() {
             showToast("error", "Error de operación", error.message || "No se pudo actualizar el perfil.");
             console.error("Detalle del fallo:", error);
         } finally {
-            
+            setLoading(false);
         }
     };
 

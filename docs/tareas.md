@@ -29,7 +29,7 @@
 7. Rechazar a un cliente registrado desde admin. ✅
 * Al realizar esta acción, al usuario le llega un correo electronico indicando que su solicitud ha sido rechazada. ✅
 * Mostramos el correo recibido y que se visualiza claramente su rechazo y el logo de la empresa. ✅
-* Mostramos que el cliente intente ingresar a la app y se le indique que no puede ingresar debido al rechazo. ⏳
+* Mostramos que el cliente intente ingresar a la app y se le indique que no puede ingresar debido al rechazo. ✅
 ---
 8. Aceptar a un cliente registrado desde admin. ✅
 * Para agilizar este punto se cambia el estado del cliente rechazado anteriormente a "cliente_pendiente" en la base de datos. ✅
@@ -38,11 +38,11 @@
 * Ingresamos a la app como cliente registrado. ✅
 * Continua en el punto 10
 ---
-9. Ingresar al local como cliente anonimo. ⏳
-* Ingresamos nombre y foto y nos registramos. ⏳
-* Mostramos que no necesitamos aprobación para ingresar. ⏳
+9. Ingresar al local como cliente anonimo. ✅
+* Ingresamos nombre y foto y nos registramos. ✅
+* Mostramos que no necesitamos aprobación para ingresar. ✅
 * Antes de escanear el QR de entrada, procedemos a escanear el QR de cualquier mesa y vemos que la app nos indica que "debemos colocarnos en la lista de espera" ⏳
-* Procedemos a escanear el QR de entrada y posteriormente visualizamos las encuestas de satisfacción previas. ⏳
+* Procedemos a escanear el QR de entrada y posteriormente visualizamos las encuestas de satisfacción previas. ✅
 * Luego, volvemos atras y nos colocamos en la "Lista de espera". ⏳
 * Desde el Metre vemos que nos llego una notificación indicando que hay un nuevo cliente en la lista de espera. ⏳
 * Desde el Metre verificamos que aparecemos en la lista de espera. ⏳
