@@ -1,26 +1,27 @@
+import { useAuth } from "@/src/context/AuthContext";
 import { useToast } from "@/src/context/ToastContext";
 import { AuthService } from '@/src/services/authService';
-import { NotificationService } from '@/src/services/notificationService';
+import { ImageService } from '@/src/services/imageService';
 import { SoundService } from '@/src/services/soundService';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { Image, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import LoadingModal from '@/src/components/LoadingModal';
+import { ActivityIndicator, Image, Modal, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 export default function RegistroAnonimoScreen() {
     const router = useRouter();
     const { showToast } = useToast();
+    const { refrescarPerfil, resolverRutaPorPerfil } = useAuth();
     const [nombre, setNombre] = useState('');
     const [foto, setFoto] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
+    const [loadingText, setLoadingText] = useState('');
 
-    // FUNCION CORREGIDA PARA ABRIR LA CAMARA REAL DEL DISPOSITIVO
     const tomarFotoPersonal = async () => {
         try {
             const { status } = await ImagePicker.requestCameraPermissionsAsync();
-            
+
             if (status !== 'granted') {
                 SoundService.reproducir('error');
                 showToast("error", "Permiso Denegado", "Ristodeli necesita acceso a la cámara para el registro express.");
@@ -28,10 +29,10 @@ export default function RegistroAnonimoScreen() {
             }
 
             const result = await ImagePicker.launchCameraAsync({
-                mediaTypes: ImagePicker.MediaTypeOptions.Images, 
-                allowsEditing: true, 
-                aspect: [1, 1],       
-                quality: 0.5,        
+                mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                allowsEditing: true,
+                aspect: [1, 1],
+                quality: 0.5,
             });
 
             if (!result.canceled && result.assets && result.assets.length > 0) {
@@ -45,49 +46,91 @@ export default function RegistroAnonimoScreen() {
 
     const handleRegistroAnonimo = async () => {
         if (!nombre.trim() || !foto) {
-            SoundService.reproducir('error'); 
+            SoundService.reproducir('error');
             showToast("error", "Campos incompletos", "Por favor, introduce tu nombre y tómate la fotografía obligatoria.");
             return;
         }
 
         setLoading(true);
+        setLoadingText('Subiendo foto...');
 
         try {
-            const data = await AuthService.registrarAnonimo(nombre, foto!);
+            console.log('[REG_ANON] 1. Subiendo foto a Supabase Storage...');
+            const resultadoSubida = await ImageService.uploadToSupabase(
+                foto,
+                "avatares",
+                "",
+                `anon_${Date.now()}`
+            );
 
-            // Registrar push token para el cliente anónimo (tabla 'anonimos')
-            NotificationService.registrar(data.id, 'anonimos');
+            console.log('[REG_ANON] Resultado subida:', JSON.stringify(resultadoSubida));
 
-            await SoundService.reproducir('exito');
-            showToast("success", "Acceso Concedido", `¡Hola ${data.nombre}! Perfil temporal creado.`);
+            if (!resultadoSubida.success || !resultadoSubida.url) {
+                SoundService.reproducir('error');
+                showToast("error", "Error de almacenamiento", resultadoSubida.message || "No se pudo guardar la foto en el servidor.");
+                setLoading(false);
+                return;
+            }
+
+            setLoadingText('Creando sesión anónima...');
+            console.log('[REG_ANON] 2. Insertando en la tabla anonimos de Supabase...');
             
+            // Registramos en la tabla anonimos de Supabase
+            const registroAnonimoCreado = await AuthService.registrarAnonimo(nombre.trim(), resultadoSubida.url);
+            console.log('[REG_ANON] Registro en tabla anonimos OK. ID generado:', registroAnonimoCreado.id);
+
+            // 🌟 CAMBIAMOS EL TEXTO DEL SPINNER (Ya no dice más nada de la mesa)
+            setLoadingText('Cargando ingreso...'); 
+            await SoundService.reproducir('exito');
+            showToast("success", "Acceso Concedido", `¡Hola ${nombre.trim()}! Perfil temporal creado.`);
+
+            // 🚀 APAGAMOS EL LOADING ANTES DE NAVEGAR
+            setLoading(false);
+
+            // 🚀 REDIRECCIÓN MANUAL FORZADA A TU HOME ANONIMO (LA PUERTA)
+            // Quitamos de en medio al resolverRutaPorPerfil para que no te tire a la mesa por descarte
             router.replace({
-                pathname: "/(tabs)/homeAnonimo",
+                pathname: "/(tabs)/homeAnonimo" as any, 
                 params: { 
-                    anonimoId: data.id,
-                    anonimoNombre: data.nombre,
-                    anonimoFoto: data.foto
+                    clienteId: registroAnonimoCreado.id,
+                    nombre: nombre.trim()
                 }
             });
 
         } catch (error: any) {
+            console.log('[REG_ANON] ERROR EN EL FLUJO:', error);
+            
+            let mensaje = error?.message || "Error desconocido";
+            if (error?.code) mensaje += ` (código: ${error.code})`;
+
             SoundService.reproducir('error');
-            showToast("error", "Error de base de datos", error.message || "No se pudo registrar el usuario anónimo.");
-        } finally {
+            showToast("error", "Error de Registro", mensaje);
             setLoading(false);
         }
     };
 
     return (
         <View className="flex-1 bg-primary px-8 justify-center items-center">
-        <LoadingModal visible={loading} message="Generando credenciales temporales..." />
+            <Modal transparent visible={loading} animationType="fade">
+                <View className="flex-1 justify-center items-center bg-black/60">
+                    <View className="bg-primary p-10 rounded-3xl items-center border-2 border-tertiary shadow-2xl">
+                        <View className="bg-secondary rounded-full p-2 mb-4 border border-tertiary">
+                            <Image source={require("@/assets/images/icon.png")} className="w-12 h-12" resizeMode="contain" />
+                        </View>
+                        <ActivityIndicator size="large" color="#F5C065" />
+                        <Text className="text-secondary font-bold mt-4 text-center uppercase text-sm">
+                            {loadingText || 'Registrando...'}
+                        </Text>
+                    </View>
+                </View>
+            </Modal>
 
             <Text className="text-secondary font-bold text-2xl uppercase mb-8 tracking-tight text-center">
                 Registro Anónimo
             </Text>
 
-            <TouchableOpacity 
-                onPress={tomarFotoPersonal} 
+            <TouchableOpacity
+                onPress={tomarFotoPersonal}
                 className="w-44 h-44 bg-secondary rounded-[30px] mb-8 border-2 border-tertiary justify-center items-center overflow-hidden shadow-lg"
             >
                 {foto ? (
@@ -110,8 +153,8 @@ export default function RegistroAnonimoScreen() {
                 className="w-full bg-secondary rounded-full px-6 py-4 text-center text-lg shadow-md mb-8 text-primary font-semibold"
             />
 
-            <TouchableOpacity 
-                onPress={handleRegistroAnonimo} 
+            <TouchableOpacity
+                onPress={handleRegistroAnonimo}
                 className="w-full bg-tertiary rounded-full py-4 shadow-lg border-b-4 border-orange active:opacity-90"
             >
                 <Text className="text-center font-bold text-primary text-lg uppercase tracking-wider">
