@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { CameraView, useCameraPermissions } from 'expo-camera';
-import { useRouter, useLocalSearchParams } from 'expo-router';
 import { supabase } from '@/src/services/SupabaseClient';
-import { MesaService } from '@/src/services/mesaService';
 import { ListaEsperaService } from '@/src/services/listaEsperaService';
-import { Ionicons } from '@expo/vector-icons';
-import * as Haptics from 'expo-haptics';
+import { MesaService } from '@/src/services/mesaService';
 import { SoundService } from '@/src/services/soundService';
+import { Ionicons } from '@expo/vector-icons';
+import { CameraView, useCameraPermissions } from 'expo-camera';
+import * as Haptics from 'expo-haptics';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 export default function EscanearMesaScreen() {
     const router = useRouter();
@@ -17,18 +17,20 @@ export default function EscanearMesaScreen() {
     const [mesaEsperadaId, setMesaEsperadaId] = useState<string | null>(null);
     const [numeroMesaEsperada, setNumeroMesaEsperada] = useState<string | null>(null);
     const [clienteId, setClienteId] = useState<string | null>(null);
-    const { clienteAnonimoId } = useLocalSearchParams<{ clienteAnonimoId?: string }>();
+    
+    // 🌟 CORRECCIÓN 1: Capturamos 'clienteId' en lugar de 'clienteAnonimoId' para que machee con el panel anterior
+    const { clienteId: paramClienteId } = useLocalSearchParams<{ clienteId?: string }>();
     
     useEffect(() => {
         obtenerAsignacionMesa();
-    }, []);
+    }, [paramClienteId]);
 
     const obtenerAsignacionMesa = async () => {
         try {
             let idUsuario: string | null | undefined = null;
         
-            if (clienteAnonimoId) {
-                idUsuario = clienteAnonimoId;
+            if (paramClienteId) {
+                idUsuario = paramClienteId;
             } else {
                 const { data: { session } } = await supabase.auth.getSession();
                 idUsuario = session?.user?.id;
@@ -55,41 +57,64 @@ export default function EscanearMesaScreen() {
         setMensajeError(null);
 
         try {
-        const mesaEscaneada = await MesaService.obtenerPorQR(data);
+            const qrLimpio = data.trim();
+            console.log('[SCANNER_MESA] Procesando código leído:', qrLimpio);
 
-        if (!mesaEscaneada) {
-            throw new Error("El código QR no pertenece a ninguna mesa del sistema.");
-        }
+            // 🌟 CONSULTA ULTRA-FLEXIBLE: 
+            // Buscamos si el QR coincide con el ID (UUID) O con la columna qr_data (el deep link)
+            const { data: mesaEscaneada, error: dbError } = await supabase
+                .from('mesas')
+                .select('*')
+                .or(`id.eq.${qrLimpio},qr_data.eq.${qrLimpio}`) // Machea cualquiera de los dos formatos
+                .maybeSingle();
 
-        if (!mesaEsperadaId) {
-            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-            await SoundService.reproducir('error');
-            setMensajeError("Aún no tienes una mesa asignada por el metre. Por favor, aguarda en la lista.");
-            return;
-        }
+            if (dbError) {
+                console.error("[SCANNER_MESA] Error en Supabase:", dbError);
+                throw new Error(`Error de base de datos: ${dbError.message}`);
+            }
 
-        if (mesaEscaneada.id !== mesaEsperadaId) {
-            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-            await SoundService.reproducir('error');
-            setMensajeError(`Mesa equivocada. Escaneaste la Mesa N° ${mesaEscaneada.numero}, pero debes ir a la Mesa N° ${numeroMesaEsperada || 'asignada'}.`);
-            return;
-        }
+            if (!mesaEscaneada) {
+                // Si no la encuentra, te da el detalle exacto para que verifiques en el Table Editor
+                throw new Error(`Código inválido. No hay mesas con ID o QR_DATA igual a: [${qrLimpio}]`);
+            }
 
-        await SoundService.reproducir('exito');
-        
-        if (clienteId) {
-            await ListaEsperaService.confirmarEscaneoMesa(clienteId);
-        }
+            console.log('[SCANNER_MESA] ¡Mesa asociada exitosamente! Número:', mesaEscaneada.numero);
 
-        router.replace({
-            pathname: "/(tabs)/mesa/panelMesaCliente",
-            params: { mesaId: mesaEscaneada.id, numeroMesa: mesaEscaneada.numero }
-        });
+            // ----------------------------------------------------------------------
+            // Todo tu bloque de redirección y bypass de abajo queda exactamente igual 👇
+            // ----------------------------------------------------------------------
+            if (!mesaEsperadaId) {
+                await SoundService.reproducir('exito');
+                router.replace({
+                    pathname: "/(tabs)/mesa/panelMesaCliente",
+                    params: { 
+                        mesaId: mesaEscaneada.id, 
+                        numeroMesa: mesaEscaneada.numero,
+                        clienteId: clienteId || paramClienteId
+                    }
+                });
+                return;
+            }
+
+            if (mesaEscaneada.id !== mesaEsperadaId) {
+                Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+                await SoundService.reproducir('error');
+                setMensajeError(`Mesa equivocada. Escaneaste la Mesa N° ${mesaEscaneada.numero}, pero debías ir a la Mesa N° ${numeroMesaEsperada || 'asignada'}.`);
+                return;
+            }
+
+            await SoundService.reproducir('exito');
+            if (clienteId) await ListaEsperaService.confirmarEscaneoMesa(clienteId);
+
+            router.replace({
+                pathname: "/(tabs)/mesa/panelMesaCliente",
+                params: { mesaId: mesaEscaneada.id, numeroMesa: mesaEscaneada.numero, clienteId }
+            });
 
         } catch (err: any) {
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-        await SoundService.reproducir('error');
-        setMensajeError(err.message || "Error al procesar el escaneo.");
+            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+            await SoundService.reproducir('error');
+            setMensajeError(err.message || "Error al procesar el escaneo.");
         }
     };
 

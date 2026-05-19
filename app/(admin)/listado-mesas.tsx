@@ -60,7 +60,7 @@ export default function ListadoMesas() {
             </TouchableOpacity>
             {mesaQR && (
               <>
-                <QRCode value={mesaQR.qr_data} size={200} color="#31603D" backgroundColor="#F5F5DC" />
+                <QRCode value={mesaQR.id} size={200} color="#31603D" backgroundColor="#F5F5DC" />
                 <Text className="text-secondary font-bold text-xl mt-6 uppercase">Mesa {mesaQR.numero}</Text>
                 <Text className="text-secondary/70 font-semibold text-sm mt-1">
                   {mesaQR.comensales} comensales - {mesaQR.tipo}
