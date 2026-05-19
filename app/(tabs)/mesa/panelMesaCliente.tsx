@@ -1,19 +1,19 @@
+import LoadingModal from '@/src/components/LoadingModal';
 import { useToast } from "@/src/context/ToastContext";
 import { supabase } from '@/src/services/SupabaseClient';
 import { SoundService } from '@/src/services/soundService';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
-import LoadingModal from '@/src/components/LoadingModal';
 
-type EstadoEstadia = 'inicial' | 'en_preparacion' | 'pedido_rechazado' | 'pedido_listo' | 'comido';
+type EstadoPedidoCliente = 'inicial' | 'en_preparacion' | 'Rechazado Mozo' | 'pedido_listo' | 'comido';
 
 export default function PanelMesaClienteScreen() {
     const router = useRouter();
     const { showToast } = useToast();
     const { mesaId, clienteId, tipoCliente } = useLocalSearchParams();
 
-    const [estado, setEstado] = useState<EstadoEstadia>('inicial');
+    const [estado, setEstado] = useState<EstadoPedidoCliente>('inicial');
     const [loading, setLoading] = useState(true);
     const [yaHizoEncuesta, setYaHizoEncuesta] = useState(false);
 
@@ -59,15 +59,17 @@ export default function PanelMesaClienteScreen() {
         {/* ────────── RENDEREADO CONDICIONAL DE BOTONES ────────── */}
         
         {/* Inicial o Pedido Rechazado por el Mozo */}
-        {(estado === 'inicial' || estado === 'pedido_rechazado') && (
+        {(estado === 'inicial' || estado === 'Rechazado Mozo') && (
             <View className="space-y-4">
-            {estado === 'pedido_rechazado' && (
+            {estado === 'Rechazado Mozo' && (
                 <Text className="text-red-500 font-bold text-center uppercase mb-2">
                 ⚠️ El pedido fue rechazado. Por favor modifícalo.
                 </Text>
             )}
             <TouchableOpacity 
-                onPress={() => router.push({ pathname: "/(tabs)/mesa/menuProductos", params: { mesaId } })}
+                onPress={() => router.push({ 
+                    pathname: "/(tabs)/mesa/menuProductos", 
+                    params: { mesaId: mesaId,numeroMesa: mesaId}})}
                 className="w-full bg-secondary py-5 rounded-[25px] items-center border border-tertiary/20 mb-4"
             >
                 <Text className="text-primary font-bold uppercase">Realizar / Modificar Pedido</Text>

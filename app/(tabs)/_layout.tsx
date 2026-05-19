@@ -1,24 +1,19 @@
-import { useEffect } from 'react';
+// app/(tabs)/_layout.tsx
 import { Stack } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-SplashScreen.preventAutoHideAsync();
-
-
-export default function RootLayout() {
-  useEffect(() => {
-    // Simula una carga (fuentes, auth, etc.) y despues oculta el splash
-    setTimeout(async () => {
-      await SplashScreen.hideAsync();
-    }, 2000);
-  }, []);
-
+export default function TabsLayout() {
   return (
-    <SafeAreaProvider>
-      <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="index" /> 
-      </Stack>
-    </SafeAreaProvider>
+    <Stack screenOptions={{ headerShown: false }}>
+      {/* 🌟 REGISTRAMOS EXPLICITAMENTE CADA PANTALLA DE ESTA SUB-CARPETA */}
+      <Stack.Screen name="home" />
+      <Stack.Screen name="homeAnonimo" />
+      <Stack.Screen name="panelAccionesAnonimo" />
+      
+      {/* 🌟 Mapeamos las subcarpetas internas como la de la mesa */}
+      <Stack.Screen name="mesa/escanearMesa" />
+      <Stack.Screen name="mesa/panelMesaCliente" />
+      <Stack.Screen name="mesa/menuProductos" />
+      <Stack.Screen name="mesa/chatMozo" />
+    </Stack>
   );
 }

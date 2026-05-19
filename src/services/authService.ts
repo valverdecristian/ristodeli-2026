@@ -3,9 +3,9 @@
 // Usa el cliente de Supabase ya configurado. El estado reactivo vive en AuthContext.tsx.
 
 import { createClient } from '@supabase/supabase-js';
+import { DetalleRegistro, UsuarioPerfil } from '../models/usuario.model';
 import { supabase } from './SupabaseClient';
 import { NotificationService } from './notificationService';
-import { DetalleRegistro, UsuarioPerfil } from '../models/usuario.model';
 
 // Credenciales para crear el cliente temporal de registro de empleados
 const SUPABASE_URL = process.env.EXPO_PUBLIC_SUPABASE_URL as string;
@@ -117,14 +117,11 @@ export const AuthService = {
    * Crea el auth user, luego inserta el perfil en public.usuarios.
    * Solo requiere nombre y foto_url (ya subida a Storage).
    */
-  async registrarAnonimo(nombre: string, fotoUrl: string) {
-    console.log('[AUTH_SVC] signInAnonymously...');
+  async registrarAnonimoAuth(nombre: string, fotoUrl: string) {
     const { data, error } = await supabase.auth.signInAnonymously();
     if (error) {
-      console.log('[AUTH_SVC] Error en signInAnonymously:', error);
       throw error;
     }
-    console.log('[AUTH_SVC] signInAnonymously OK, user id:', data.user?.id);
 
     if (!data.user) throw new Error('No se devolvió un usuario anónimo.');
 

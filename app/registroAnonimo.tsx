@@ -3,13 +3,11 @@ import { useToast } from "@/src/context/ToastContext";
 import { AuthService } from '@/src/services/authService';
 import { ImageService } from '@/src/services/imageService';
 import { SoundService } from '@/src/services/soundService';
-import { supabase } from '@/src/services/SupabaseClient';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { Image, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import LoadingModal from '@/src/components/LoadingModal';
+import { ActivityIndicator, Image, Modal, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 export default function RegistroAnonimoScreen() {
     const router = useRouter();
@@ -75,37 +73,38 @@ export default function RegistroAnonimoScreen() {
             }
 
             setLoadingText('Creando sesión anónima...');
-            console.log('[REG_ANON] 2. Llamando a registrarAnonimo...');
-            const authResult = await AuthService.registrarAnonimo(nombre.trim(), resultadoSubida.url);
-            console.log('[REG_ANON] registrarAnonimo OK, user:', authResult.user?.id);
+            console.log('[REG_ANON] 2. Insertando en la tabla anonimos de Supabase...');
+            
+            // Registramos en la tabla anonimos de Supabase
+            const registroAnonimoCreado = await AuthService.registrarAnonimo(nombre.trim(), resultadoSubida.url);
+            console.log('[REG_ANON] Registro en tabla anonimos OK. ID generado:', registroAnonimoCreado.id);
 
-            setLoadingText('Cargando perfil...');
-            console.log('[REG_ANON] 3. Refrescando perfil...');
-            await refrescarPerfil();
-            console.log('[REG_ANON] refrescarPerfil OK');
-
+            // 🌟 CAMBIAMOS EL TEXTO DEL SPINNER (Ya no dice más nada de la mesa)
+            setLoadingText('Cargando ingreso...'); 
             await SoundService.reproducir('exito');
             showToast("success", "Acceso Concedido", `¡Hola ${nombre.trim()}! Perfil temporal creado.`);
 
-            const ruta = resolverRutaPorPerfil('cliente_anonimo');
-            console.log('[REG_ANON] 4. Redirigiendo a:', ruta);
-            router.replace(ruta);
+            // 🚀 APAGAMOS EL LOADING ANTES DE NAVEGAR
+            setLoading(false);
+
+            // 🚀 REDIRECCIÓN MANUAL FORZADA A TU HOME ANONIMO (LA PUERTA)
+            // Quitamos de en medio al resolverRutaPorPerfil para que no te tire a la mesa por descarte
+            router.replace({
+                pathname: "/(tabs)/homeAnonimo" as any, 
+                params: { 
+                    clienteId: registroAnonimoCreado.id,
+                    nombre: nombre.trim()
+                }
+            });
 
         } catch (error: any) {
-            console.log('[REG_ANON] ERROR:', error);
-            console.log('[REG_ANON] Error code:', error?.code);
-            console.log('[REG_ANON] Error message:', error?.message);
-            console.log('[REG_ANON] Error details:', error?.details);
-            console.log('[REG_ANON] Error hint:', error?.hint);
-
-            // Mostrar info detallada en el toast
+            console.log('[REG_ANON] ERROR EN EL FLUJO:', error);
+            
             let mensaje = error?.message || "Error desconocido";
             if (error?.code) mensaje += ` (código: ${error.code})`;
-            if (error?.hint) mensaje += `\nHint: ${error.hint}`;
 
             SoundService.reproducir('error');
-            showToast("error", `Error: ${error?.code || 'desconocido'}`, mensaje);
-        } finally {
+            showToast("error", "Error de Registro", mensaje);
             setLoading(false);
         }
     };

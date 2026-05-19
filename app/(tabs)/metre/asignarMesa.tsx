@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity, Modal, Alert } from 'react-native';
-import { supabase } from '@/src/services/SupabaseClient'; // necesario para Realtime
-import { MesaService } from '@/src/services/mesaService';
-import { ListaEsperaService } from '@/src/services/listaEsperaService';
 import LoadingModal from '@/src/components/LoadingModal';
-import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
-import * as Haptics from 'expo-haptics';
+import { supabase } from '@/src/services/SupabaseClient'; // necesario para Realtime
+import { ListaEsperaService } from '@/src/services/listaEsperaService';
+import { MesaService } from '@/src/services/mesaService';
 import { SoundService } from '@/src/services/soundService';
+import { Ionicons } from '@expo/vector-icons';
+import * as Haptics from 'expo-haptics';
+import { useRouter } from 'expo-router';
+import React, { useEffect, useState } from 'react';
+import { Alert, FlatList, Modal, Text, TouchableOpacity, View } from 'react-native';
 
 export default function AsignarMesaScreen() {
     const router = useRouter();
@@ -58,7 +58,6 @@ export default function AsignarMesaScreen() {
         await ListaEsperaService.asignarMesa(clienteSeleccionado.id, mesa.id);
 
         SoundService.reproducir('exito');
-        Alert.alert("Mesa Asignada", `La mesa número ${mesa.numero} fue otorgada con éxito.`);
         
         setModalVisible(false);
         setClienteSeleccionado(null);
