@@ -122,15 +122,37 @@ export const ListaEsperaService = {
    * Usada por asignarMesa.tsx al confirmar la asignación.
    */
   async asignarMesa(listaEsperaId: string, mesaId: string) {
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from('lista_espera')
       .update({
         estado: 'asignado',
         mesa_asignada: mesaId,
       })
-      .eq('id', listaEsperaId);
+      .eq('id', listaEsperaId)
+      .select('sesion_id')
+      .single();
 
     if (error) throw error;
+    return data?.sesion_id as string;
+  },
+
+  /**
+   * Obtiene el sesion_id activo para una mesa (estado='asignado' y qr escaneado).
+   * Usada por escanearMesa.tsx, chatMozo.tsx (mozo).
+   */
+  async obtenerSesionActiva(mesaId: string) {
+    const { data, error } = await supabase
+      .from('lista_espera')
+      .select('sesion_id')
+      .eq('mesa_asignada', mesaId)
+      .eq('estado', 'asignado')
+      .eq('qr_mesa_escaneado', true)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (error || !data) return null;
+    return data.sesion_id as string;
   },
 
   /**

@@ -1,4 +1,3 @@
-// app/(tabs)/mesa/chatMozo.tsx
 import { useToast } from "@/src/context/ToastContext";
 import { supabase } from '@/src/services/SupabaseClient';
 import { Ionicons } from '@expo/vector-icons';
@@ -9,22 +8,22 @@ import { FlatList, KeyboardAvoidingView, Platform, Text, TextInput, TouchableOpa
 interface Consulta {
     id: number;
     created_at: string;
-    id_anonimo: string | null;
-    id_registrado: string | null;
+    id_usuario: string;
     mesa_id: string;
     mensaje: string;
+    nombre_remitente: string;
 }
 
 export default function ChatMozoScreen() {
     const router = useRouter();
     const { showToast } = useToast();
-    
-    // Recibimos los UUIDs reales desde los parámetros de navegación
-    const { mesaId, numeroMesa, clienteId, tipoCliente } = useLocalSearchParams<{ 
-        mesaId: string; 
+
+    const { mesaId, numeroMesa, id_usuario, sesion_id, tipoCliente } = useLocalSearchParams<{
+        mesaId: string;
         numeroMesa: string;
-        clienteId?: string; // UUID de la tabla anonimos o usuarios
-        tipoCliente?: 'anonimo' | 'registrado'
+        id_usuario: string;
+        sesion_id: string;
+        tipoCliente?: 'anonimo' | 'registrado';
     }>();
 
     const [mensajes, setMensajes] = useState<Consulta[]>([]);
@@ -32,17 +31,24 @@ export default function ChatMozoScreen() {
     const [loading, setLoading] = useState(true);
     const flatListRef = useRef<FlatList>(null);
 
+    const miId = id_usuario;
+
+    const formatearHora = (ts: string) => {
+        if (!ts) return '';
+        const d = new Date(ts);
+        return d.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
+    };
+
     useEffect(() => {
-        if (!mesaId) return;
+        if (!sesion_id) return;
 
         fetchMensajes();
 
-        // ⚡ TIEMPO REAL: Escuchamos inserts en tu tabla consultas para esta mesa
         const channel = supabase
-            .channel(`chat_mesa_${mesaId}`)
+            .channel(`chat_sesion_${sesion_id}`)
             .on(
                 'postgres_changes',
-                { event: 'INSERT', schema: 'public', table: 'consultas', filter: `mesa_id=eq.${mesaId}` },
+                { event: 'INSERT', schema: 'public', table: 'consultas', filter: `sesion_id=eq.${sesion_id}` },
                 (payload) => {
                     const msg = payload.new as Consulta;
                     setMensajes((prev) => [...prev, msg]);
@@ -51,7 +57,7 @@ export default function ChatMozoScreen() {
             .subscribe();
 
         return () => { supabase.removeChannel(channel); };
-    }, [mesaId]);
+    }, [sesion_id]);
 
     const fetchMensajes = async () => {
         try {
@@ -59,7 +65,7 @@ export default function ChatMozoScreen() {
             const { data, error } = await supabase
                 .from('consultas')
                 .select('*')
-                .eq('mesa_id', mesaId)
+                .eq('sesion_id', sesion_id)
                 .order('created_at', { ascending: true });
 
             if (error) throw error;
@@ -72,21 +78,27 @@ export default function ChatMozoScreen() {
     };
 
     const handleEnviarMensaje = async () => {
-        if (!nuevoMensaje.trim() || !mesaId) return;
+        if (!nuevoMensaje.trim() || !sesion_id || !mesaId || !miId) return;
 
         try {
             const textoAEnviar = nuevoMensaje.trim();
             setNuevoMensaje('');
 
-            // Armamos el registro dinámico respetando tus claves foráneas
-            const registroInsert: any = {
+            const { data: userData } = await supabase
+                .from('usuarios')
+                .select('nombres')
+                .eq('id', miId)
+                .single();
+            const nombreRemitente = userData?.nombres || 'Cliente';
+
+            const { error } = await supabase.from('consultas').insert({
+                sesion_id,
                 mesa_id: mesaId,
                 mensaje: textoAEnviar,
-                id_anonimo: tipoCliente === 'anonimo' ? clienteId : null,
-                id_registrado: tipoCliente === 'registrado' ? clienteId : null
-            };
+                id_usuario: miId,
+                nombre_remitente: nombreRemitente,
+            });
 
-            const { error } = await supabase.from('consultas').insert(registroInsert);
             if (error) throw error;
         } catch (error: any) {
             showToast("error", "Error", "No se pudo enviar el mensaje.");
@@ -97,8 +109,8 @@ export default function ChatMozoScreen() {
         <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} className="flex-1 bg-primary pt-12">
             <View className="flex-row items-center px-6 mb-4 justify-between">
                 <View className="flex-row items-center">
-                    <TouchableOpacity 
-                        onPress={() => router.replace("/(tabs)/mesa/panelMesaCliente")} 
+                    <TouchableOpacity
+                        onPress={() => router.back()}
                         className="bg-secondary p-2.5 rounded-full mr-4"
                     >
                         <Ionicons name="arrow-back" size={18} color="#31603D" />
@@ -118,18 +130,20 @@ export default function ChatMozoScreen() {
                     showsVerticalScrollIndicator={false}
                     onContentSizeChange={() => flatListRef.current?.scrollToEnd({ animated: true })}
                     renderItem={({ item }) => {
-                        // Es cliente si alguno de los campos de ID tiene datos
-                        const esCliente = item.id_anonimo !== null || item.id_registrado !== null;
+                        const esMio = item.id_usuario === miId;
                         return (
-                            <View className={`flex-row ${esCliente ? 'justify-end' : 'justify-start'} mb-4`}>
+                            <View className={`flex-row ${esMio ? 'justify-end' : 'justify-start'} mb-4`}>
                                 <View className={`max-w-[80%] rounded-2xl px-4 py-3 shadow-sm ${
-                                    esCliente ? 'bg-primary rounded-tr-none' : 'bg-tertiary/20 rounded-tl-none border border-tertiary/30'
+                                    esMio ? 'bg-primary rounded-tr-none' : 'bg-tertiary/20 rounded-tl-none border border-tertiary/30'
                                 }`}>
-                                    <Text className={`text-[10px] uppercase font-black mb-1 ${esCliente ? 'text-tertiary' : 'text-primary'}`}>
-                                        {esCliente ? 'Tú' : 'Mozo'}
+                                    <Text className={`text-[10px] uppercase font-black mb-1 ${esMio ? 'text-tertiary' : 'text-primary'}`}>
+                                        {esMio ? 'Tú' : item.nombre_remitente}
                                     </Text>
-                                    <Text className={`text-sm font-medium ${esCliente ? 'text-white' : 'text-primary'}`}>
+                                    <Text className={`text-sm font-medium ${esMio ? 'text-white' : 'text-primary'}`}>
                                         {item.mensaje}
+                                    </Text>
+                                    <Text className={`text-[9px] mt-1 ${esMio ? 'text-white/40 text-right' : 'text-primary/40'}`}>
+                                        {formatearHora(item.created_at)}
                                     </Text>
                                 </View>
                             </View>
