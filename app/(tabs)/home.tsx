@@ -1,6 +1,7 @@
 // app/(tabs)/home.tsx
 import LoadingModal from "@/src/components/LoadingModal";
 import { AuthService } from "@/src/services/authService";
+import { NotificationService } from "@/src/services/notificationService";
 import { useToast } from "@/src/context/ToastContext";
 import { ListaEsperaService } from "@/src/services/listaEsperaService";
 import { SoundService } from "@/src/services/soundService";
@@ -113,6 +114,9 @@ export default function HomeEntradaScreen() {
           "Te has unido a la lista de espera con éxito.",
         );
 
+        // 🌟 DISPARADOR: Avisamos al Metre en segundo plano
+        NotificationService.notificarNuevoClienteEnEspera(currentNombre);
+
         router.replace({
           pathname: "/panelAccionesAnonimo" as any,
           params: {
@@ -135,6 +139,9 @@ export default function HomeEntradaScreen() {
           "¡Anunciado!",
           "Te has unido a la lista de espera. El Metre te asignará una mesa pronto.",
         );
+
+        // 🌟 DISPARADOR: Avisamos al Metre en segundo plano
+        NotificationService.notificarNuevoClienteEnEspera(currentNombre);
 
         router.replace({
           pathname: "/(tabs)/panelAccionesCliente",

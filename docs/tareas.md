@@ -23,7 +23,7 @@
 * Mostrar que queremos ingresar a la app y nos indica que no podemos ingresar aun. ✅
 ---
 6. Verificar ingreso del cliente registrado desde supervisor. ✅
-* Mostramos que nos llego una push notificación de que un cliente solicita acceso. ⏳
+* Mostramos que nos llego una push notificación de que un cliente solicita acceso. ✅
 * luego mostramos que dicho clientes aparece en la lista de "aprobar clientes" y que podemos aprobarlo o rechazarlo. ✅
 ---
 7. Rechazar a un cliente registrado desde admin. ✅
@@ -41,16 +41,16 @@
 9. Ingresar al local como cliente anonimo. ✅
 * Ingresamos nombre y foto y nos registramos. ✅
 * Mostramos que no necesitamos aprobación para ingresar. ✅
-* Antes de escanear el QR de entrada, procedemos a escanear el QR de cualquier mesa y vemos que la app nos indica que "debemos colocarnos en la lista de espera" ⏳
+* Antes de escanear el QR de entrada, procedemos a escanear el QR de cualquier mesa y vemos que la app nos indica que "debemos colocarnos en la lista de espera" ✅
 * Procedemos a escanear el QR de entrada y posteriormente visualizamos las encuestas de satisfacción previas. ✅
-* Luego, volvemos atras y nos colocamos en la "Lista de espera". ⏳
-* Desde el Metre vemos que nos llego una notificación indicando que hay un nuevo cliente en la lista de espera. ⏳
-* Desde el Metre verificamos que aparecemos en la lista de espera. ⏳
+* Luego, volvemos atras y nos colocamos en la "Lista de espera". ✅
+* Desde el Metre vemos que nos llego una notificación indicando que hay un nuevo cliente en la lista de espera. ✅
+* Desde el Metre verificamos que aparecemos en la lista de espera. ✅
 ---
 10. Asignar una mesa a un cliente registrado desde el Metre. ⏳
 * Continuando desde el punto 8. ⏳
-* Escaneamos el QR de entrada y rapidamente nos colocamos en la lista de espera. ⏳
-* Desde el Metre verificamos nuevamente que este cliente aparece en la lista de espera y le asignamos una mesa. ⏳
+* Escaneamos el QR de entrada y rapidamente nos colocamos en la lista de espera. ✅
+* Desde el Metre verificamos nuevamente que este cliente aparece en la lista de espera y le asignamos una mesa. ✅
 * El cliente recibe una notificación que indica cual mesa fue asignada. ⏳
 * Procedemos a escanear el QR de otra mesa, para mostrar que no nos podemos vincular a esa mesa (nos indica cual es). ⏳
 * Procedemos a escanear el QR de nuestra mesa y nos vinculamos correctamente. El cliente procede a ver el menú. ⏳

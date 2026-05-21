@@ -3,6 +3,7 @@ import { supabase } from '@/src/services/SupabaseClient'; // necesario para Real
 import { ListaEsperaService } from '@/src/services/listaEsperaService';
 import { MesaService } from '@/src/services/mesaService';
 import { SoundService } from '@/src/services/soundService';
+import { NotificationService } from '@/src/services/notificationService';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
@@ -58,6 +59,18 @@ export default function AsignarMesaScreen() {
         await ListaEsperaService.asignarMesa(clienteSeleccionado.id, mesa.id);
 
         SoundService.reproducir('exito');
+
+        console.log("=== DEBUG ASIGNACIÓN DE MESA ===");
+        console.log("1. Objeto completo del cliente:", JSON.stringify(clienteSeleccionado, null, 2));
+        console.log("2. Propiedad .id:", clienteSeleccionado.id);
+        console.log("3. Propiedad .cliente_id:", clienteSeleccionado.cliente_id);
+        console.log("================================");
+
+        // 🌟 DISPARADOR: Avisamos al Cliente que su mesa está lista
+        // Nota: Asegurate de usar el campo correcto que guarde el ID del usuario en tu tabla usuarios.
+        // Si tu ListaEsperaService.obtenerPendientes() devuelve el ID del usuario en una propiedad llamada 'usuario_id' o 'cliente_id', usá esa. 
+        // Si el clienteSeleccionado.id ya es el UUID del usuario, dejalo así:
+        NotificationService.notificarMesaAsignada(clienteSeleccionado.cliente_id, mesa.numero);
         
         setModalVisible(false);
         setClienteSeleccionado(null);
