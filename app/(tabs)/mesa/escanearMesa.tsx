@@ -60,13 +60,17 @@ export default function EscanearMesaScreen() {
             const qrLimpio = data.trim();
             console.log('[SCANNER_MESA] Procesando código leído:', qrLimpio);
 
-            // 🌟 CONSULTA ULTRA-FLEXIBLE: 
-            // Buscamos si el QR coincide con el ID (UUID) O con la columna qr_data (el deep link)
-            const { data: mesaEscaneada, error: dbError } = await supabase
-                .from('mesas')
-                .select('*')
-                .or(`id.eq.${qrLimpio},qr_data.eq.${qrLimpio}`) // Machea cualquiera de los dos formatos
-                .maybeSingle();
+            const esUUIDValido = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(qrLimpio);
+
+            let query = supabase.from('mesas').select('*');
+
+            if (esUUIDValido) {
+                query = query.or(`id.eq.${qrLimpio},qr_data.eq.${qrLimpio}`);
+            } else {
+                query = query.eq('qr_data', qrLimpio);
+            }
+
+            const { data: mesaEscaneada, error: dbError } = await query.maybeSingle();
 
             if (dbError) {
                 console.error("[SCANNER_MESA] Error en Supabase:", dbError);
@@ -74,20 +78,16 @@ export default function EscanearMesaScreen() {
             }
 
             if (!mesaEscaneada) {
-                // Si no la encuentra, te da el detalle exacto para que verifiques en el Table Editor
-                throw new Error(`Código inválido. No hay mesas con ID o QR_DATA igual a: [${qrLimpio}]`);
+                throw new Error("El código QR escaneado no pertenece a ninguna mesa de este restaurante.");
             }
 
             console.log('[SCANNER_MESA] ¡Mesa asociada exitosamente! Número:', mesaEscaneada.numero);
 
-            // ----------------------------------------------------------------------
-            // Todo tu bloque de redirección y bypass de abajo queda exactamente igual 👇
-            // ----------------------------------------------------------------------
             if (!mesaEsperadaId) {
                 await SoundService.reproducir('exito');
                 const sesionIdBypass = clienteId ? await ListaEsperaService.obtenerSesionActiva(mesaEscaneada.id) : null;
                 router.replace({
-                    pathname: "/(tabs)/mesa/panelMesaCliente",
+                    pathname: "/(tabs)/mesa/panelMesaCliente" as any,
                     params: { 
                         mesaId: mesaEscaneada.id, 
                         numeroMesa: mesaEscaneada.numero,
@@ -106,12 +106,12 @@ export default function EscanearMesaScreen() {
             }
 
             await SoundService.reproducir('exito');
-                if (clienteId) await ListaEsperaService.confirmarEscaneoMesa(clienteId);
+            if (clienteId) await ListaEsperaService.confirmarEscaneoMesa(clienteId);
 
             const sesionId = clienteId ? await ListaEsperaService.obtenerSesionActiva(mesaEscaneada.id) : null;
 
             router.replace({
-                pathname: "/(tabs)/mesa/panelMesaCliente",
+                pathname: "/(tabs)/mesa/panelMesaCliente" as any,
                 params: { mesaId: mesaEscaneada.id, numeroMesa: mesaEscaneada.numero, clienteId, sesion_id: sesionId || undefined }
             });
 

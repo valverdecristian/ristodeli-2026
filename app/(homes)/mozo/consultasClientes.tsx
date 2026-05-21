@@ -22,36 +22,39 @@ export default function ConsultasClientesScreen() {
         try {
             setLoading(true);
 
-            const { data: listaData, error: listaError } = await supabase
-                .from('lista_espera')
-                .select('sesion_id, mesa_asignada')
-                .eq('estado', 'asignado')
-                .eq('qr_mesa_escaneado', true);
+            // 🌟 NUEVO ENFOQUE: Buscamos directamente en la tabla de chats (consultas)
+            // Traemos todos los mensajes ordenados del más nuevo al más viejo, e incluimos el número de mesa
+            const { data: mensajesData, error: msgError } = await supabase
+                .from('consultas')
+                .select('sesion_id, mesa_id, mensaje, created_at, mesas(numero)')
+                .order('created_at', { ascending: false });
 
-            if (listaError) throw listaError;
-            if (!listaData || listaData.length === 0) {
+            if (msgError) throw msgError;
+
+            if (!mensajesData || mensajesData.length === 0) {
                 setSesiones([]);
                 return;
             }
 
-            const sesionesData = await Promise.all(
-                listaData.map(async (item) => {
-                    const [mesaResult, msgResult] = await Promise.all([
-                        supabase.from('mesas').select('numero').eq('id', item.mesa_asignada).single(),
-                        supabase.from('consultas').select('mensaje, created_at').eq('sesion_id', item.sesion_id).order('created_at', { ascending: false }).limit(1).maybeSingle(),
-                    ]);
+            // 🌟 AGRUPACIÓN INTELIGENTE: Filtramos para mostrar solo el ÚLTIMO mensaje de cada mesa
+            const mesasVistas = new Set();
+            const sesionesAgrupadas: SesionActiva[] = [];
 
-                    return {
-                        sesion_id: item.sesion_id,
-                        mesa_id: item.mesa_asignada,
-                        numero_mesa: mesaResult.data?.numero || 0,
-                        ultimo_mensaje: msgResult.data?.mensaje || '',
-                        ultima_actividad: msgResult.data?.created_at || '',
-                    };
-                })
-            );
+            mensajesData.forEach((msg: any) => {
+                // Si todavía no agregamos esta mesa a la lista, la metemos (como están ordenados, este será el último mensaje)
+                if (!mesasVistas.has(msg.mesa_id)) {
+                    mesasVistas.add(msg.mesa_id);
+                    sesionesAgrupadas.push({
+                        sesion_id: msg.sesion_id || msg.mesa_id, // Usamos el ID de mesa como respaldo
+                        mesa_id: msg.mesa_id,
+                        numero_mesa: msg.mesas?.numero || 0,
+                        ultimo_mensaje: msg.mensaje || '',
+                        ultima_actividad: msg.created_at || '',
+                    });
+                }
+            });
 
-            setSesiones(sesionesData);
+            setSesiones(sesionesAgrupadas);
         } catch (error) {
             console.error("Error al cargar sesiones activas:", error);
         } finally {

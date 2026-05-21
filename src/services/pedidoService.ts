@@ -40,19 +40,24 @@ export const PedidoService = {
   },
 
   /**
-   * Actualiza el estado de un conjunto de pedidos (por sus IDs) a un nuevo estado.
-   * - cocina usa: 'Listo Cocina'
-   * - bar usa: 'Listo Bar'
+   * Actualiza el estado de un conjunto de pedidos.
+   * Si es rechazado, se le puede pasar un motivo que se guardará concatenado.
    */
-  async actualizarEstado(ids: string[], nuevoEstado: string) {
+  async actualizarEstado(ids: string[], nuevoEstado: string, motivo?: string) {
+    // Si el mozo manda un motivo, lo guardamos como "Rechazado: [Motivo]"
+    let estadoFinal = nuevoEstado;
+    if (motivo && motivo.trim() !== '') {
+        estadoFinal = `${nuevoEstado}: ${motivo.trim()}`;
+    }
+
     const { error } = await supabase
       .from('pedidos')
-      .update({ estado: nuevoEstado }) //
-      .in('id', ids); //
+      .update({ estado: estadoFinal }) 
+      .in('id', ids); 
 
-    if (error) throw error; //
+    if (error) throw error; 
   },
-
+  
   /**
    * Inserta la comanda desde el celular del Cliente
    * Queda retenida en 'A Confirmar Mozo' cumpliendo el Punto 12 del PDF.

@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
 import { FlatList, KeyboardAvoidingView, Platform, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ListaEsperaService } from '@/src/services/listaEsperaService';
 
 interface Consulta {
     id: number;
@@ -18,11 +19,13 @@ export default function ChatMozoScreen() {
     const router = useRouter();
     const { showToast } = useToast();
 
-    const { mesaId, numeroMesa, id_usuario, sesion_id, tipoCliente } = useLocalSearchParams<{
+    // 🌟 CORRECCIÓN 1: Capturamos 'clienteId' como respaldo de 'id_usuario'
+    const { mesaId, numeroMesa, id_usuario, clienteId, sesion_id, tipoCliente } = useLocalSearchParams<{
         mesaId: string;
         numeroMesa: string;
-        id_usuario: string;
-        sesion_id: string;
+        id_usuario?: string;
+        clienteId?: string;
+        sesion_id?: string;
         tipoCliente?: 'anonimo' | 'registrado';
     }>();
 
@@ -31,7 +34,8 @@ export default function ChatMozoScreen() {
     const [loading, setLoading] = useState(true);
     const flatListRef = useRef<FlatList>(null);
 
-    const miId = id_usuario;
+    // 🌟 UNIFICACIÓN: miId usa el que venga disponible de los parámetros
+    const miId = id_usuario || clienteId;
 
     const formatearHora = (ts: string) => {
         if (!ts) return '';
@@ -40,15 +44,23 @@ export default function ChatMozoScreen() {
     };
 
     useEffect(() => {
-        if (!sesion_id) return;
+        // Si no hay sesión id (ej: entramos directo por falla del mozo), no rompemos el canal
+        const idCanal = sesion_id || mesaId; 
+        if (!idCanal) return;
 
         fetchMensajes();
 
         const channel = supabase
-            .channel(`chat_sesion_${sesion_id}`)
+            .channel(`chat_sesion_${idCanal}`)
             .on(
                 'postgres_changes',
-                { event: 'INSERT', schema: 'public', table: 'consultas', filter: `sesion_id=eq.${sesion_id}` },
+                // Si hay sesion_id filtramos por sesion, si no, filtramos por mesa_id como fallback
+                { 
+                    event: 'INSERT', 
+                    schema: 'public', 
+                    table: 'consultas', 
+                    filter: sesion_id ? `sesion_id=eq.${sesion_id}` : `mesa_id=eq.${mesaId}` 
+                },
                 (payload) => {
                     const msg = payload.new as Consulta;
                     setMensajes((prev) => [...prev, msg]);
@@ -57,17 +69,23 @@ export default function ChatMozoScreen() {
             .subscribe();
 
         return () => { supabase.removeChannel(channel); };
-    }, [sesion_id]);
+    }, [sesion_id, mesaId]);
 
     const fetchMensajes = async () => {
         try {
             setLoading(true);
-            const { data, error } = await supabase
-                .from('consultas')
-                .select('*')
-                .eq('sesion_id', sesion_id)
-                .order('created_at', { ascending: true });
+            let query = supabase.from('consultas').select('*').order('created_at', { ascending: true });
+            
+            // Usamos sesion_id si existe, si no usamos mesaId como plan B
+            if (sesion_id) {
+                query = query.eq('sesion_id', sesion_id);
+            } else if (mesaId) {
+                query = query.eq('mesa_id', mesaId);
+            } else {
+                return;
+            }
 
+            const { data, error } = await query;
             if (error) throw error;
             setMensajes(data || []);
         } catch (error: any) {
@@ -78,28 +96,54 @@ export default function ChatMozoScreen() {
     };
 
     const handleEnviarMensaje = async () => {
-        if (!nuevoMensaje.trim() || !sesion_id || !mesaId || !miId) return;
+        if (!nuevoMensaje.trim() || !mesaId) return;
 
         try {
             const textoAEnviar = nuevoMensaje.trim();
             setNuevoMensaje('');
 
-            const { data: userData } = await supabase
-                .from('usuarios')
-                .select('nombres')
-                .eq('id', miId)
-                .single();
-            const nombreRemitente = userData?.nombres || 'Cliente';
+            let sesionActiva = sesion_id;
+            if (!sesionActiva) {
+                console.log('[CHAT_MOZO] Modo Express: Usando mesaId como sesion_id...');
+                sesionActiva = mesaId; 
+            }
+
+            let nombreRemitente = 'Cliente Anónimo';
+            let idUsuarioParaInsertar = null; 
+
+            if (tipoCliente !== 'anonimo') {
+                idUsuarioParaInsertar = miId;
+                
+                const { data: userData } = await supabase
+                    .from('usuarios')
+                    .select('nombres')
+                    .eq('id', miId)
+                    .maybeSingle(); 
+                
+                if (userData?.nombres) {
+                    nombreRemitente = userData.nombres;
+                } else {
+                    nombreRemitente = 'Cliente';
+                }
+            } else {
+                nombreRemitente = 'Cliente (Express)';
+            }
 
             const { error } = await supabase.from('consultas').insert({
-                sesion_id,
+                sesion_id: sesionActiva,         
                 mesa_id: mesaId,
                 mensaje: textoAEnviar,
-                id_usuario: miId,
+                id_usuario: idUsuarioParaInsertar, 
                 nombre_remitente: nombreRemitente,
             });
 
-            if (error) throw error;
+            if (error) {
+                console.error("[CHAT] Error Supabase:", error);
+                throw error;
+            }
+            
+            console.log('[CHAT_MOZO] ¡Mensaje enviado con éxito!');
+            
         } catch (error: any) {
             showToast("error", "Error", "No se pudo enviar el mensaje.");
         }
