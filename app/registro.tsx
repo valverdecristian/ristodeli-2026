@@ -160,7 +160,7 @@ export default function RegistroScreen() {
 
             await SoundService.reproducir('exito');
             showToast('success', 'Registro enviado', 'Cuenta creada. Aguarda la aprobación del Supervisor.');
-            router.replace('/');
+            router.replace('/login');
 
         } catch (error: any) {
             setLoading(false);

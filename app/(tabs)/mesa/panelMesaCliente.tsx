@@ -17,34 +17,86 @@ export default function PanelMesaClienteScreen() {
     const [loading, setLoading] = useState(true);
     const [yaHizoEncuesta, setYaHizoEncuesta] = useState(false);
 
+    // Unificamos el número de mesa asegurándonos de que sea un número válido
+    const nroMesaInt = (numeroMesa && !isNaN(parseInt(numeroMesa as string, 10))) 
+        ? parseInt(numeroMesa as string, 10) 
+        : parseInt(mesaId as string, 10) || 21;
+
     useEffect(() => {
-            fetchEstadoActual();
-        
-            const channel = supabase
-            .channel('cambios_estadia')
+        fetchEstadoActual();
+    
+        const nombreCanal = `cambios_estadia_${Date.now()}`;
+        const channel = supabase
+            .channel(nombreCanal)
             .on(
                 'postgres_changes', 
-                { 
-                event: 'UPDATE', 
-                schema: 'public', 
-                table: 'pedidos', 
-                filter: `mesa_id=eq.${mesaId}` 
-                }, 
+                { event: '*', schema: 'public', table: 'pedidos' }, 
                 (payload: { [key: string]: any }) => { 
-                if (payload.new && payload.new.estado) {
-                    adaptarEstadoFlujo(payload.new.estado);
-                }
+                    // Filtramos internamente para evitar el bug de Replica Identity
+                    const mesaPayload = payload.new?.mesa_numero;
+                    if (mesaPayload && parseInt(mesaPayload, 10) === nroMesaInt) {
+                        if (payload.new?.estado) {
+                            console.log('[PANEL_MESA] Cambio detectado por el Mozo/Cocina:', payload.new.estado);
+                            adaptarEstadoFlujo(payload.new.estado);
+                        }
+                    }
                 }
             )
             .subscribe();
-        
-            return () => { 
+    
+        return () => { 
             supabase.removeChannel(channel); 
-            };
-    }, [mesaId]);
+        };
+    }, [mesaId, nroMesaInt]);
 
-    const fetchEstadoActual = async () => { setLoading(false); };
-    const adaptarEstadoFlujo = (estadoDB: string) => { /* ... mapeo de lógica ... */ };
+    // 🌟 1. BUSCAMOS LA VERDAD EN LA BASE DE DATOS
+    const fetchEstadoActual = async () => { 
+        try {
+            setLoading(true);
+            const { data, error } = await supabase
+                .from('pedidos')
+                .select('estado')
+                .eq('mesa_numero', nroMesaInt)
+                .order('created_at', { ascending: false }) // Traemos el pedido más reciente de esta mesa
+                .limit(1)
+                .maybeSingle();
+
+            if (error) throw error;
+
+            if (data && data.estado) {
+                console.log('[PANEL_MESA] Estado inicial de la mesa cargado:', data.estado);
+                adaptarEstadoFlujo(data.estado);
+            } else {
+                setEstado('inicial'); // Si no hay pedidos, es una mesa virgen
+            }
+        } catch (err) {
+            console.log("[PANEL_MESA] Error al cargar estado:", err);
+            setEstado('inicial');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // 🌟 2. MAPEO AUTOMÁTICO DE ESTADOS
+    const adaptarEstadoFlujo = (estadoDB: string) => { 
+        const e = estadoDB.toLowerCase();
+
+        if (e.includes('rechazado') || e.includes('cancelado')) {
+            setEstado('Rechazado Mozo');
+        } else if (e === 'pendiente' || e.includes('preparando')) {
+            setEstado('en_preparacion');
+        } else if (e.includes('listo')) {
+            setEstado('pedido_listo');
+        } else if (e === 'entregado') {
+            // 🌟 CAMBIO: Si el mozo marcó 'entregado', forzamos a 'comido' 
+            // para que aparezcan los botones de cuenta y encuesta automáticamente
+            setEstado('comido'); 
+        } else if (e === 'comido' || e === 'pagado') {
+            setEstado('comido');
+        } else {
+            setEstado('inicial'); 
+        }
+    };
 
     if (loading) {
         return <LoadingModal visible={true} message="Cargando tu mesa..." />;
@@ -53,7 +105,7 @@ export default function PanelMesaClienteScreen() {
     return (
         <ScrollView className="flex-1 bg-primary px-6 pt-6">
         <View className="bg-secondary p-4 rounded-3xl mb-6 items-center">
-            <Text className="text-primary font-black uppercase">Mesa Nº {mesaId}</Text>
+            <Text className="text-primary font-black uppercase">Mesa Nº {numeroMesa || mesaId}</Text>
         </View>
 
         {/* ────────── RENDEREADO CONDICIONAL DE BOTONES ────────── */}
@@ -68,8 +120,8 @@ export default function PanelMesaClienteScreen() {
             )}
             <TouchableOpacity 
                 onPress={() => router.push({ 
-                    pathname: "/(tabs)/mesa/menuProductos", 
-                    params: { mesaId: mesaId,numeroMesa: mesaId}})}
+                    pathname: "/(tabs)/mesa/menuProductos" as any, 
+                    params: { mesaId: mesaId, numeroMesa: numeroMesa || mesaId, clienteId: clienteId }})}
                 className="w-full bg-secondary py-5 rounded-[25px] items-center border border-tertiary/20 mb-4"
             >
                 <Text className="text-primary font-bold uppercase">Realizar / Modificar Pedido</Text>
@@ -77,8 +129,8 @@ export default function PanelMesaClienteScreen() {
 
             <TouchableOpacity 
                 onPress={() => router.push({ 
-                    pathname: "/(tabs)/mesa/chatMozo",
-                    params: { mesaId, numeroMesa, id_usuario: clienteId, sesion_id, tipoCliente }
+                    pathname: "/(tabs)/mesa/chatMozo" as any,
+                    params: { mesaId, numeroMesa, id_usuario: clienteId, clienteId, sesion_id, tipoCliente }
                 })}
                 className="w-full bg-secondary py-5 rounded-[25px] items-center border border-tertiary/20"
             >
@@ -91,7 +143,7 @@ export default function PanelMesaClienteScreen() {
         {estado === 'en_preparacion' && (
             <View className="space-y-4">
             <TouchableOpacity 
-                onPress={() => router.push("/(tabs)/mesa/estadoPedido")}
+                onPress={() => router.push("/(tabs)/mesa/estadoPedido" as any)}
                 className="w-full bg-secondary py-5 rounded-[25px] items-center border border-tertiary/20 mb-4"
             >
                 <Text className="text-primary font-bold uppercase">Ver Estado del Pedido</Text>
@@ -100,7 +152,7 @@ export default function PanelMesaClienteScreen() {
             {/* Juegos bloqueados si es anónimo */}
             <TouchableOpacity 
                 disabled={tipoCliente === 'anonimo'}
-                onPress={() => router.push("/(tabs)/mesa/juegos")}
+                onPress={() => router.push("/(juegos)/" as any)}
                 className={`w-full py-5 rounded-[25px] items-center border ${tipoCliente === 'anonimo' ? 'bg-gray-400 border-gray-500' : 'bg-tertiary border-orange'}`}
             >
                 <Text className={`font-bold uppercase ${tipoCliente === 'anonimo' ? 'text-gray-600' : 'text-primary'}`}>
@@ -129,7 +181,7 @@ export default function PanelMesaClienteScreen() {
             <View className="space-y-4">
             {!yaHizoEncuesta && (
                 <TouchableOpacity 
-                onPress={() => router.push("/(tabs)/mesa/formularioEncuesta")}
+                onPress={() => router.push("/(tabs)/mesa/formularioEncuesta" as any)}
                 className="w-full bg-secondary py-5 rounded-[25px] items-center border border-tertiary/20 mb-4"
                 >
                 <Text className="text-primary font-bold uppercase">Encuesta de Satisfacción</Text>
@@ -137,7 +189,7 @@ export default function PanelMesaClienteScreen() {
             )}
 
             <TouchableOpacity 
-                onPress={() => router.push({ pathname: "/(tabs)/mesa/pedirCuenta", params: { mesaId } })}
+                onPress={() => router.push({ pathname: "/(tabs)/mesa/pedirCuenta" as any, params: { mesaId } })}
                 className="w-full bg-tertiary py-5 rounded-[25px] items-center border-b-4 border-orange"
             >
                 <Text className="text-primary font-bold uppercase">Pedir la Cuenta</Text>

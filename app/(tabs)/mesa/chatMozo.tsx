@@ -4,7 +4,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
 import { FlatList, KeyboardAvoidingView, Platform, Text, TextInput, TouchableOpacity, View } from 'react-native';
-
 interface Consulta {
     id: number;
     created_at: string;
@@ -13,36 +12,31 @@ interface Consulta {
     mensaje: string;
     nombre_remitente: string;
 }
-
 export default function ChatMozoScreen() {
     const router = useRouter();
     const { showToast } = useToast();
-
-    const { mesaId, numeroMesa, id_usuario, sesion_id, tipoCliente } = useLocalSearchParams<{
+    const { mesaId, numeroMesa, id_usuario, clienteId, sesion_id, tipoCliente } = useLocalSearchParams<{
         mesaId: string;
         numeroMesa: string;
-        id_usuario: string;
-        sesion_id: string;
+        id_usuario?: string;
+        clienteId?: string;
+        sesion_id?: string;
         tipoCliente?: 'anonimo' | 'registrado';
     }>();
-
     const [mensajes, setMensajes] = useState<Consulta[]>([]);
     const [nuevoMensaje, setNuevoMensaje] = useState('');
     const [loading, setLoading] = useState(true);
     const [miNombre, setMiNombre] = useState<string>('Cliente');
     const flatListRef = useRef<FlatList>(null);
-
-    const miId = id_usuario;
-
+    const miId = id_usuario || clienteId;
     const formatearHora = (ts: string) => {
         if (!ts) return '';
         const d = new Date(ts);
         return d.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
     };
-
     useEffect(() => {
-        if (!sesion_id) return;
-
+        const idCanal = sesion_id || mesaId;
+        if (!idCanal) return;
         (async () => {
             if (miId && miNombre === 'Cliente') {
                 const { data: userData } = await supabase
@@ -56,33 +50,37 @@ export default function ChatMozoScreen() {
                 }
             }
         })();
-
         fetchMensajes();
-
         const channel = supabase
-            .channel(`chat_sesion_${sesion_id}`)
+            .channel(`chat_sesion_${idCanal}`)
             .on(
                 'postgres_changes',
-                { event: 'INSERT', schema: 'public', table: 'consultas', filter: `sesion_id=eq.${sesion_id}` },
+                {
+                    event: 'INSERT',
+                    schema: 'public',
+                    table: 'consultas',
+                    filter: sesion_id ? `sesion_id=eq.${sesion_id}` : `mesa_id=eq.${mesaId}`
+                },
                 (payload) => {
                     const msg = payload.new as Consulta;
                     setMensajes((prev) => prev.some(m => m.id === msg.id) ? prev : [...prev, msg]);
                 }
             )
             .subscribe();
-
         return () => { supabase.removeChannel(channel); };
-    }, [sesion_id]);
-
+    }, [sesion_id, mesaId]);
     const fetchMensajes = async () => {
         try {
             setLoading(true);
-            const { data, error } = await supabase
-                .from('consultas')
-                .select('*')
-                .eq('sesion_id', sesion_id)
-                .order('created_at', { ascending: true });
-
+            let query = supabase.from('consultas').select('*').order('created_at', { ascending: true });
+            if (sesion_id) {
+                query = query.eq('sesion_id', sesion_id);
+            } else if (mesaId) {
+                query = query.eq('mesa_id', mesaId);
+            } else {
+                return;
+            }
+            const { data, error } = await query;
             if (error) throw error;
             setMensajes(data || []);
         } catch (error: any) {
@@ -91,33 +89,35 @@ export default function ChatMozoScreen() {
             setLoading(false);
         }
     };
-
     const handleEnviarMensaje = async () => {
-        if (!nuevoMensaje.trim() || !sesion_id || !mesaId || !miId) return;
-
+        if (!nuevoMensaje.trim() || !mesaId || !miId) return;
         const textoAEnviar = nuevoMensaje.trim();
         setNuevoMensaje('');
-
-        // OPTIMISMO LOCAL: aparece al instante
+        let sesionActiva = sesion_id;
+        if (!sesionActiva) {
+            sesionActiva = mesaId;
+        }
+        let nombreRemitente = miNombre;
+        if (tipoCliente === 'anonimo') {
+            nombreRemitente = 'Cliente (Express)';
+        }
         const msgOptimista: Consulta = {
             id: Date.now(),
             created_at: new Date().toISOString(),
             id_usuario: miId,
             mesa_id: mesaId,
             mensaje: textoAEnviar,
-            nombre_remitente: miNombre,
+            nombre_remitente: nombreRemitente,
         };
         setMensajes(prev => [...prev, msgOptimista]);
-
         try {
             const { error } = await supabase.from('consultas').insert({
-                sesion_id,
+                sesion_id: sesionActiva,
                 mesa_id: mesaId,
                 mensaje: textoAEnviar,
                 id_usuario: miId,
-                nombre_remitente: miNombre,
+                nombre_remitente: nombreRemitente,
             });
-
             if (error) {
                 showToast("error", "Error", "No se pudo enviar el mensaje.");
                 setMensajes(prev => prev.filter(m => m.id !== msgOptimista.id));
@@ -127,7 +127,6 @@ export default function ChatMozoScreen() {
             setMensajes(prev => prev.filter(m => m.id !== msgOptimista.id));
         }
     };
-
     return (
         <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} className="flex-1 bg-primary pt-12">
             <View className="flex-row items-center px-6 mb-4 justify-between">
@@ -144,7 +143,6 @@ export default function ChatMozoScreen() {
                     </View>
                 </View>
             </View>
-
             <View className="flex-1 bg-secondary rounded-t-[32px] p-6 border-t border-tertiary/20">
                 <FlatList
                     ref={flatListRef}
@@ -172,7 +170,6 @@ export default function ChatMozoScreen() {
                         );
                     }}
                 />
-
                 <View className="flex-row items-center pt-3 border-t border-primary/5">
                     <TextInput
                         value={nuevoMensaje}

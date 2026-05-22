@@ -23,38 +23,42 @@ export default function ConsultasClientesScreen() {
         try {
             setLoading(true);
 
-            const { data: listaData, error: listaError } = await supabase
-                .from('lista_espera')
-                .select('sesion_id, mesa_asignada')
-                .eq('estado', 'asignado')
-                .eq('qr_mesa_escaneado', true);
+            // Buscamos directamente en la tabla de chats (consultas)
+            // Traemos todos los mensajes ordenados del más nuevo al más viejo, e incluimos el número de mesa
+            const { data: mensajesData, error: msgError } = await supabase
+                .from('consultas')
+                .select('sesion_id, mesa_id, mensaje, created_at, mesas(numero)')
+                .order('created_at', { ascending: false });
 
-            if (listaError) throw listaError;
-            if (!listaData || listaData.length === 0) {
+            if (msgError) throw msgError;
+
+            if (!mensajesData || mensajesData.length === 0) {
                 setSesiones([]);
                 return;
             }
 
-            const sesionesData = await Promise.all(
-                listaData.map(async (item) => {
-                    const [mesaResult, msgResult, unreadResult] = await Promise.all([
-                        supabase.from('mesas').select('numero').eq('id', item.mesa_asignada).single(),
-                        supabase.from('consultas').select('mensaje, created_at').eq('sesion_id', item.sesion_id).order('created_at', { ascending: false }).limit(1).maybeSingle(),
-                        supabase.from('consultas').select('id', { count: 'exact', head: true }).eq('sesion_id', item.sesion_id).eq('leido', false),
-                    ]);
-
-                    return {
-                        sesion_id: item.sesion_id,
-                        mesa_id: item.mesa_asignada,
-                        numero_mesa: mesaResult.data?.numero || 0,
-                        ultimo_mensaje: msgResult.data?.mensaje || '',
-                        ultima_actividad: msgResult.data?.created_at || '',
-                        no_leidos: unreadResult.count ?? 0,
-                    };
-                })
-            );
-
-            setSesiones(sesionesData);
+// AGRUPACION: ultimo mensaje por mesa + no leidos
+            const mesasVistas = new Set();
+            const sesionesAgrupadas: SesionActiva[] = [];
+            for (const msg of mensajesData) {
+                if (!mesasVistas.has(msg.mesa_id)) {
+                    mesasVistas.add(msg.mesa_id);
+                    const { count } = await supabase
+                        .from('consultas')
+                        .select('id', { count: 'exact', head: true })
+                        .eq('sesion_id', msg.sesion_id || msg.mesa_id)
+                        .eq('leido', false);
+                    sesionesAgrupadas.push({
+                        sesion_id: msg.sesion_id || msg.mesa_id,
+                        mesa_id: msg.mesa_id,
+                        numero_mesa: msg.mesas?.numero || 0,
+                        ultimo_mensaje: msg.mensaje || '',
+                        ultima_actividad: msg.created_at || '',
+                        no_leidos: count ?? 0,
+                    });
+                }
+            }
+            setSesiones(sesionesAgrupadas);
         } catch (error) {
             console.error("Error al cargar sesiones activas:", error);
         } finally {
