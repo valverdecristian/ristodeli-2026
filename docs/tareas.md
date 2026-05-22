@@ -47,11 +47,11 @@
 * Desde el Metre vemos que nos llego una notificación indicando que hay un nuevo cliente en la lista de espera. ✅
 * Desde el Metre verificamos que aparecemos en la lista de espera. ✅
 ---
-10. Asignar una mesa a un cliente registrado desde el Metre. ⏳
+10. Asignar una mesa a un cliente registrado desde el Metre. ✅
 * Continuando desde el punto 8. ⏳
 * Escaneamos el QR de entrada y rapidamente nos colocamos en la lista de espera. ✅
 * Desde el Metre verificamos nuevamente que este cliente aparece en la lista de espera y le asignamos una mesa. ✅
-* El cliente recibe una notificación que indica cual mesa fue asignada. ⏳
+* El cliente recibe una notificación que indica cual mesa fue asignada. ✅
 * Procedemos a escanear el QR de otra mesa, para mostrar que no nos podemos vincular a esa mesa (nos indica cual es). ⏳
 * Procedemos a escanear el QR de nuestra mesa y nos vinculamos correctamente. El cliente procede a ver el menú. ⏳
 * Mostramos que la mesa asignada no esta disponible para otro cliente. ⏳

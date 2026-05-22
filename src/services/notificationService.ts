@@ -240,14 +240,12 @@ export const NotificationService = {
   async notificarNuevoClienteEnEspera(nombreCliente: string): Promise<void> {
     try {
       const tokens = await NotificationService.obtenerTokensMetres();
-      if (tokens.length > 0) {
         await NotificationService.enviar(
           tokens,
-          'Nuevo cliente en puerta',
+          'Nuevo cliente en lista de espera',
           `${nombreCliente} ingresó a la lista de espera y aguarda una mesa.`,
           { pantalla: 'listaEspera' }
         );
-      }
     } catch (error) {
       console.error('[NotificationService] Error notificando al metre:', error);
     }
@@ -277,7 +275,7 @@ export const NotificationService = {
         // 🌟 Envolvemos el token en un array [token] porque enviar() espera un string[]
         await NotificationService.enviar(
           [token], 
-          '🍽️ ¡Tu mesa está lista!',
+          '¡Tu mesa está lista!',
           `El metre te ha asignado la Mesa ${numeroMesa}. Ya podés acercarte y escanear el QR en la mesa.`,
           { pantalla: 'homeCliente' } 
         );
