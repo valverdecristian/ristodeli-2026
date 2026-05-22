@@ -76,4 +76,34 @@ export const MesaService = {
     if (error || !data) return null;
     return data.numero;
   },
+
+  /**
+   * Obtiene la información del cliente asignado a una mesa desde lista_espera.
+   * Usada por EstadoMesas (metre) para mostrar quién ocupa la mesa.
+   */
+  async obtenerClienteDeMesa(mesaId: string) {
+    const { data, error } = await supabase
+      .from('lista_espera')
+      .select(`
+        cliente_id,
+        sesion_id,
+        usuarios!inner(nombres, apellidos, perfil)
+      `)
+      .eq('mesa_asignada', mesaId)
+      .eq('estado', 'asignado')
+      .limit(1)
+      .maybeSingle();
+
+    if (error || !data) return null;
+    const user = data.usuarios as any;
+    return {
+      sesion_id: data.sesion_id,
+      cliente_id: data.cliente_id,
+      esAnonimo: user.perfil === 'cliente_anonimo',
+      nombre: user.perfil === 'cliente_anonimo'
+        ? user.nombres
+        : `${user.nombres} ${user.apellidos || ''}`.trim(),
+      perfil: user.perfil,
+    };
+  },
 };

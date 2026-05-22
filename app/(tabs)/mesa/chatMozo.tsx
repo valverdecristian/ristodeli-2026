@@ -29,6 +29,7 @@ export default function ChatMozoScreen() {
     const [mensajes, setMensajes] = useState<Consulta[]>([]);
     const [nuevoMensaje, setNuevoMensaje] = useState('');
     const [loading, setLoading] = useState(true);
+    const [miNombre, setMiNombre] = useState<string>('Cliente');
     const flatListRef = useRef<FlatList>(null);
 
     const miId = id_usuario;
@@ -42,6 +43,20 @@ export default function ChatMozoScreen() {
     useEffect(() => {
         if (!sesion_id) return;
 
+        (async () => {
+            if (miId && miNombre === 'Cliente') {
+                const { data: userData } = await supabase
+                    .from('usuarios')
+                    .select('nombres, apellidos')
+                    .eq('id', miId)
+                    .single();
+                if (userData) {
+                    const nombre = `${userData.nombres} ${userData.apellidos || ''}`.trim();
+                    setMiNombre(nombre);
+                }
+            }
+        })();
+
         fetchMensajes();
 
         const channel = supabase
@@ -51,7 +66,7 @@ export default function ChatMozoScreen() {
                 { event: 'INSERT', schema: 'public', table: 'consultas', filter: `sesion_id=eq.${sesion_id}` },
                 (payload) => {
                     const msg = payload.new as Consulta;
-                    setMensajes((prev) => [...prev, msg]);
+                    setMensajes((prev) => prev.some(m => m.id === msg.id) ? prev : [...prev, msg]);
                 }
             )
             .subscribe();
@@ -80,28 +95,36 @@ export default function ChatMozoScreen() {
     const handleEnviarMensaje = async () => {
         if (!nuevoMensaje.trim() || !sesion_id || !mesaId || !miId) return;
 
+        const textoAEnviar = nuevoMensaje.trim();
+        setNuevoMensaje('');
+
+        // OPTIMISMO LOCAL: aparece al instante
+        const msgOptimista: Consulta = {
+            id: Date.now(),
+            created_at: new Date().toISOString(),
+            id_usuario: miId,
+            mesa_id: mesaId,
+            mensaje: textoAEnviar,
+            nombre_remitente: miNombre,
+        };
+        setMensajes(prev => [...prev, msgOptimista]);
+
         try {
-            const textoAEnviar = nuevoMensaje.trim();
-            setNuevoMensaje('');
-
-            const { data: userData } = await supabase
-                .from('usuarios')
-                .select('nombres')
-                .eq('id', miId)
-                .single();
-            const nombreRemitente = userData?.nombres || 'Cliente';
-
             const { error } = await supabase.from('consultas').insert({
                 sesion_id,
                 mesa_id: mesaId,
                 mensaje: textoAEnviar,
                 id_usuario: miId,
-                nombre_remitente: nombreRemitente,
+                nombre_remitente: miNombre,
             });
 
-            if (error) throw error;
+            if (error) {
+                showToast("error", "Error", "No se pudo enviar el mensaje.");
+                setMensajes(prev => prev.filter(m => m.id !== msgOptimista.id));
+            }
         } catch (error: any) {
             showToast("error", "Error", "No se pudo enviar el mensaje.");
+            setMensajes(prev => prev.filter(m => m.id !== msgOptimista.id));
         }
     };
 

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity, Image } from 'react-native';
-import { supabase } from '@/src/services/SupabaseClient'; // necesario para Realtime
+import { View, Text, FlatList, TouchableOpacity, Image, Modal, Switch, ActivityIndicator } from 'react-native';
+import { supabase } from '@/src/services/SupabaseClient';
 import { MesaService } from '@/src/services/mesaService';
 import LoadingModal from '@/src/components/LoadingModal';
 import { Ionicons } from '@expo/vector-icons';
@@ -11,6 +11,11 @@ export default function EstadoMesasScreen() {
     const router = useRouter();
     const [loading, setLoading] = useState(true);
     const [mesas, setMesas] = useState<any[]>([]);
+    const [modalVisible, setModalVisible] = useState(false);
+    const [mesaModal, setMesaModal] = useState<any>(null);
+    const [clienteInfo, setClienteInfo] = useState<any>(null);
+    const [nuevoEstado, setNuevoEstado] = useState<string>('Libre');
+    const [cargandoCliente, setCargandoCliente] = useState(false);
 
     useEffect(() => {
         fetchEstadoMesas();
@@ -37,6 +42,52 @@ export default function EstadoMesasScreen() {
           setLoading(false);
         }
       };
+
+    const handleAbrirModal = async (mesa: any) => {
+      setMesaModal(mesa);
+      setNuevoEstado(mesa.estado);
+      setClienteInfo(null);
+      setModalVisible(true);
+
+      if (mesa.estado === 'Ocupada') {
+        setCargandoCliente(true);
+        const info = await MesaService.obtenerClienteDeMesa(mesa.id);
+        setClienteInfo(info);
+        setCargandoCliente(false);
+      }
+    };
+
+    const handleAceptar = async () => {
+      if (nuevoEstado === mesaModal.estado) {
+        setModalVisible(false);
+        return;
+      }
+
+      if (nuevoEstado === 'Libre' && mesaModal.estado === 'Ocupada') {
+        const { data: asignacion } = await supabase
+          .from('lista_espera')
+          .select('sesion_id')
+          .eq('mesa_asignada', mesaModal.id)
+          .eq('estado', 'asignado')
+          .maybeSingle();
+
+        if (asignacion?.sesion_id) {
+          await supabase
+            .from('lista_espera')
+            .update({ estado: 'finalizado' })
+            .eq('sesion_id', asignacion.sesion_id);
+          await supabase
+            .from('consultas')
+            .delete()
+            .eq('sesion_id', asignacion.sesion_id);
+        }
+
+        await MesaService.actualizarEstado(mesaModal.id, 'Libre');
+      }
+
+      setModalVisible(false);
+      fetchEstadoMesas();
+    };
 
     const handleRefreshVisual = () => {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -85,13 +136,14 @@ export default function EstadoMesasScreen() {
                 const estaLibre = item.estado?.toLowerCase() === 'libre';
 
                 return (
-                <View 
+                <TouchableOpacity
+                    onPress={() => handleAbrirModal(item)}
+                    activeOpacity={0.7}
                     style={{ elevation: 2 }}
                     className={`bg-secondary w-[48%] mb-5 rounded-[28px] overflow-hidden border-2 shadow-sm ${
                     estaLibre ? 'border-emerald-500/30' : 'border-red-500/30'
                     }`}
                 >
-                    {/* Contenedor de la Foto de la Mesa */}
                     <View className="w-full h-28 bg-primary/10 relative">
                     {item.foto ? (
                         <Image 
@@ -105,7 +157,6 @@ export default function EstadoMesasScreen() {
                         </View>
                     )}
 
-                    {/* Badge de Estado Absoluto sobre la foto */}
                     <View className={`absolute top-2 right-2 px-2 py-1 rounded-full border ${
                         estaLibre ? 'bg-emerald-100 border-emerald-400' : 'bg-red-100 border-red-400'
                     }`}>
@@ -117,7 +168,6 @@ export default function EstadoMesasScreen() {
                     </View>
                     </View>
 
-                    {/* Detalles de la Mesa */}
                     <View className="p-4 bg-secondary">
                     <View className="flex-row justify-between items-center mb-1">
                         <Text className="text-primary font-black text-base uppercase">Mesa {item.numero}</Text>
@@ -137,11 +187,102 @@ export default function EstadoMesasScreen() {
                         Tipo: {item.tipo}
                     </Text>
                     </View>
-                </View>
+                </TouchableOpacity>
                 );
             }}
             />
         )}
+
+        <Modal visible={modalVisible} transparent animationType="fade" onRequestClose={() => setModalVisible(false)}>
+          <View className="flex-1 bg-black/50 justify-center items-center px-6">
+            <View className="bg-secondary w-full max-w-sm rounded-[28px] overflow-hidden">
+              {mesaModal && (
+                <>
+                  <View className="w-full h-36 bg-primary/10 relative">
+                    {mesaModal.foto ? (
+                      <Image source={{ uri: mesaModal.foto }} className="w-full h-full" resizeMode="cover" />
+                    ) : (
+                      <View className="w-full h-full justify-center items-center bg-tertiary/10">
+                        <Ionicons name="camera-outline" size={40} color="#31603D/40" />
+                      </View>
+                    )}
+                  </View>
+
+                  <View className="p-5">
+                    <View className="flex-row justify-between items-center mb-1">
+                      <Text className="text-primary font-black text-lg uppercase">Mesa {mesaModal.numero}</Text>
+                      {mesaModal.tipo?.toLowerCase() === 'vip' && (
+                        <Ionicons name="star" size={16} color="#F5C065" />
+                      )}
+                    </View>
+                    <View className="flex-row items-center mb-3">
+                      <Ionicons name="people" size={13} color="#6E433D" style={{ marginRight: 4 }} />
+                      <Text className="text-tertiary text-xs font-bold uppercase">Capacidad: {mesaModal.comensales} comensales</Text>
+                    </View>
+
+                    <View className="h-px bg-primary/10 my-3" />
+
+                    <Text className="text-primary font-bold text-xs uppercase tracking-wider mb-2">Cliente</Text>
+                    {cargandoCliente ? (
+                      <View className="flex-row items-center py-2">
+                        <ActivityIndicator size="small" color="#31603D" />
+                        <Text className="text-tertiary text-xs font-bold ml-2">Cargando cliente...</Text>
+                      </View>
+                    ) : mesaModal.estado === 'Ocupada' && clienteInfo ? (
+                      <View className="flex-row items-center py-2">
+                        <View className="w-8 h-8 rounded-full bg-primary/10 justify-center items-center mr-3">
+                          <Ionicons name="person" size={16} color="#31603D" />
+                        </View>
+                        <View>
+                          <Text className="text-primary font-bold text-sm">{clienteInfo.nombre}</Text>
+                          <Text className="text-tertiary text-[10px] font-bold uppercase">
+                            {clienteInfo.esAnonimo ? 'Cliente Anónimo' : 'Cliente Registrado'}
+                          </Text>
+                        </View>
+                      </View>
+                    ) : (
+                      <View className="flex-row items-center py-2">
+                        <View className="w-8 h-8 rounded-full bg-primary/10 justify-center items-center mr-3">
+                          <Ionicons name="person-outline" size={16} color="#31603D" />
+                        </View>
+                        <Text className="text-tertiary text-xs font-bold">Sin cliente</Text>
+                      </View>
+                    )}
+
+                    <View className="h-px bg-primary/10 my-3" />
+
+                    <Text className="text-primary font-bold text-xs uppercase tracking-wider mb-3">Estado</Text>
+                    <View className="flex-row items-center justify-between bg-primary/5 rounded-xl px-4 py-3">
+                      <Text className={`text-xs font-black uppercase tracking-wider ${nuevoEstado === 'Libre' ? 'text-emerald-600' : 'text-tertiary'}`}>Libre</Text>
+                      <Switch
+                        value={nuevoEstado === 'Ocupada'}
+                        onValueChange={(val) => setNuevoEstado(val ? 'Ocupada' : 'Libre')}
+                        trackColor={{ false: '#4ADE80', true: '#F87171' }}
+                        thumbColor="#31603D"
+                      />
+                      <Text className={`text-xs font-black uppercase tracking-wider ${nuevoEstado === 'Ocupada' ? 'text-red-500' : 'text-tertiary'}`}>Ocupada</Text>
+                    </View>
+
+                    <View className="flex-row justify-end mt-5 gap-3">
+                      <TouchableOpacity
+                        onPress={() => setModalVisible(false)}
+                        className="bg-primary/10 py-3 px-6 rounded-full"
+                      >
+                        <Text className="text-primary font-bold text-xs uppercase">Cancelar</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        onPress={handleAceptar}
+                        className="bg-primary py-3 px-6 rounded-full"
+                      >
+                        <Text className="text-white font-bold text-xs uppercase">Aceptar</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                </>
+              )}
+            </View>
+          </View>
+        </Modal>
         </View>
     );
 }

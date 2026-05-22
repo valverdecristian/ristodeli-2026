@@ -12,6 +12,7 @@ interface HomeButton {
   title: string;
   icon: string; 
   onPress: () => void;
+  badge?: number;
 }
 
 interface HomeBaseProps {
@@ -79,6 +80,11 @@ export default function HomeBase({ roleTitle, buttons }: HomeBaseProps) {
               style={{ elevation: 8 }} 
               className="bg-tertiary w-[47%] aspect-square rounded-[35px] p-4 items-center justify-center mb-6 shadow-xl active:bg-secondary"
             >
+              {btn.badge ? (
+                <View className="absolute -top-2 -right-2 bg-red-500 rounded-full w-7 h-7 items-center justify-center z-10 shadow-lg border-2 border-tertiary">
+                  <Text className="text-white font-black text-[11px]">{btn.badge > 99 ? '99+' : btn.badge}</Text>
+                </View>
+              ) : null}
               <View className="bg-primary/10 p-4 rounded-full mb-3">
                 <Ionicons name={btn.icon as any} size={42} color="#31603D" />
               </View>
