@@ -4,8 +4,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
 import { FlatList, KeyboardAvoidingView, Platform, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { ListaEsperaService } from '@/src/services/listaEsperaService';
-
 interface Consulta {
     id: number;
     created_at: string;
@@ -14,12 +12,9 @@ interface Consulta {
     mensaje: string;
     nombre_remitente: string;
 }
-
 export default function ChatMozoScreen() {
     const router = useRouter();
     const { showToast } = useToast();
-
-    // 🌟 CORRECCIÓN 1: Capturamos 'clienteId' como respaldo de 'id_usuario'
     const { mesaId, numeroMesa, id_usuario, clienteId, sesion_id, tipoCliente } = useLocalSearchParams<{
         mesaId: string;
         numeroMesa: string;
@@ -28,55 +23,56 @@ export default function ChatMozoScreen() {
         sesion_id?: string;
         tipoCliente?: 'anonimo' | 'registrado';
     }>();
-
     const [mensajes, setMensajes] = useState<Consulta[]>([]);
     const [nuevoMensaje, setNuevoMensaje] = useState('');
     const [loading, setLoading] = useState(true);
+    const [miNombre, setMiNombre] = useState<string>('Cliente');
     const flatListRef = useRef<FlatList>(null);
-
-    // 🌟 UNIFICACIÓN: miId usa el que venga disponible de los parámetros
     const miId = id_usuario || clienteId;
-
     const formatearHora = (ts: string) => {
         if (!ts) return '';
         const d = new Date(ts);
         return d.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
     };
-
     useEffect(() => {
-        // Si no hay sesión id (ej: entramos directo por falla del mozo), no rompemos el canal
-        const idCanal = sesion_id || mesaId; 
+        const idCanal = sesion_id || mesaId;
         if (!idCanal) return;
-
+        (async () => {
+            if (miId && miNombre === 'Cliente') {
+                const { data: userData } = await supabase
+                    .from('usuarios')
+                    .select('nombres, apellidos')
+                    .eq('id', miId)
+                    .single();
+                if (userData) {
+                    const nombre = `${userData.nombres} ${userData.apellidos || ''}`.trim();
+                    setMiNombre(nombre);
+                }
+            }
+        })();
         fetchMensajes();
-
         const channel = supabase
             .channel(`chat_sesion_${idCanal}`)
             .on(
                 'postgres_changes',
-                // Si hay sesion_id filtramos por sesion, si no, filtramos por mesa_id como fallback
-                { 
-                    event: 'INSERT', 
-                    schema: 'public', 
-                    table: 'consultas', 
-                    filter: sesion_id ? `sesion_id=eq.${sesion_id}` : `mesa_id=eq.${mesaId}` 
+                {
+                    event: 'INSERT',
+                    schema: 'public',
+                    table: 'consultas',
+                    filter: sesion_id ? `sesion_id=eq.${sesion_id}` : `mesa_id=eq.${mesaId}`
                 },
                 (payload) => {
                     const msg = payload.new as Consulta;
-                    setMensajes((prev) => [...prev, msg]);
+                    setMensajes((prev) => prev.some(m => m.id === msg.id) ? prev : [...prev, msg]);
                 }
             )
             .subscribe();
-
         return () => { supabase.removeChannel(channel); };
     }, [sesion_id, mesaId]);
-
     const fetchMensajes = async () => {
         try {
             setLoading(true);
             let query = supabase.from('consultas').select('*').order('created_at', { ascending: true });
-            
-            // Usamos sesion_id si existe, si no usamos mesaId como plan B
             if (sesion_id) {
                 query = query.eq('sesion_id', sesion_id);
             } else if (mesaId) {
@@ -84,7 +80,6 @@ export default function ChatMozoScreen() {
             } else {
                 return;
             }
-
             const { data, error } = await query;
             if (error) throw error;
             setMensajes(data || []);
@@ -94,61 +89,44 @@ export default function ChatMozoScreen() {
             setLoading(false);
         }
     };
-
     const handleEnviarMensaje = async () => {
-        if (!nuevoMensaje.trim() || !mesaId) return;
-
+        if (!nuevoMensaje.trim() || !mesaId || !miId) return;
+        const textoAEnviar = nuevoMensaje.trim();
+        setNuevoMensaje('');
+        let sesionActiva = sesion_id;
+        if (!sesionActiva) {
+            sesionActiva = mesaId;
+        }
+        let nombreRemitente = miNombre;
+        if (tipoCliente === 'anonimo') {
+            nombreRemitente = 'Cliente (Express)';
+        }
+        const msgOptimista: Consulta = {
+            id: Date.now(),
+            created_at: new Date().toISOString(),
+            id_usuario: miId,
+            mesa_id: mesaId,
+            mensaje: textoAEnviar,
+            nombre_remitente: nombreRemitente,
+        };
+        setMensajes(prev => [...prev, msgOptimista]);
         try {
-            const textoAEnviar = nuevoMensaje.trim();
-            setNuevoMensaje('');
-
-            let sesionActiva = sesion_id;
-            if (!sesionActiva) {
-                console.log('[CHAT_MOZO] Modo Express: Usando mesaId como sesion_id...');
-                sesionActiva = mesaId; 
-            }
-
-            let nombreRemitente = 'Cliente Anónimo';
-            let idUsuarioParaInsertar = null; 
-
-            if (tipoCliente !== 'anonimo') {
-                idUsuarioParaInsertar = miId;
-                
-                const { data: userData } = await supabase
-                    .from('usuarios')
-                    .select('nombres')
-                    .eq('id', miId)
-                    .maybeSingle(); 
-                
-                if (userData?.nombres) {
-                    nombreRemitente = userData.nombres;
-                } else {
-                    nombreRemitente = 'Cliente';
-                }
-            } else {
-                nombreRemitente = 'Cliente (Express)';
-            }
-
             const { error } = await supabase.from('consultas').insert({
-                sesion_id: sesionActiva,         
+                sesion_id: sesionActiva,
                 mesa_id: mesaId,
                 mensaje: textoAEnviar,
-                id_usuario: idUsuarioParaInsertar, 
+                id_usuario: miId,
                 nombre_remitente: nombreRemitente,
             });
-
             if (error) {
-                console.error("[CHAT] Error Supabase:", error);
-                throw error;
+                showToast("error", "Error", "No se pudo enviar el mensaje.");
+                setMensajes(prev => prev.filter(m => m.id !== msgOptimista.id));
             }
-            
-            console.log('[CHAT_MOZO] ¡Mensaje enviado con éxito!');
-            
         } catch (error: any) {
             showToast("error", "Error", "No se pudo enviar el mensaje.");
+            setMensajes(prev => prev.filter(m => m.id !== msgOptimista.id));
         }
     };
-
     return (
         <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} className="flex-1 bg-primary pt-12">
             <View className="flex-row items-center px-6 mb-4 justify-between">
@@ -165,7 +143,6 @@ export default function ChatMozoScreen() {
                     </View>
                 </View>
             </View>
-
             <View className="flex-1 bg-secondary rounded-t-[32px] p-6 border-t border-tertiary/20">
                 <FlatList
                     ref={flatListRef}
@@ -177,9 +154,8 @@ export default function ChatMozoScreen() {
                         const esMio = item.id_usuario === miId;
                         return (
                             <View className={`flex-row ${esMio ? 'justify-end' : 'justify-start'} mb-4`}>
-                                <View className={`max-w-[80%] rounded-2xl px-4 py-3 shadow-sm ${
-                                    esMio ? 'bg-primary rounded-tr-none' : 'bg-tertiary/20 rounded-tl-none border border-tertiary/30'
-                                }`}>
+                                <View className={`max-w-[80%] rounded-2xl px-4 py-3 shadow-sm ${esMio ? 'bg-primary rounded-tr-none' : 'bg-tertiary/20 rounded-tl-none border border-tertiary/30'
+                                    }`}>
                                     <Text className={`text-[10px] uppercase font-black mb-1 ${esMio ? 'text-tertiary' : 'text-primary'}`}>
                                         {esMio ? 'Tú' : item.nombre_remitente}
                                     </Text>
@@ -194,7 +170,6 @@ export default function ChatMozoScreen() {
                         );
                     }}
                 />
-
                 <View className="flex-row items-center pt-3 border-t border-primary/5">
                     <TextInput
                         value={nuevoMensaje}

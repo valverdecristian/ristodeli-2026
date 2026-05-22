@@ -2,7 +2,7 @@ import { supabase } from "@/src/services/SupabaseClient";
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { FlatList, Modal, Text, TouchableOpacity, View, Image } from 'react-native';
+import { FlatList, Image, Modal, Text, TouchableOpacity, View } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -19,7 +19,7 @@ export default function ListadoMesas() {
 
   const renderMesa = ({ item }: { item: any }) => (
     <View style={{ width: '47%', marginBottom: 20 }} className="bg-secondary rounded-[25px] overflow-hidden shadow-lg">
-      
+
       {/* 1. Foto de la Mesa con Botón QR Flotante */}
       <View className="relative w-full h-32 bg-primary/20">
         {item.foto ? (
@@ -29,8 +29,8 @@ export default function ListadoMesas() {
             <Ionicons name="image-outline" size={32} color="#31603D" style={{ opacity: 0.3 }} />
           </View>
         )}
-        
-        <TouchableOpacity 
+
+        <TouchableOpacity
           className="absolute top-2 right-2 bg-tertiary p-2 rounded-full shadow-lg"
           style={{ elevation: 5 }}
           onPress={() => setMesaQR(item)}
@@ -42,7 +42,7 @@ export default function ListadoMesas() {
       {/* 2. Información de la Mesa */}
       <View className="p-4 items-center">
         <Text className="text-primary font-black text-xl uppercase tracking-tighter">Mesa {item.numero}</Text>
-        
+
         <View className="flex-row items-center mt-1">
           <Ionicons name={item.tipo === 'vip' ? 'star' : 'restaurant'} size={12} color="#31603D" />
           <Text className="text-primary/70 font-bold uppercase text-[10px] ml-1">
@@ -62,7 +62,7 @@ export default function ListadoMesas() {
 
   return (
     <SafeAreaView className="flex-1 bg-primary">
-      
+
       {/* HEADER CORREGIDO: pt-4 y pb-5 para igualar a alta-mesa */}
       <View className="bg-tertiary px-6 pt-4 pb-5 flex-row items-center justify-between shadow-2xl">
         <View className="flex-row items-center">
@@ -101,7 +101,7 @@ export default function ListadoMesas() {
             {mesaQR && (
               <>
                 <View className="bg-secondary p-4 rounded-2xl mb-4">
-                   <QRCode value={mesaQR.qr_data} size={200} color="#31603D" backgroundColor="#F8EECB" />
+                  <QRCode value={mesaQR.qr_data} size={200} color="#31603D" backgroundColor="#F8EECB" />
                 </View>
                 <Text className="text-secondary font-black text-3xl mt-2 uppercase tracking-tighter">Mesa {mesaQR.numero}</Text>
                 <Text className="text-secondary/70 font-bold uppercase text-sm mt-1">
@@ -112,7 +112,7 @@ export default function ListadoMesas() {
           </View>
         </View>
       </Modal>
-      
+
     </SafeAreaView>
   );
 }

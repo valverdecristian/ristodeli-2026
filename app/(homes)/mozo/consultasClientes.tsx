@@ -10,6 +10,7 @@ interface SesionActiva {
     numero_mesa: number;
     ultimo_mensaje: string;
     ultima_actividad: string;
+    no_leidos: number;
 }
 
 export default function ConsultasClientesScreen() {
@@ -22,7 +23,7 @@ export default function ConsultasClientesScreen() {
         try {
             setLoading(true);
 
-            // 🌟 NUEVO ENFOQUE: Buscamos directamente en la tabla de chats (consultas)
+            // Buscamos directamente en la tabla de chats (consultas)
             // Traemos todos los mensajes ordenados del más nuevo al más viejo, e incluimos el número de mesa
             const { data: mensajesData, error: msgError } = await supabase
                 .from('consultas')
@@ -36,24 +37,27 @@ export default function ConsultasClientesScreen() {
                 return;
             }
 
-            // 🌟 AGRUPACIÓN INTELIGENTE: Filtramos para mostrar solo el ÚLTIMO mensaje de cada mesa
+// AGRUPACION: ultimo mensaje por mesa + no leidos
             const mesasVistas = new Set();
             const sesionesAgrupadas: SesionActiva[] = [];
-
-            mensajesData.forEach((msg: any) => {
-                // Si todavía no agregamos esta mesa a la lista, la metemos (como están ordenados, este será el último mensaje)
+            for (const msg of mensajesData) {
                 if (!mesasVistas.has(msg.mesa_id)) {
                     mesasVistas.add(msg.mesa_id);
+                    const { count } = await supabase
+                        .from('consultas')
+                        .select('id', { count: 'exact', head: true })
+                        .eq('sesion_id', msg.sesion_id || msg.mesa_id)
+                        .eq('leido', false);
                     sesionesAgrupadas.push({
-                        sesion_id: msg.sesion_id || msg.mesa_id, // Usamos el ID de mesa como respaldo
+                        sesion_id: msg.sesion_id || msg.mesa_id,
                         mesa_id: msg.mesa_id,
                         numero_mesa: msg.mesas?.numero || 0,
                         ultimo_mensaje: msg.mensaje || '',
                         ultima_actividad: msg.created_at || '',
+                        no_leidos: count ?? 0,
                     });
                 }
-            });
-
+            }
             setSesiones(sesionesAgrupadas);
         } catch (error) {
             console.error("Error al cargar sesiones activas:", error);
@@ -62,13 +66,21 @@ export default function ConsultasClientesScreen() {
         }
     };
 
+    const marcarLeido = async (sesionId: string) => {
+        await supabase
+            .from('consultas')
+            .update({ leido: true })
+            .eq('sesion_id', sesionId)
+            .eq('leido', false);
+    };
+
     useEffect(() => {
         cargarSesionesActivas();
 
         const channelName = `realtime_consultas_${Date.now()}`;
         const channel = supabase
             .channel(channelName)
-            .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'consultas' }, () => {
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'consultas' }, () => {
                 cargarSesionesActivas();
             })
             .subscribe();
@@ -92,7 +104,8 @@ export default function ConsultasClientesScreen() {
 
     const cantidad = sesiones.length;
 
-    const navegarAChat = (item: SesionActiva) => {
+    const navegarAChat = async (item: SesionActiva) => {
+        await marcarLeido(item.sesion_id);
         router.push({
             pathname: "/(homes)/mozo/chatMozo",
             params: { mesaId: item.mesa_id, numeroMesa: item.numero_mesa, sesion_id: item.sesion_id }
@@ -124,7 +137,14 @@ export default function ConsultasClientesScreen() {
                                 <View className="bg-tertiary/20 p-3 rounded-full mr-3">
                                     <Ionicons name="chatbubble-ellipses" size={20} color="#F5C065" />
                                 </View>
-                                <Text className="text-white font-black text-base uppercase">Mesa N° {item.numero_mesa}</Text>
+                                <View className="flex-1 flex-row items-center">
+                                    <Text className="text-white font-black text-base uppercase">Mesa N° {item.numero_mesa}</Text>
+                                    {item.no_leidos > 0 && (
+                                        <View className="bg-red-500 rounded-full min-w-[20px] h-5 px-1.5 items-center justify-center ml-2">
+                                            <Text className="text-white font-black text-[10px]">{item.no_leidos}</Text>
+                                        </View>
+                                    )}
+                                </View>
                             </View>
                             {item.ultimo_mensaje ? (
                                 <Text className="text-white/60 text-xs ml-2" numberOfLines={2}>{item.ultimo_mensaje}</Text>
@@ -147,8 +167,13 @@ export default function ConsultasClientesScreen() {
                         <TouchableOpacity
                             key={item.sesion_id}
                             onPress={() => navegarAChat(item)}
-                            className="w-[48%] bg-primary border border-tertiary/30 p-4 rounded-[24px] mb-4 items-center"
+                            className="w-[48%] bg-primary border border-tertiary/30 p-4 rounded-[24px] mb-4 items-center relative"
                         >
+                            {item.no_leidos > 0 && (
+                                <View className="absolute -top-2 -right-2 bg-red-500 rounded-full min-w-[22px] h-[22px] px-1.5 items-center justify-center z-10 border-2 border-secondary">
+                                    <Text className="text-white font-black text-[10px]">{item.no_leidos}</Text>
+                                </View>
+                            )}
                             <View className="bg-tertiary/20 p-3 rounded-full mb-2">
                                 <Ionicons name="chatbubble-ellipses" size={22} color="#F5C065" />
                             </View>
@@ -170,8 +195,13 @@ export default function ConsultasClientesScreen() {
                         onPress={() => navegarAChat(item)}
                         className="flex-row items-center bg-primary border border-tertiary/20 p-4 rounded-[20px] mb-3"
                     >
-                        <View className="w-10 h-10 bg-tertiary/20 rounded-full items-center justify-center mr-3">
+                        <View className="w-10 h-10 bg-tertiary/20 rounded-full items-center justify-center mr-3 relative">
                             <Text className="text-tertiary font-black text-sm">{item.numero_mesa}</Text>
+                            {item.no_leidos > 0 && (
+                                <View className="absolute -top-1 -right-1 bg-red-500 rounded-full w-4 h-4 items-center justify-center">
+                                    <Text className="text-white font-black text-[8px]">{item.no_leidos > 9 ? '9+' : item.no_leidos}</Text>
+                                </View>
+                            )}
                         </View>
                         <View className="flex-1">
                             {item.ultimo_mensaje ? (

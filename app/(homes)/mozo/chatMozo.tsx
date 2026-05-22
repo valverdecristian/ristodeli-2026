@@ -81,10 +81,20 @@ export default function ChatMozoScreen() {
         inicializar();
     }, [params]);
 
+    const marcarLeido = async () => {
+        if (!sesionId) return;
+        await supabase
+            .from('consultas')
+            .update({ leido: true })
+            .eq('sesion_id', sesionId)
+            .eq('leido', false);
+    };
+
     useEffect(() => {
         if (!sesionId) return;
 
         fetchMensajes();
+        marcarLeido();
 
         const channel = supabase
             .channel(`chat_sesion_mozo_${sesionId}`)
@@ -123,10 +133,21 @@ export default function ChatMozoScreen() {
     const handleEnviarMensaje = async () => {
         if (!nuevoMensaje.trim() || !sesionId || !mesaId || !miId) return;
 
-        try {
-            const textoAEnviar = nuevoMensaje.trim();
-            setNuevoMensaje('');
+        const textoAEnviar = nuevoMensaje.trim();
+        setNuevoMensaje('');
 
+        // OPTIMISMO LOCAL: aparece al instante
+        const msgOptimista: Consulta = {
+            id: Date.now(),
+            created_at: new Date().toISOString(),
+            id_usuario: miId,
+            mesa_id: mesaId,
+            mensaje: textoAEnviar,
+            nombre_remitente: miNombre,
+        };
+        setMensajes(prev => [...prev, msgOptimista]);
+
+        try {
             const { error } = await supabase.from('consultas').insert({
                 sesion_id: sesionId,
                 mesa_id: mesaId,
@@ -135,9 +156,13 @@ export default function ChatMozoScreen() {
                 nombre_remitente: miNombre,
             });
 
-            if (error) throw error;
+            if (error) {
+                showToast("error", "Error", "No se pudo enviar el mensaje.");
+                setMensajes(prev => prev.filter(m => m.id !== msgOptimista.id));
+            }
         } catch (error: any) {
             showToast("error", "Error", "No se pudo enviar el mensaje.");
+            setMensajes(prev => prev.filter(m => m.id !== msgOptimista.id));
         }
     };
 
@@ -180,9 +205,8 @@ export default function ChatMozoScreen() {
                             const esMio = item.id_usuario === miId;
                             return (
                                 <View className={`flex-row ${esMio ? 'justify-end' : 'justify-start'} mb-4`}>
-                                    <View className={`max-w-[80%] rounded-2xl px-4 py-3 shadow-sm ${
-                                        esMio ? 'bg-primary rounded-tr-none' : 'bg-tertiary/20 rounded-tl-none border border-tertiary/30'
-                                    }`}>
+                                    <View className={`max-w-[80%] rounded-2xl px-4 py-3 shadow-sm ${esMio ? 'bg-primary rounded-tr-none' : 'bg-tertiary/20 rounded-tl-none border border-tertiary/30'
+                                        }`}>
                                         <Text className={`text-[10px] uppercase font-black mb-1 ${esMio ? 'text-tertiary' : 'text-primary'}`}>
                                             {esMio ? 'Tú' : item.nombre_remitente}
                                         </Text>
