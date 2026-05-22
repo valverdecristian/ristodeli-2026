@@ -4,6 +4,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
 import { FlatList, KeyboardAvoidingView, Platform, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { NotificationService } from '@/src/services/notificationService';
+
 interface Consulta {
     id: number;
     created_at: string;
@@ -121,7 +123,12 @@ export default function ChatMozoScreen() {
             if (error) {
                 showToast("error", "Error", "No se pudo enviar el mensaje.");
                 setMensajes(prev => prev.filter(m => m.id !== msgOptimista.id));
+                return;
             }
+            
+            console.log('[CHAT_MOZO] ¡Mensaje enviado con éxito!');
+            NotificationService.notificarMensajeAMozos(numeroMesa || 'Desconocida', textoAEnviar);
+            
         } catch (error: any) {
             showToast("error", "Error", "No se pudo enviar el mensaje.");
             setMensajes(prev => prev.filter(m => m.id !== msgOptimista.id));
