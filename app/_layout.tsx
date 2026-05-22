@@ -54,6 +54,12 @@ export default function RootLayout() {
         } else if (data.pantalla === 'aprobaciones') {
           // Si es el staff de aprobación, lo mandamos a su pantalla de aprobaciones
           router.push('/(homes)/supervisor/aprobaciones' as any);
+        } else if (data.pantalla === 'chatCliente') {
+          // Si es el cliente, lo mandamos al chat (ajusta la ruta y los parámetros según tu estructura)
+          router.push('/(tabs)/mesa/chatMozo' as any);
+        } else if (data.pantalla === 'consultasClientes') {
+          // Si es el mozo, lo mandamos a la pantalla de consultas de clientes
+          router.push('/(homes)/mozo/consultasClientes' as any);
         }
       }
     });

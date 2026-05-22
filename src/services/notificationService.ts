@@ -284,4 +284,59 @@ export const NotificationService = {
       console.error('[NotificationService] Error notificando asignación de mesa al cliente:', error);
     }
   },
+
+  /**
+   * FLUJO CHAT 1: El Mozo escribe -> Avisa al Cliente específico
+   */
+  async notificarMensajeACliente(clienteId: string, mensaje: string): Promise<void> {
+    try {
+      // Reutilizamos tu helper existente para buscar el token del cliente
+      const token = await NotificationService.obtenerTokenCliente(clienteId);
+      
+      if (token && token.startsWith('ExponentPushToken')) {
+        await NotificationService.enviar(
+          [token],
+          'Mensaje del Mozo',
+          mensaje,
+          { pantalla: 'chatCliente' } // ⚠️ Ajustá este string al nombre real de la ruta del chat del cliente
+        );
+      }
+    } catch (error) {
+      console.error('[NotificationService] Error notificando mensaje al cliente:', error);
+    }
+  },
+
+  /**
+   * FLUJO CHAT 2: El Cliente escribe -> Avisa a los Mozos
+   */
+  async notificarMensajeAMozos(numeroMesa: string | number, mensaje: string): Promise<void> {
+    try {
+      // Buscamos los tokens de todos los usuarios con perfil 'mozo'
+      const { data, error } = await supabase
+        .from('usuarios')
+        .select('push_token')
+        .eq('perfil', 'mozo')
+        .not('push_token', 'is', null);
+
+      if (error) {
+        console.error('[NotificationService] Error obteniendo tokens de mozos:', error.message);
+        return;
+      }
+
+      const tokens = (data ?? [])
+        .map((u: { push_token: string | null }) => u.push_token)
+        .filter((t): t is string => !!t && t.startsWith('ExponentPushToken'));
+
+      if (tokens.length > 0) {
+        await NotificationService.enviar(
+          tokens,
+          `🔔 Mensaje de la Mesa ${numeroMesa}`,
+          mensaje,
+          { pantalla: 'consultasClientes' } // La pantalla donde los mozos ven la lista de chats
+        );
+      }
+    } catch (error) {
+      console.error('[NotificationService] Error notificando mensaje a mozos:', error);
+    }
+  },
 };
