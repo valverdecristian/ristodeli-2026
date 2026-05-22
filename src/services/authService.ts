@@ -177,7 +177,7 @@ export const AuthService = {
     // Obtener el userId ANTES de invalidar la sesión
     const { data: { session } } = await supabase.auth.getSession();
     if (session?.user?.id) {
-      await NotificationService.limpiarToken(session.user.id, 'usuarios');
+      await NotificationService.limpiarToken(session.user.id);
     }
 
     const { error } = await supabase.auth.signOut();

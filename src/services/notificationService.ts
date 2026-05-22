@@ -7,6 +7,15 @@
 import * as Notifications from 'expo-notifications';
 import { supabase } from './SupabaseClient';
 
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowBanner: true,
+    shouldShowList: true,
+    shouldPlaySound: true,
+    shouldSetBadge: true,
+  }),
+});
+
 // Project ID de EAS — obtenido de app.json extra.eas.projectId
 const EAS_PROJECT_ID = 'e747ca2a-d49f-40cd-8cfa-e0bb41e14b37';
 
@@ -176,7 +185,7 @@ export const NotificationService = {
       const tokens = await NotificationService.obtenerTokensStaff();
       await NotificationService.enviar(
         tokens,
-        '👤 Nuevo cliente pendiente',
+        'Nuevo cliente pendiente',
         `${nombreCliente} se registró y requiere tu aprobación.`,
         { pantalla: 'aprobaciones' }
       );
@@ -194,17 +203,85 @@ export const NotificationService = {
    * @param id    - UUID del usuario o anónimo
    * @param tabla - Tabla donde está el token: 'usuarios' | 'anonimos'
    */
-  async limpiarToken(
-    id: string,
-    tabla: 'usuarios' | 'anonimos'
-  ): Promise<void> {
+  async limpiarToken(id: string): Promise<void> {
     const { error } = await supabase
-      .from(tabla)
+      .from('usuarios')
       .update({ push_token: null })
       .eq('id', id);
 
     if (error) {
       console.error('[NotificationService] Error al limpiar el push token:', error.message);
+    }
+  },
+
+  /**
+   * Obtiene los push tokens válidos de todos los usuarios con perfil 'metre'.
+   */
+  async obtenerTokensMetres(): Promise<string[]> {
+    const { data, error } = await supabase
+      .from('usuarios')
+      .select('push_token')
+      .eq('perfil', 'metre')
+      .not('push_token', 'is', null);
+
+    if (error) {
+      console.error('[NotificationService] Error obteniendo tokens de metres:', error.message);
+      return [];
+    }
+
+    return (data ?? [])
+      .map((u: { push_token: string | null }) => u.push_token)
+      .filter((t): t is string => !!t && t.startsWith('ExponentPushToken'));
+  },
+
+  /**
+   * FLUJO 1: El cliente se anota en la lista -> Avisa al Metre
+   */
+  async notificarNuevoClienteEnEspera(nombreCliente: string): Promise<void> {
+    try {
+      const tokens = await NotificationService.obtenerTokensMetres();
+        await NotificationService.enviar(
+          tokens,
+          'Nuevo cliente en lista de espera',
+          `${nombreCliente} ingresó a la lista de espera y aguarda una mesa.`,
+          { pantalla: 'listaEspera' }
+        );
+    } catch (error) {
+      console.error('[NotificationService] Error notificando al metre:', error);
+    }
+  },
+
+  /**
+   * Helper para buscar el token de un cliente específico.
+   */
+  async obtenerTokenCliente(clienteId: string): Promise<string | null> {
+    const { data, error } = await supabase
+      .from('usuarios')
+      .select('push_token')
+      .eq('id', clienteId)
+      .single();
+
+    if (error || !data) return null;
+    return data.push_token;
+  },
+
+  /**
+   * FLUJO 2: El Metre asigna la mesa -> Avisa al Cliente
+   */
+  async notificarMesaAsignada(clienteId: string, numeroMesa: string | number): Promise<void> {
+    try {
+      const token = await NotificationService.obtenerTokenCliente(clienteId);
+      if (token && token.startsWith('ExponentPushToken')) {
+        // 🌟 Envolvemos el token en un array [token] porque enviar() espera un string[]
+        await NotificationService.enviar(
+          [token], 
+          '¡Tu mesa está lista!',
+          `El metre te ha asignado la Mesa ${numeroMesa}. Ya podés acercarte y escanear el QR en la mesa.`,
+          { pantalla: 'homeCliente' } 
+        );
+      }
+    } catch (error) {
+      console.error('[NotificationService] Error notificando asignación de mesa al cliente:', error);
     }
   },
 };

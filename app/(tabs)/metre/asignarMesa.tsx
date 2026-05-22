@@ -3,6 +3,7 @@ import { supabase } from '@/src/services/SupabaseClient'; // necesario para Real
 import { ListaEsperaService } from '@/src/services/listaEsperaService';
 import { MesaService } from '@/src/services/mesaService';
 import { SoundService } from '@/src/services/soundService';
+import { NotificationService } from '@/src/services/notificationService';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
@@ -58,6 +59,9 @@ export default function AsignarMesaScreen() {
         await ListaEsperaService.asignarMesa(clienteSeleccionado.id, mesa.id);
 
         SoundService.reproducir('exito');
+
+        // 🌟 DISPARADOR: Avisamos al Cliente que su mesa está lista
+        NotificationService.notificarMesaAsignada(clienteSeleccionado.cliente_id, mesa.numero);
         
         setModalVisible(false);
         setClienteSeleccionado(null);
