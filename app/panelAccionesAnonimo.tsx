@@ -9,7 +9,7 @@ export default function PanelAccionesAnonimoScreen() {
     const router = useRouter();
     const { showToast } = useToast();
     const { currentUser } = useAuth();
-    
+
     // 🌟 Atrapamos clienteId, nombre y foto
     const { clienteId, nombre, foto } = useLocalSearchParams<{ clienteId?: string; nombre?: string; foto?: string }>();
 
@@ -26,7 +26,7 @@ export default function PanelAccionesAnonimoScreen() {
         showToast("info", "Escáner de Mesa", "Abriendo cámara para vincular tu usuario a la mesa asignada por el Metre.");
         router.push({
             pathname: "/(tabs)/mesa/escanearMesa" as any,
-            params: { 
+            params: {
                 clienteId: clienteId,
                 tipoCliente: 'anonimo'
             }

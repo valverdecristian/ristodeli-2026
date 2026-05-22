@@ -156,9 +156,8 @@ export default function ChatMozoScreen() {
                         const esMio = item.id_usuario === miId;
                         return (
                             <View className={`flex-row ${esMio ? 'justify-end' : 'justify-start'} mb-4`}>
-                                <View className={`max-w-[80%] rounded-2xl px-4 py-3 shadow-sm ${
-                                    esMio ? 'bg-primary rounded-tr-none' : 'bg-tertiary/20 rounded-tl-none border border-tertiary/30'
-                                }`}>
+                                <View className={`max-w-[80%] rounded-2xl px-4 py-3 shadow-sm ${esMio ? 'bg-primary rounded-tr-none' : 'bg-tertiary/20 rounded-tl-none border border-tertiary/30'
+                                    }`}>
                                     <Text className={`text-[10px] uppercase font-black mb-1 ${esMio ? 'text-tertiary' : 'text-primary'}`}>
                                         {esMio ? 'Tú' : item.nombre_remitente}
                                     </Text>
