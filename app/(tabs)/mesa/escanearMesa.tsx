@@ -91,10 +91,6 @@ pathname: "/(tabs)/mesa/panelMesaCliente" as any,
                         clienteId: clienteId || paramClienteId,
                         sesion_id: sesionIdBypass || undefined
                     }
-                        numeroMesa: mesaEscaneada.numero,
-                        clienteId: clienteId || paramClienteId,
-                        sesion_id: sesionIdBypass || undefined
-                    }
                 });
                 return;
             }
