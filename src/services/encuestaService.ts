@@ -19,4 +19,27 @@ export const EncuestaService = {
     if (error) throw error;
     return data || [];
   },
+
+  /**
+   * Registra una nueva encuesta de satisfacción en la base de datos.
+   */
+  async guardar(encuesta: {
+    cliente_nombre: string;
+    satisfaccion: number;
+    recomienda: boolean;
+    limpieza: string;
+    comentarios: string | null;
+    atencion: number;
+    comida: number;
+    ambiente: number;
+  }) {
+    const { data, error } = await supabase
+      .from('encuestas')
+      .insert([encuesta])
+      .select();
+
+    if (error) throw error;
+    return data;
+  },
 };
+

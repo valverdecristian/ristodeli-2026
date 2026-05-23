@@ -10,8 +10,8 @@ export interface ItemCarrito {
   producto_nombre: string;
   categoria: string;
   cantidad: number;
-  precio: number;            
-  tiempo_elaboracion: number; 
+  precio: number;
+  tiempo_elaboracion: number;
 }
 
 export const PedidoService = {
@@ -26,7 +26,7 @@ export const PedidoService = {
     let query = supabase
       .from('pedidos')
       .select('*')
-      .eq('estado', 'Pendiente'); //
+      .in('estado', ['Pendiente', 'En Preparación']); //
 
     if (sector === 'bar') {
       query = query.eq('categoria', 'bebida'); //
@@ -47,17 +47,17 @@ export const PedidoService = {
     // Si el mozo manda un motivo, lo guardamos como "Rechazado: [Motivo]"
     let estadoFinal = nuevoEstado;
     if (motivo && motivo.trim() !== '') {
-        estadoFinal = `${nuevoEstado}: ${motivo.trim()}`;
+      estadoFinal = `${nuevoEstado}: ${motivo.trim()}`;
     }
 
     const { error } = await supabase
       .from('pedidos')
-      .update({ estado: estadoFinal }) 
-      .in('id', ids); 
+      .update({ estado: estadoFinal })
+      .in('id', ids);
 
-    if (error) throw error; 
+    if (error) throw error;
   },
-  
+
   /**
    * Inserta la comanda desde el celular del Cliente
    * Queda retenida en 'A Confirmar Mozo' cumpliendo el Punto 12 del PDF.
@@ -74,7 +74,7 @@ export const PedidoService = {
       producto_nombre: item.producto_nombre,
       categoria: item.categoria,
       cantidad: item.cantidad,
-      estado: 'A Confirmar Mozo', 
+      estado: 'A Confirmar Mozo',
     }));
 
     const { data, error } = await supabase

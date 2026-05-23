@@ -2,7 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import React, { ComponentProps } from "react";
 import { Image, Text, TouchableOpacity, View, ScrollView } from "react-native";
 // 🌟 IMPORTANTE: SafeAreaView es lo que evita que se pegue al borde superior
-import { SafeAreaView } from "react-native-safe-area-context"; 
+import { SafeAreaView } from "react-native-safe-area-context";
 
 interface HomeClienteBaseProps {
   nombre: string;
@@ -35,7 +35,7 @@ export default function HomeClienteBase({
 }: HomeClienteBaseProps) {
   return (
     <SafeAreaView className="flex-1 bg-primary">
-      
+
       {/* 🌟 HEADER TIPO "DUEÑO" 🌟 */}
       {/* Usamos bg-tertiary para emular la barra superior de la otra vista */}
       <View className="bg-tertiary px-6 pt-4 pb-5 flex-row items-center justify-between shadow-2xl z-10">
@@ -48,7 +48,7 @@ export default function HomeClienteBase({
       </View>
 
       {/* 🌟 SCROLLVIEW: Protege la vista en celulares más chicos 🌟 */}
-      <ScrollView 
+      <ScrollView
         contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 24, paddingTop: 24, paddingBottom: 40 }}
         showsVerticalScrollIndicator={false}
       >
@@ -115,20 +115,22 @@ export default function HomeClienteBase({
             </Text>
           </TouchableOpacity>
 
-          <TouchableOpacity
-            onPress={onJuegos}
-            className="w-full bg-secondary py-5 rounded-[25px] flex-row items-center justify-center border border-tertiary/20 shadow-md active:opacity-90"
-          >
-            <Ionicons
-              name="game-controller-outline"
-              size={24}
-              color="#31603D"
-              style={{ marginRight: 12 }}
-            />
-            <Text className="text-primary font-bold uppercase text-sm tracking-wide">
-              Juegos
-            </Text>
-          </TouchableOpacity>
+          {tipoCliente === "registrado" && (
+            <TouchableOpacity
+              onPress={onJuegos}
+              className="w-full bg-secondary py-5 rounded-[25px] flex-row items-center justify-center border border-tertiary/20 shadow-md active:opacity-90"
+            >
+              <Ionicons
+                name="game-controller-outline"
+                size={24}
+                color="#31603D"
+                style={{ marginRight: 12 }}
+              />
+              <Text className="text-primary font-bold uppercase text-sm tracking-wide">
+                Juegos
+              </Text>
+            </TouchableOpacity>
+          )}
 
           {tipoCliente === "registrado" && onAccionAdicional && (
             <TouchableOpacity

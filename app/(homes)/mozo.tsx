@@ -8,12 +8,16 @@ export default function HomeMozo() {
     const [noLeidos, setNoLeidos] = useState(0);
 
     const fetchNoLeidos = async () => {
-        const { count } = await supabase
-            .from('consultas')
-            .select('*', { count: 'exact', head: true })
-            .eq('leido', false);
+        try {
+            const { count } = await supabase
+                .from('consultas')
+                .select('*', { count: 'exact', head: true })
+                .eq('leido', false);
 
-        setNoLeidos(count ?? 0);
+            setNoLeidos(count ?? 0);
+        } catch (err) {
+            console.error('Error al cargar consultas no leídas:', err);
+        }
     };
 
     useEffect(() => {
@@ -26,14 +30,16 @@ export default function HomeMozo() {
             })
             .subscribe();
 
-        return () => { supabase.removeChannel(channel); };
+        return () => {
+            supabase.removeChannel(channel);
+        };
     }, []);
 
     const accionesMozo = [
         { title: 'Consultas de clientes', icon: 'chatbubble-ellipses', onPress: () => router.push('/(homes)/mozo/consultasClientes' as any), badge: noLeidos },
         { title: 'Confirmar pedido', icon: 'checkmark-circle', onPress: () => router.push('/(homes)/mozo/confirmarPedido') },
         { title: 'Entregar pedido', icon: 'bicycle', onPress: () => router.push('/(homes)/mozo/entregarPedido' as any) },
-        { title: 'Cobrar cuenta', icon: 'cash', onPress: () => console.log('Ir a Cobrar cuenta')},
+        { title: 'Cobrar cuenta', icon: 'cash', onPress: () => router.push('/(homes)/mozo/cobrarCuenta' as any) },
     ];
 
     return (

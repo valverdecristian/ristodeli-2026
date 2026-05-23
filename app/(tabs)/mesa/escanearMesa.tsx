@@ -60,7 +60,7 @@ export default function EscanearMesaScreen() {
             const qrLimpio = data.trim();
             console.log('[SCANNER_MESA] Procesando código leído:', qrLimpio);
 
-const esUUIDValido = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(qrLimpio);
+            const esUUIDValido = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(qrLimpio);
             let query = supabase.from('mesas').select('*');
             if (esUUIDValido) {
                 query = query.or(`id.eq.${qrLimpio},qr_data.eq.${qrLimpio}`);
@@ -81,18 +81,7 @@ const esUUIDValido = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3
             console.log('[SCANNER_MESA] ¡Mesa asociada exitosamente! Número:', mesaEscaneada.numero);
 
             if (!mesaEsperadaId) {
-                await SoundService.reproducir('exito');
-                const sesionIdBypass = clienteId ? await ListaEsperaService.obtenerSesionActiva(mesaEscaneada.id) : null;
-                router.replace({
-pathname: "/(tabs)/mesa/panelMesaCliente" as any,
-                    params: {
-                        mesaId: mesaEscaneada.id,
-                        numeroMesa: mesaEscaneada.numero,
-                        clienteId: clienteId || paramClienteId,
-                        sesion_id: sesionIdBypass || undefined
-                    }
-                });
-                return;
+                throw new Error("No tienes una mesa asignada en este momento. Por favor, únete a la lista de espera en la entrada.");
             }
 
             if (mesaEscaneada.id !== mesaEsperadaId) {

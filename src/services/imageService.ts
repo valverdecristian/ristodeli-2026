@@ -13,12 +13,10 @@ export const ImageService = {
    * No permite elegir archivos desde la galería.
    */
   takePhoto: async () => {
-    
     const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
 
     if (permissionResult.granted === false) {
-      alert("Se requieren permisos de la cámara para completar el registro en Ristodeli.");
-      return null;
+      throw new Error("Se requieren permisos de la cámara para capturar la fotografía.");
     }
 
     // Disparamos de forma directa la interfaz de la cámara
@@ -31,6 +29,30 @@ export const ImageService = {
 
     if (!result.canceled) {
       return result.assets[0]; 
+    }
+
+    return null;
+  },
+
+  /**
+   * 2. Abre la galería del dispositivo y permite seleccionar una imagen.
+   */
+  chooseFromGallery: async () => {
+    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (permissionResult.granted === false) {
+      throw new Error("Se requieren permisos de galería para seleccionar la fotografía.");
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ["images"],
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.5,
+    });
+
+    if (!result.canceled) {
+      return result.assets[0];
     }
 
     return null;

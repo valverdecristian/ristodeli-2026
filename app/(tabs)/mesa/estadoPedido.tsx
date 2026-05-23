@@ -3,6 +3,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList, Text, TouchableOpacity, View } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface PedidoItem {
     id: number;
@@ -15,26 +16,28 @@ interface PedidoItem {
 
 export default function EstadoPedidoScreen() {
     const router = useRouter();
-    const { mesaId, numeroMesa } = useLocalSearchParams();
-    
+    const { mesaId, numeroMesa, sesion_id } = useLocalSearchParams<{ mesaId?: string; numeroMesa?: string; sesion_id?: string }>();
+
     const [pedidos, setPedidos] = useState<PedidoItem[]>([]);
     const [loading, setLoading] = useState(true);
+    const [descuentoInfo, setDescuentoInfo] = useState<{ descuento: number; juego: string } | null>(null);
 
     // Unificamos el número de mesa para asegurar la consulta
-    const nroMesaInt = (numeroMesa && !isNaN(parseInt(numeroMesa as string, 10))) 
-        ? parseInt(numeroMesa as string, 10) 
+    const nroMesaInt = (numeroMesa && !isNaN(parseInt(numeroMesa as string, 10)))
+        ? parseInt(numeroMesa as string, 10)
         : parseInt(mesaId as string, 10) || 21;
 
     useEffect(() => {
         fetchPedidosEnCurso();
+        cargarDescuentoDeJuego();
 
         // 🌟 CANAL DINÁMICO: Inmune a errores de caché
         const nombreCanal = `monitoreo_cocina_mesa_${nroMesaInt}_${Date.now()}`;
         const channel = supabase
             .channel(nombreCanal)
             .on(
-                'postgres_changes', 
-                { event: '*', schema: 'public', table: 'pedidos' }, 
+                'postgres_changes',
+                { event: '*', schema: 'public', table: 'pedidos' },
                 (payload: any) => {
                     const mesaPayload = payload.new?.mesa_numero;
                     // Si el cambio es de nuestra mesa, recargamos la lista silenciosamente
@@ -45,8 +48,8 @@ export default function EstadoPedidoScreen() {
             )
             .subscribe();
 
-        return () => { 
-            supabase.removeChannel(channel); 
+        return () => {
+            supabase.removeChannel(channel);
         };
     }, [nroMesaInt]);
 
@@ -62,10 +65,10 @@ export default function EstadoPedidoScreen() {
             if (error) throw error;
 
             // Filtramos en memoria para asegurar que capturamos todas las variantes
-            const filtrados = (data || []).filter(p => 
-                ['pendiente', 'listo cocina', 'listo bar', 'entregado'].includes(p.estado.toLowerCase())
+            const filtrados = (data || []).filter(p =>
+                ['pendiente', 'en preparación', 'en preparacion', 'listo cocina', 'listo bar', 'entregado'].includes(p.estado.toLowerCase())
             );
-            
+
             setPedidos(filtrados);
         } catch (error) {
             console.error("[ESTADO_PEDIDO] Error:", error);
@@ -74,11 +77,36 @@ export default function EstadoPedidoScreen() {
         }
     };
 
+    const cargarDescuentoDeJuego = async () => {
+        if (!sesion_id) return;
+        try {
+            const key = `ristodeli_juegos_sesion_${sesion_id}`;
+            const json = await AsyncStorage.getItem(key);
+            if (json) {
+                const state = JSON.parse(json);
+                if (state.descuentoGanado > 0 && state.juegoGanador) {
+                    const nombresJuegos: { [key: string]: string } = {
+                        tateti: "Tateti",
+                        adivinanza: "Adivinanza",
+                        memoria: "Memoria"
+                    };
+                    const nombreBonito = nombresJuegos[state.juegoGanador] || state.juegoGanador;
+                    setDescuentoInfo({
+                        descuento: state.descuentoGanado,
+                        juego: nombreBonito
+                    });
+                }
+            }
+        } catch (err) {
+            console.error("[ESTADO_PEDIDO] Error al cargar descuento:", err);
+        }
+    };
+
     // 🎨 DICCIONARIO VISUAL: Mapea el estado aburrido de la BD a un diseño atractivo
     const obtenerEstiloEstado = (estadoDB: string) => {
         const e = estadoDB.toLowerCase();
-        
-        if (e === 'pendiente') {
+
+        if (e === 'pendiente' || e.includes('preparacion') || e.includes('preparación')) {
             return {
                 bg: 'bg-orange-500/20',
                 borde: 'border-orange-500/50',
@@ -105,7 +133,7 @@ export default function EstadoPedidoScreen() {
                 label: 'Entregado en mesa'
             };
         }
-        
+
         // Fallback genérico
         return {
             bg: 'bg-gray-500/20',
@@ -131,6 +159,21 @@ export default function EstadoPedidoScreen() {
 
             {/* ────────── CONTENIDO ────────── */}
             <View className="flex-1 bg-secondary rounded-t-[32px] pt-6 px-4 border-t border-tertiary/20">
+                {descuentoInfo && (
+                    <View className="bg-green-600/10 border border-green-600/30 rounded-2xl p-4 mb-4 flex-row items-center">
+                        <View className="bg-green-600/20 p-2 rounded-full mr-3">
+                            <Ionicons name="gift-outline" size={20} color="#16a34a" />
+                        </View>
+                        <View className="flex-1">
+                            <Text className="text-green-800 font-extrabold text-xs uppercase tracking-wide">
+                                Descuento de Juegos Aplicado
+                            </Text>
+                            <Text className="text-green-700 text-xs font-semibold mt-0.5">
+                                ¡Felicidades! Se aplicará un {descuentoInfo.descuento}% de descuento en tu cuenta por ganar en {descuentoInfo.juego}.
+                            </Text>
+                        </View>
+                    </View>
+                )}
                 {loading ? (
                     <View className="flex-1 justify-center items-center">
                         <ActivityIndicator size="large" color="#31603D" />
@@ -152,7 +195,7 @@ export default function EstadoPedidoScreen() {
                         }
                         renderItem={({ item }) => {
                             const estilo = obtenerEstiloEstado(item.estado);
-                            
+
                             return (
                                 <View style={{ elevation: 2 }} className="bg-white rounded-3xl p-5 mb-4 border border-primary/10 shadow-sm">
                                     <View className="flex-row justify-between items-start mb-3">
