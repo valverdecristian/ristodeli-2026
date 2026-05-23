@@ -87,16 +87,16 @@ De acuerdo a los requerimientos de la cátedra, se detallan las tareas asignadas
 | 7. Rechazar a un cliente registrado | dueño o supervisor | 🚀 Listo para Demo |  |
 | 8. Aceptar a un cliente registrado | dueño o supervisor | 🚀 Listo para Demo |  |
 | 9. Ingresar al local | cliente anónimo | 🚀 Listo para Demo |  |
-| 10. Asignar una mesa a un cliente registrado | metre | 🏗️ En Desarrollo |  |
-| 11. Ver el listado de los productos | cliente registrado o anónimo | 🏗️ En Desarrollo |  |
+| 10. Asignar una mesa a un cliente registrado | metre | 🚀 Listo para Demo |  |
+| 11. Ver el listado de los productos | cliente registrado o anónimo | 🚀 Listo para Demo |  |
 | 12. Realizar el pedido para todos los comensales de la mesa | cliente registrado o anónimo | 🏗️ En Desarrollo |  |
-| 13. Rechazar el pedido, para que el usuario lo modifique | mozo | ⏳ Próximo |  |
-| 14. Confirmar el pedido | mozo | ⏳ Próximo |  |
-| 15. Acceder a los juegos | cliente registrado o anónimo | ⏳ Próximo |  |
-| 16. Recepción de los productos correspondientes | cocinero |  |  |
-| 17. Recepción de los productos correspondientes | cantinero |  |  |
-| 18. Realizar las tareas correspondientes | cocinero y cantinero |  |  |
-| 19. Entrega del pedido completo | mozo |  |  |
+| 13. Rechazar el pedido, para que el usuario lo modifique | mozo | 🏗️ En Desarrollo |  |
+| 14. Confirmar el pedido | mozo | 🏗️ En Desarrollo |  |
+| 15. Acceder a los juegos | cliente registrado o anónimo | 🏗️ En Desarrollo |  |
+| 16. Recepción de los productos correspondientes | cocinero | 🏗️ En Desarrollo |  |
+| 17. Recepción de los productos correspondientes | cantinero | 🏗️ En Desarrollo |  |
+| 18. Realizar las tareas correspondientes | cocinero y cantinero | 🏗️ En Desarrollo |  |
+| 19. Entrega del pedido completo | mozo | 🏗️ En Desarrollo |  |
 | 20. Acceder a la encuesta de satisfacción | cliente registrado o anónimo |  |  |
 | 21. Solicitar cuenta al mozo | cliente registrado o anónimo |  |  |
 | 22. Confirmar el pago y liberar mesa | mozo |  |  |
@@ -113,10 +113,45 @@ De acuerdo a los requerimientos de la cátedra, se detallan las tareas asignadas
 ## 🎨 Ver Capturas de Pantalla
 
 <details>
-<summary>Capturas de Pantalla</summary>
-    <img src="assets/capturas/icono.jpeg" alt="icono" width="300">
-    <img src="assets/capturas/splash.jpeg" alt="splash" width="300">
-    <img src="assets/capturas/login.jpeg" alt="login" width="300">
+<summary>Vistas de Entrada</summary>
+    <img src="assets/capturas/icono.jpg" alt="icono" width="300">
+    <img src="assets/capturas/splash.jpg" alt="splash" width="300">
+    <img src="assets/capturas/login.jpg" alt="login" width="300">
+    <img src="assets/capturas/acceso_rapido.jpg" alt="login" width="300">
+</details>
+
+<details>
+<summary>Registro: Cliente Registrado y Anonimo</summary>
+    <img src="assets/capturas/registro_01.jpg" alt="login" width="300">
+    <img src="assets/capturas/registro_02.jpg" alt="login" width="300">
+    <img src="assets/capturas/registro_anonimo.jpg" alt="login" width="300">
+</details>
+
+<details>
+<summary>Vistas del Dueño</summary>
+    <img src="assets/capturas/admin_home.jpg" alt="login" width="300">
+    <img src="assets/capturas/admin_alta_mesa.jpg" alt="login" width="300">
+    <img src="assets/capturas/admin_clientes_pendientes.jpg" alt="login" width="300">
+</details>
+
+<details>
+<summary>Vistas del Metre</summary>
+</details>
+
+<details>
+<summary>Vistas del Mozo</summary>
+</details>
+
+<details>
+<summary>Vistas del Cantinero</summary>
+</details>
+
+<details>
+<summary>Vistas del Cocinero</summary>
+</details>
+
+<details>
+<summary>Vistas del Cliente</summary>
 </details>
 
 <br>
@@ -128,6 +163,31 @@ De acuerdo a los requerimientos de la cátedra, se detallan las tareas asignadas
 <p align="center">
   <img src="assets/qr/qr_entrada.jpeg" alt="QR Entrada" width="300">
 </p>
+
+<br>
+
+<p align="center">QR de Mesas</p>
+
+<p align="center">
+  <img src="assets/qr/MESA_01.jpg" alt="QR MESA 1" width="300">
+</p>
+<p align="center">
+  <img src="assets/qr/MESA_02.jpg" alt="QR MESA 2" width="300">
+</p>
+<p align="center">
+  <img src="assets/qr/MESA_03.jpg" alt="QR MESA 3" width="300">
+</p>
+<p align="center">
+  <img src="assets/qr/MESA_04.jpg" alt="QR MESA 4" width="300">
+</p>
+<p align="center">
+  <img src="assets/qr/MESA_05.jpg" alt="QR MESA 5" width="300">
+</p>
+
+<br>
+
+<p align="center">QR de Propinas</p>
+<p align="center">PROXIMAMENTE...</p>
 
 <br>
 
