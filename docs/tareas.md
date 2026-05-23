@@ -52,15 +52,15 @@
 * Escaneamos el QR de entrada y rapidamente nos colocamos en la lista de espera. ✅
 * Desde el Metre verificamos nuevamente que este cliente aparece en la lista de espera y le asignamos una mesa. ✅
 * El cliente recibe una notificación que indica cual mesa fue asignada. ✅
-* Procedemos a escanear el QR de otra mesa, para mostrar que no nos podemos vincular a esa mesa (nos indica cual es). ⏳
-* Procedemos a escanear el QR de nuestra mesa y nos vinculamos correctamente. El cliente procede a ver el menú. ⏳
+* Procedemos a escanear el QR de otra mesa, para mostrar que no nos podemos vincular a esa mesa (nos indica cual es). ✅
+* Procedemos a escanear el QR de nuestra mesa y nos vinculamos correctamente. El cliente procede a ver el menú. ✅
 * Mostramos que la mesa asignada no esta disponible para otro cliente. ✅
 ---
-11. Continuando con el punto 10 mostramos que como cliente podemos ver el menú de los productos disponibles. ⏳
-* Volvemos para atras y mostramos que podemos hacer una consulta al mozo. ⏳
-* Realizamos una consulta y al mozo le llega una push notificación. ⏳
-* Desde el panel del mozo vemos la consulta y respondemos. ⏳
-* Al cliente le llega una push notification de que el mozo le respondio la consulta y mostramos el mensaje recibido. ⏳
+11. Continuando con el punto 10 mostramos que como cliente podemos ver el menú de los productos disponibles. ✅
+* Volvemos para atras y mostramos que podemos hacer una consulta al mozo. ✅
+* Realizamos una consulta y al mozo le llega una push notificación. ✅
+* Desde el panel del mozo vemos la consulta y respondemos. ✅
+* Al cliente le llega una push notification de que el mozo le respondio la consulta y mostramos el mensaje recibido. ✅
 ---
 12. Realizar el pedido para todos los comensales de la mesa. ⏳
 * **En este punto participamos LOS TRES: cliente, mozo y cocinero. Realizamos los puntos 12, 13 y 14 juntos.**
@@ -78,11 +78,11 @@
 * Estando logueado como cocinero mostramos que nos llego una notificación de un nuevo pedido de preparación. ⏳
 * Mostramos que el pedido se encuentra en la cola de preparacion. ⏳
 * El cliente escanea el QR de mesa nuevamente y ve que su pedido esta en preparación. ⏳
-* Vuelve atras para acceder a los juegos. ⏳
+* Vuelve atras para acceder a los juegos. ✅
 ---
 15. Acceder a los juegos
-* El cliente visualiza los tres juegos disponibles. ⏳
-* Cada juego indicara que porcentaje de descuento le corresponde en caso de ganar SOLO EN EL PRIMER INTENTO DEL PRIMER JUEGO QUE SELECCIONE. ⏳
+* El cliente visualiza los tres juegos disponibles. ✅
+* Cada juego indicara que porcentaje de descuento le corresponde en caso de ganar SOLO EN EL PRIMER INTENTO DEL PRIMER JUEGO QUE SELECCIONE. ✅
 * Jugar un juego y obtener el descuento, que se podra visualizar en el "estado del pedido". ⏳
 * Jugar a otro juego y verificar que no se obtuvo otro descuento, ya que no es acumulativo. ⏳
 ---

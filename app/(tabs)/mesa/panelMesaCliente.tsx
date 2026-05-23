@@ -5,6 +5,7 @@ import { SoundService } from '@/src/services/soundService';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 type EstadoPedidoCliente = 'inicial' | 'en_preparacion' | 'Rechazado Mozo' | 'pedido_listo' | 'comido';
 
@@ -103,6 +104,8 @@ export default function PanelMesaClienteScreen() {
     }
 
     return (
+        // 🌟 1. El SafeAreaView abraza toda la pantalla y maneja el color de fondo
+        <SafeAreaView className="flex-1 bg-primary">
         <ScrollView className="flex-1 bg-primary px-6 pt-6">
         <View className="bg-secondary p-4 rounded-3xl mb-6 items-center">
             <Text className="text-primary font-black uppercase">Mesa Nº {numeroMesa || mesaId}</Text>
@@ -198,5 +201,6 @@ export default function PanelMesaClienteScreen() {
         )}
 
         </ScrollView>
+        </SafeAreaView>
     );
 }
