@@ -36,8 +36,6 @@ export default function HomeClienteBase({
   return (
     <SafeAreaView className="flex-1 bg-primary">
 
-      {/* 🌟 HEADER TIPO "DUEÑO" 🌟 */}
-      {/* Usamos bg-tertiary para emular la barra superior de la otra vista */}
       <View className="bg-tertiary px-6 pt-4 pb-5 flex-row items-center justify-between shadow-2xl z-10">
         <Text className="text-primary font-bold text-2xl uppercase tracking-tighter">
           {tipoCliente === 'anonimo' ? 'Modo Anónimo' : 'Cliente'}
@@ -47,12 +45,10 @@ export default function HomeClienteBase({
         </TouchableOpacity>
       </View>
 
-      {/* 🌟 SCROLLVIEW: Protege la vista en celulares más chicos 🌟 */}
       <ScrollView
         contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 24, paddingTop: 24, paddingBottom: 40 }}
         showsVerticalScrollIndicator={false}
       >
-        {/* Tarjeta de perfil grande y prominente */}
         <View className="bg-secondary rounded-[30px] p-8 w-full items-center mb-10 border border-tertiary/20 shadow-md">
           <View className="w-32 h-32 rounded-full border-4 border-tertiary overflow-hidden bg-primary justify-center items-center mb-6">
             {fotoUrl ? (
@@ -81,7 +77,7 @@ export default function HomeClienteBase({
           </View>
         </View>
 
-        {/* Botones de Acción */}
+        {/* Botones de Accion */}
         <View className="w-full space-y-5">
           <TouchableOpacity
             onPress={onEscanearMesa}

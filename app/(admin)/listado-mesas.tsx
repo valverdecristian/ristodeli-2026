@@ -20,7 +20,7 @@ export default function ListadoMesas() {
   const renderMesa = ({ item }: { item: any }) => (
     <View style={{ width: '47%', marginBottom: 20 }} className="bg-secondary rounded-[25px] overflow-hidden shadow-lg">
 
-      {/* 1. Foto de la Mesa con Botón QR Flotante */}
+      {/* Foto de la Mesa con Botón QR Flotante */}
       <View className="relative w-full h-32 bg-primary/20">
         {item.foto ? (
           <Image source={{ uri: item.foto }} className="w-full h-full" resizeMode="cover" />
@@ -39,7 +39,7 @@ export default function ListadoMesas() {
         </TouchableOpacity>
       </View>
 
-      {/* 2. Información de la Mesa */}
+      {/* Información de la Mesa */}
       <View className="p-4 items-center">
         <Text className="text-primary font-black text-xl uppercase tracking-tighter">Mesa {item.numero}</Text>
 
@@ -63,7 +63,7 @@ export default function ListadoMesas() {
   return (
     <SafeAreaView className="flex-1 bg-primary">
 
-      {/* HEADER CORREGIDO: pt-4 y pb-5 para igualar a alta-mesa */}
+      {/* HEADER */}
       <View className="bg-tertiary px-6 pt-4 pb-5 flex-row items-center justify-between shadow-2xl">
         <View className="flex-row items-center">
           <TouchableOpacity onPress={() => router.back()} className="mr-3">
@@ -82,7 +82,7 @@ export default function ListadoMesas() {
           data={mesas}
           keyExtractor={(item) => item.id.toString()}
           numColumns={2}
-          key={2} /* Ayuda a que React Native no se rompa al pasar de 1 a 2 columnas en desarrollo */
+          key={2}
           columnWrapperStyle={{ justifyContent: 'space-between', paddingHorizontal: 20 }}
           contentContainerStyle={{ paddingVertical: 24 }}
           renderItem={renderMesa}

@@ -1,13 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
-import {
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-  ActivityIndicator
-} from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { SoundService } from "@/src/services/soundService";
@@ -92,7 +86,7 @@ export default function MemoriaScreen() {
           setJuegoHabilitado(false); // No califica para descuento
         }
         if (state.juegosJugados && state.juegosJugados.includes("memoria")) {
-          setEsPrimerIntento(false); // Ya jugó a este juego en esta sesión
+          setEsPrimerIntento(false); // Ya jugo a este juego en esta sesión
         }
         if (state.descuentoGanado) {
           setDescuentoAplicado(state.descuentoGanado);
@@ -266,7 +260,7 @@ export default function MemoriaScreen() {
           )}
         </View>
 
-        {/* Estadísticas */}
+        {/* Estadisticas */}
         <View className="bg-secondary rounded-2xl px-6 py-4 mb-6 w-full flex-row justify-around">
           <View className="items-center">
             <Text className="text-primary/60 text-xs font-bold uppercase">
@@ -326,7 +320,7 @@ export default function MemoriaScreen() {
           </View>
         )}
 
-        {/* Botón */}
+        {/* Boton */}
         <TouchableOpacity
           onPress={handleReinicio}
           className="mt-8 bg-tertiary rounded-full px-8 py-4 shadow-lg border-b-4 border-orange w-full"

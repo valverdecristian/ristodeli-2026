@@ -1,14 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
-import {
-  Keyboard,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-  ActivityIndicator,
-} from "react-native";
+import { Keyboard, Text, TextInput, TouchableOpacity, View, ActivityIndicator, } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { SoundService } from "@/src/services/soundService";
@@ -126,7 +119,7 @@ export default function AdivinanzaScreen() {
     const newAttempts = attempts + 1;
     setAttempts(newAttempts);
 
-    // Registrar inicio del juego en el primer intento
+    // Registra inicio del juego en el primer intento
     if (newAttempts === 1) {
       await registrarIntentoJuego();
     }

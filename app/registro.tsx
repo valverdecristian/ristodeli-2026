@@ -174,7 +174,7 @@ export default function RegistroScreen() {
         }
     };
 
-    // Escáner modular
+    // Escaner modular
     if (showScanner) {
         return (
             <ScannerDNI
@@ -209,7 +209,7 @@ export default function RegistroScreen() {
 
             <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} className="flex-1">
 
-                {/* PASO 1: Foto + datos personales + escáner */}
+                {/* Foto + datos personales + escaner */}
                 {paso === 1 && (
                     <ScrollView contentContainerStyle={{ flexGrow: 1 }} className="px-8 pt-6" showsVerticalScrollIndicator={false}>
                         <CapturaFoto
@@ -241,7 +241,7 @@ export default function RegistroScreen() {
                     </ScrollView>
                 )}
 
-                {/* PASO 2: Email + contraseña + confirmación */}
+                {/* Email + contraseña + confirmación */}
                 {paso === 2 && (
                     <ScrollView contentContainerStyle={{ flexGrow: 1 }} className="px-8 pt-8" showsVerticalScrollIndicator={false}>
                         <CustomInput placeholder="Correo electrónico" value={email} onChangeText={setEmail} autoCapitalize="none" keyboardType="email-address" />

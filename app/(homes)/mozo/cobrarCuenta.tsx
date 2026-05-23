@@ -93,7 +93,6 @@ export default function CobrarCuentaScreen() {
             setPropinaPorcentaje(0);
             setPropinaInfo('');
 
-            // 1. Obtener cliente y sesion activa
             const cliente = await MesaService.obtenerClienteDeMesa(mesa.id);
             if (cliente) {
                 setClienteNombre(cliente.nombre);
@@ -103,7 +102,6 @@ export default function CobrarCuentaScreen() {
                 setSesionId('');
             }
 
-            // 2. Obtener hora de inicio de la sesión
             let sessionStart = new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString();
             const { data: asignacion } = await supabase
                 .from('lista_espera')
@@ -116,7 +114,6 @@ export default function CobrarCuentaScreen() {
                 sessionStart = asignacion.created_at;
             }
 
-            // 3. Obtener consumos de la mesa
             const { data: pedidos, error: errPedidos } = await supabase
                 .from('pedidos')
                 .select('*')
@@ -127,7 +124,6 @@ export default function CobrarCuentaScreen() {
 
             if (errPedidos) throw errPedidos;
 
-            // 4. Obtener todos los productos para precios
             const { data: productos, error: errProd } = await supabase
                 .from('productos')
                 .select('nombre, precio');
@@ -187,7 +183,6 @@ export default function CobrarCuentaScreen() {
         try {
             setSubmittingPago(true);
 
-            // 1. Obtener la asignación activa de lista_espera
             const { data: asignacion, error: errAsign } = await supabase
                 .from('lista_espera')
                 .select('id, sesion_id, created_at')
@@ -199,7 +194,6 @@ export default function CobrarCuentaScreen() {
 
             const targetSesionId = asignacion?.sesion_id || sesionId;
 
-            // 2. Finalizar la sesión en lista_espera
             if (asignacion?.id) {
                 const { error: errUpd } = await supabase
                     .from('lista_espera')
@@ -208,7 +202,6 @@ export default function CobrarCuentaScreen() {
                 if (errUpd) throw errUpd;
             }
 
-            // 3. Eliminar las consultas de la sesión
             if (targetSesionId) {
                 await supabase
                     .from('consultas')
@@ -216,7 +209,6 @@ export default function CobrarCuentaScreen() {
                     .eq('sesion_id', targetSesionId);
             }
 
-            // 4. Actualizar todos los pedidos de la sesión a 'Pagado'
             let sessionStart = new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString();
             if (asignacion?.created_at) {
                 sessionStart = asignacion.created_at;
@@ -228,10 +220,8 @@ export default function CobrarCuentaScreen() {
                 .gte('created_at', sessionStart);
             if (errPedUpd) throw errPedUpd;
 
-            // 5. Cambiar estado de la mesa a 'Libre'
             await MesaService.actualizarEstado(mesaSeleccionada.id, 'Libre');
 
-            // 6. Eliminar llaves locales de AsyncStorage para la sesión (limpieza del dispositivo de cobro/pruebas)
             if (targetSesionId) {
                 await AsyncStorage.removeItem(`encuesta_completada_${targetSesionId}`);
                 await AsyncStorage.removeItem(`ristodeli_juegos_sesion_${targetSesionId}`);

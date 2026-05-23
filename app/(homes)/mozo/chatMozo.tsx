@@ -137,7 +137,6 @@ export default function ChatMozoScreen() {
         const textoAEnviar = nuevoMensaje.trim();
         setNuevoMensaje('');
 
-        // OPTIMISMO LOCAL: aparece al instante
         const msgOptimista: Consulta = {
             id: Date.now(),
             created_at: new Date().toISOString(),
@@ -162,19 +161,17 @@ export default function ChatMozoScreen() {
                 setMensajes(prev => prev.filter(m => m.id !== msgOptimista.id));
             }
 
-            // 🌟 2. Buscamos quién es el cliente sentado en esta mesa
             const { data: listaData } = await supabase
                 .from('lista_espera')
                 .select('cliente_id')
                 .eq('sesion_id', sesionId)
                 .single();
 
-            // 🌟 3. DISPARADOR: Le avisamos al celular del cliente
             if (listaData?.cliente_id) {
                 NotificationService.notificarMensajeACliente(listaData.cliente_id, textoAEnviar);
             }
 
-            
+
         } catch (error: any) {
             showToast("error", "Error", "No se pudo enviar el mensaje.");
             setMensajes(prev => prev.filter(m => m.id !== msgOptimista.id));

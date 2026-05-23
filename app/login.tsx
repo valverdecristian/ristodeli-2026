@@ -4,13 +4,13 @@ import { useRouter } from 'expo-router';
 import { useToast } from "@/src/context/ToastContext";
 import { SoundService } from '@/src/services/soundService';
 import { supabase } from '@/src/services/SupabaseClient';
-import AccesosRapidos from '@/src/components/AccesosRapidos'; 
+import AccesosRapidos from '@/src/components/AccesosRapidos';
 import LoadingModal from '@/src/components/LoadingModal';
 
 export default function LoginScreen() {
   const router = useRouter();
   const { showToast } = useToast();
-  
+
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -90,10 +90,10 @@ export default function LoginScreen() {
       setLoading(false);
       await SoundService.reproducir('exito');
 
-      // Redirección por roles
+      // Redireccion por roles
       switch (currentRole) {
         case "dueño":
-        case "admin": 
+        case "admin":
           router.replace("/(homes)/duenio");
           break;
         case "supervisor":
@@ -116,7 +116,7 @@ export default function LoginScreen() {
           router.replace({
             pathname: "/(tabs)/home",
             params: {
-              usuarioId: userProfile.id,       
+              usuarioId: userProfile.id,
               usuarioNombre: userProfile.nombres,
               usuarioFoto: userProfile.foto_url || ''
             }
@@ -139,20 +139,19 @@ export default function LoginScreen() {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       className="flex-1"
     >
-      {/* 2. Inyectamos el Modal de Carga Reutilizable */}
       <LoadingModal visible={loading} message="Verificando credenciales..." />
 
       <ScrollView contentContainerStyle={{ flexGrow: 1 }} className="bg-primary">
         <View className="flex-1 items-center justify-center px-10 pt-16">
-          
+
           {/* LOGO */}
-        <View className="bg-transparent rounded-full p-1 mb-8 shadow-2xl border-4 border-tertiary">
-          <Image
-            source={require("../assets/images/icon.png")}
-            className="w-40 h-40" 
-            resizeMode="contain"
-          />
-        </View>
+          <View className="bg-transparent rounded-full p-1 mb-8 shadow-2xl border-4 border-tertiary">
+            <Image
+              source={require("../assets/images/icon.png")}
+              className="w-40 h-40"
+              resizeMode="contain"
+            />
+          </View>
 
           {/* FORMULARIO */}
           <View className="w-full">
@@ -175,7 +174,7 @@ export default function LoginScreen() {
               className="w-full bg-secondary rounded-full px-6 py-4 text-center text-lg shadow-md mb-8 text-primary font-semibold"
             />
 
-            {/* BOTÓN PRINCIPAL */}
+            {/* BOTON PRINCIPAL */}
             <TouchableOpacity
               onPress={handleLogin}
               className="w-full bg-tertiary rounded-full py-4 shadow-lg border-b-4 border-orange active:opacity-90 mb-6"
@@ -208,7 +207,7 @@ export default function LoginScreen() {
 
           </View>
 
-          {/* ACCESOS RÁPIDOS */}
+          {/* ACCESOS RAPIDOS */}
           <AccesosRapidos onSelect={fillCredentials} />
 
         </View>

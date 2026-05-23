@@ -1,7 +1,3 @@
-// src/services/pedidoService.ts
-// Centraliza toda la lógica de acceso a datos de la tabla `pedidos`.
-// Consumidores: ListaPedidosPendientes.tsx, menuProductos.tsx
-
 import { supabase } from './SupabaseClient';
 
 export type SectorPedido = 'cocina' | 'bar';
@@ -26,15 +22,15 @@ export const PedidoService = {
     let query = supabase
       .from('pedidos')
       .select('*')
-      .in('estado', ['Pendiente', 'En Preparación']); //
+      .in('estado', ['Pendiente', 'En Preparación']);
 
     if (sector === 'bar') {
-      query = query.eq('categoria', 'bebida'); //
+      query = query.eq('categoria', 'bebida');
     } else {
-      query = query.neq('categoria', 'bebida'); //
+      query = query.neq('categoria', 'bebida');
     }
 
-    const { data, error } = await query.order('created_at', { ascending: true }); //
+    const { data, error } = await query.order('created_at', { ascending: true });
     if (error) throw error; //
     return data || []; //
   },
@@ -44,7 +40,6 @@ export const PedidoService = {
    * Si es rechazado, se le puede pasar un motivo que se guardará concatenado.
    */
   async actualizarEstado(ids: string[], nuevoEstado: string, motivo?: string) {
-    // Si el mozo manda un motivo, lo guardamos como "Rechazado: [Motivo]"
     let estadoFinal = nuevoEstado;
     if (motivo && motivo.trim() !== '') {
       estadoFinal = `${nuevoEstado}: ${motivo.trim()}`;
@@ -63,14 +58,12 @@ export const PedidoService = {
    * Queda retenida en 'A Confirmar Mozo' cumpliendo el Punto 12 del PDF.
    */
   async enviarPedidoMesa(mesaNumero: number, items: ItemCarrito[]) {
-    // 🌟 REFUERZO DE SEGURIDAD: Si por error de navegación llega 0 o NaN, 
-    // le clavamos la mesa 21 de pruebas para que Supabase no tire el not-null constraint
     const numeroMesaValido = (!mesaNumero || isNaN(mesaNumero)) ? 21 : mesaNumero;
 
     console.log('[PEDIDO_SERVICE] Insertando pedido para Mesa N°:', numeroMesaValido);
 
     const registrosPedidos = items.map((item) => ({
-      mesa_numero: numeroMesaValido, // Usamos el número validado y seguro
+      mesa_numero: numeroMesaValido,
       producto_nombre: item.producto_nombre,
       categoria: item.categoria,
       cantidad: item.cantidad,

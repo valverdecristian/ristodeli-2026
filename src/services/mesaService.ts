@@ -1,7 +1,3 @@
-// src/services/mesaService.ts
-// Centraliza toda la lógica de acceso a datos de la tabla `mesas`.
-// Consumidores: escanearMesa.tsx, estadoMesas.tsx, asignarMesa.tsx
-
 import { supabase } from './SupabaseClient';
 
 export const MesaService = {

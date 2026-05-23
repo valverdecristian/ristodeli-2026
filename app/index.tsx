@@ -10,14 +10,14 @@ export default function SplashScreenCustom() {
 
   useEffect(() => {
     Animated.timing(rotateValue, {
-      toValue: 1, 
-      duration: 3000, 
+      toValue: 1,
+      duration: 3000,
       easing: Easing.linear,
-      useNativeDriver: true, 
+      useNativeDriver: true,
     }).start();
 
     const timer = setTimeout(() => {
-      router.replace('/login'); 
+      router.replace('/login');
     }, 3000);
 
     return () => clearTimeout(timer);
@@ -30,8 +30,8 @@ export default function SplashScreenCustom() {
 
   return (
     <SafeAreaView className="flex-1 bg-primary justify-between items-center py-16">
-      
-      {/* SECCIÓN SUPERIOR: Nombres del equipo */}
+
+      {/* SECCION SUPERIOR: Nombres del equipo */}
       <View className="items-center mt-10">
         <Text className="text-secondary text-4xl font-serif tracking-widest mb-3">
           Chavez Alejo
@@ -44,13 +44,13 @@ export default function SplashScreenCustom() {
         </Text>
       </View>
 
-      {/* SECCIÓN CENTRAL: Logo Animado */}
+      {/* SECCION CENTRAL: Logo Animado */}
       <View className="items-center justify-center shadow-2xl">
-        <Animated.Image 
-          source={require('@/assets/images/icon.png')} 
-          style={{ 
-            width: 220, 
-            height: 220, 
+        <Animated.Image
+          source={require('@/assets/images/icon.png')}
+          style={{
+            width: 220,
+            height: 220,
             borderRadius: 110,
             transform: [{ rotate: spin }]
           }}
@@ -58,7 +58,7 @@ export default function SplashScreenCustom() {
         />
       </View>
 
-      {/* SECCIÓN INFERIOR: Título de la app */}
+      {/* SECCION INFERIOR: Titulo de la app */}
       <View className="mb-10">
         <Text className="text-secondary text-[45px] font-serif tracking-[8px]">
           RISTODELI

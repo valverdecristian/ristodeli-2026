@@ -1,6 +1,3 @@
-// src/services/notificationService.ts
-// Centraliza la lógica de permisos, obtención y persistencia de push tokens.
-// Consumidores:
 //   - AuthContext.tsx   → usuarios registrados (todos los roles)
 //   - registroAnonimo.tsx → clientes anónimos
 
@@ -16,7 +13,7 @@ Notifications.setNotificationHandler({
   }),
 });
 
-// Project ID de EAS — obtenido de app.json extra.eas.projectId
+// Project ID de EAS 
 const EAS_PROJECT_ID = 'e747ca2a-d49f-40cd-8cfa-e0bb41e14b37';
 
 export const NotificationService = {
@@ -240,12 +237,12 @@ export const NotificationService = {
   async notificarNuevoClienteEnEspera(nombreCliente: string): Promise<void> {
     try {
       const tokens = await NotificationService.obtenerTokensMetres();
-        await NotificationService.enviar(
-          tokens,
-          'Nuevo cliente en lista de espera',
-          `${nombreCliente} ingresó a la lista de espera y aguarda una mesa.`,
-          { pantalla: 'listaEspera' }
-        );
+      await NotificationService.enviar(
+        tokens,
+        'Nuevo cliente en lista de espera',
+        `${nombreCliente} ingresó a la lista de espera y aguarda una mesa.`,
+        { pantalla: 'listaEspera' }
+      );
     } catch (error) {
       console.error('[NotificationService] Error notificando al metre:', error);
     }
@@ -274,10 +271,10 @@ export const NotificationService = {
       if (token && token.startsWith('ExponentPushToken')) {
         // 🌟 Envolvemos el token en un array [token] porque enviar() espera un string[]
         await NotificationService.enviar(
-          [token], 
+          [token],
           '¡Tu mesa está lista!',
           `El metre te ha asignado la Mesa ${numeroMesa}. Ya podés acercarte y escanear el QR en la mesa.`,
-          { pantalla: 'homeCliente' } 
+          { pantalla: 'homeCliente' }
         );
       }
     } catch (error) {
@@ -292,7 +289,7 @@ export const NotificationService = {
     try {
       // Reutilizamos tu helper existente para buscar el token del cliente
       const token = await NotificationService.obtenerTokenCliente(clienteId);
-      
+
       if (token && token.startsWith('ExponentPushToken')) {
         await NotificationService.enviar(
           [token],

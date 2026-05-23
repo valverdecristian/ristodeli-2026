@@ -150,13 +150,11 @@ export default function TatetiScreen() {
       await registrarIntentoJuego();
     }
 
-    // 1. Turno del Jugador (X)
     const newBoard = [...board];
     newBoard[index] = "X";
     let currentMoves = moves + 1;
     let gameWinner = calculateWinner(newBoard);
 
-    // 2. Turno de la IA (O) si no hay ganador y quedan celdas vacías
     if (!gameWinner && currentMoves < 9) {
       const emptyCells = newBoard
         .map((cell, idx) => (cell === null ? idx : null))
@@ -201,7 +199,6 @@ export default function TatetiScreen() {
     setBoard(Array(9).fill(null));
     setWinner(null);
     setMoves(0);
-    // Reiniciar anula el primer intento
     setEsPrimerIntento(false);
     setFeedback("Nueva partida. Los reinicios anulan el descuento.");
   };
@@ -261,7 +258,7 @@ export default function TatetiScreen() {
           )}
         </View>
 
-        {/* Información de partida */}
+        {/* Informacion de partida */}
         {!gameWinner && !isBoardFull && (
           <View className="mb-8 items-center">
             <Text className="text-secondary font-bold text-lg uppercase">
@@ -316,7 +313,7 @@ export default function TatetiScreen() {
           </View>
         )}
 
-        {/* Botón reiniciar */}
+        {/* Boton reiniciar */}
         <TouchableOpacity
           onPress={resetGame}
           className="mt-8 bg-tertiary rounded-full px-8 py-4 shadow-lg border-b-4 border-orange w-full"

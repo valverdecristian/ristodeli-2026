@@ -154,7 +154,7 @@ export default function AgregarEmpleadoScreen() {
     }
   };
 
-  // INYECTAMOS EL COMPONENTE MODULAR DEL ESCÁNER
+  // INYECTA EL COMPONENTE MODULAR DEL ESCÁNER
   if (showScanner) {
     return (
       <ScannerDNI

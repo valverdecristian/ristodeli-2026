@@ -1,4 +1,3 @@
-// app/(tabs)/home.tsx
 import LoadingModal from "@/src/components/LoadingModal";
 import { AuthService } from "@/src/services/authService";
 import { NotificationService } from "@/src/services/notificationService";
@@ -22,12 +21,10 @@ export default function HomeEntradaScreen() {
   const router = useRouter();
   const { showToast } = useToast();
 
-  // 1. Recibimos todos los parámetros posibles
   const { usuarioId, usuarioNombre, usuarioFoto, clienteId, nombre, foto } =
     useLocalSearchParams();
 
-  // 2. Determinamos qué tipo de usuario es
-  const isAnonimo = !!clienteId; // Si existe clienteId, es anónimo
+  const isAnonimo = !!clienteId;
   const currentId = String(isAnonimo ? clienteId : usuarioId);
   const currentNombre = String(
     isAnonimo ? nombre : usuarioNombre || "Cliente Express",
@@ -44,15 +41,11 @@ export default function HomeEntradaScreen() {
     }
   }, [permission]);
 
-  // 3. Función para cerrar sesión o volver al inicio
   const handleLogout = async () => {
-    // 1. Prendemos el LoadingModal para que no se vea un corte brusco
     setLoading(true);
     try {
-      // 2. Ejecutamos tu función que limpia el token y cierra sesión en Supabase
       await AuthService.cerrarSesion();
 
-      // 3. Volvemos a la pantalla principal de la app (Index)
       router.replace("/login");
     } catch (error) {
       console.error("Error al cerrar sesión:", error);
@@ -100,7 +93,6 @@ export default function HomeEntradaScreen() {
     setLoading(true);
     try {
       if (isAnonimo) {
-        // --- LÓGICA CLIENTE ANÓNIMO ---
         await ListaEsperaService.agregarClienteAnonimo({
           nombre: currentNombre,
           foto: currentFoto,
@@ -114,19 +106,17 @@ export default function HomeEntradaScreen() {
           "Te has unido a la lista de espera con éxito.",
         );
 
-        // 🌟 DISPARADOR: Avisamos al Metre en segundo plano
         NotificationService.notificarNuevoClienteEnEspera(currentNombre);
 
         router.replace({
           pathname: "/panelAccionesAnonimo" as any,
           params: {
             clienteId: currentId,
-            nombre: currentNombre, // 🌟 AHORA SÍ VIAJA EL NOMBRE
-            foto: currentFoto, // 🌟 AHORA SÍ VIAJA LA FOTO
+            nombre: currentNombre,
+            foto: currentFoto,
           },
         });
       } else {
-        // --- LÓGICA CLIENTE REGISTRADO ---
         await ListaEsperaService.agregarClienteRegistrado({
           nombre: currentNombre,
           foto: currentFoto,
@@ -140,7 +130,6 @@ export default function HomeEntradaScreen() {
           "Te has unido a la lista de espera. El Metre te asignará una mesa pronto.",
         );
 
-        // 🌟 DISPARADOR: Avisamos al Metre en segundo plano
         NotificationService.notificarNuevoClienteEnEspera(currentNombre);
 
         router.replace({
@@ -167,10 +156,8 @@ export default function HomeEntradaScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-primary">
-      {/* 4. Implementación de LoadingModal */}
       <LoadingModal visible={loading} message="Procesando Entrada..." />
 
-      {/* 5. Toolbar superior con botón de Logout */}
       <View className="px-6 pt-4 pb-4 bg-tertiary flex-row justify-between items-center shadow-md z-10">
         <View>
           <Text className="text-primary font-black text-xl uppercase tracking-tighter">
@@ -189,7 +176,6 @@ export default function HomeEntradaScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* Header de Información */}
       <View className="p-6 bg-secondary border-b border-tertiary/20 items-center">
         <Text className="text-primary font-black text-base uppercase tracking-wider">
           ¡Hola, {currentNombre.split(" ")[0]}!
@@ -199,7 +185,6 @@ export default function HomeEntradaScreen() {
         </Text>
       </View>
 
-      {/* Cámara */}
       <View className="flex-1 overflow-hidden relative justify-center items-center">
         <CameraView
           style={StyleSheet.absoluteFillObject}

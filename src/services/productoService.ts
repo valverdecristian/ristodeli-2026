@@ -1,7 +1,3 @@
-// src/services/productoService.ts
-// Centraliza toda la lógica de acceso a datos de la tabla `productos`.
-// Consumidores: VisorProductos.tsx, FormularioProducto.tsx
-
 import { supabase } from './SupabaseClient';
 
 export type TipoProducto = 'plato' | 'bebida' | 'postre';

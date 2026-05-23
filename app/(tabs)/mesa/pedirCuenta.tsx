@@ -54,7 +54,6 @@ export default function PedirCuentaScreen() {
         try {
             setLoading(true);
 
-            // 1. Obtener el descuento desde AsyncStorage
             if (sesion_id) {
                 const key = `ristodeli_juegos_sesion_${sesion_id}`;
                 const json = await AsyncStorage.getItem(key);
@@ -72,7 +71,6 @@ export default function PedirCuentaScreen() {
                 }
             }
 
-            // 2. Obtener hora de inicio de la sesión
             let sessionStart = new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(); // Fallback 4 horas
             if (mesaId) {
                 const { data: asignacion } = await supabase
@@ -87,7 +85,6 @@ export default function PedirCuentaScreen() {
                 }
             }
 
-            // 3. Obtener consumos de la mesa
             const { data: pedidos, error: errPedidos } = await supabase
                 .from('pedidos')
                 .select('*')
@@ -98,7 +95,6 @@ export default function PedirCuentaScreen() {
 
             if (errPedidos) throw errPedidos;
 
-            // 4. Obtener todos los productos para mapear precios
             const { data: productos, error: errProd } = await supabase
                 .from('productos')
                 .select('nombre, precio');
@@ -194,7 +190,6 @@ export default function PedirCuentaScreen() {
         try {
             setSubmitting(true);
 
-            // 1. Guardar descuento en pedidos si aplica
             if (descuentoPorcentaje > 0) {
                 const { error: errDesc } = await supabase
                     .from('pedidos')
@@ -208,7 +203,6 @@ export default function PedirCuentaScreen() {
                 if (errDesc) throw errDesc;
             }
 
-            // 2. Guardar propina en pedidos
             const { error: errProp } = await supabase
                 .from('pedidos')
                 .insert([{
@@ -220,7 +214,6 @@ export default function PedirCuentaScreen() {
                 }]);
             if (errProp) throw errProp;
 
-            // 3. Cambiar estado de la mesa a 'Pidiendo Cuenta'
             if (mesaId) {
                 await MesaService.actualizarEstado(mesaId as string, 'Pidiendo Cuenta');
             }
@@ -361,7 +354,7 @@ export default function PedirCuentaScreen() {
                             </Text>
                         </View>
 
-                        {/* Botón Scanner de Propina */}
+                        {/* Boton Scanner de Propina */}
                         <TouchableOpacity
                             onPress={async () => {
                                 await SoundService.reproducir('exito');
@@ -405,7 +398,7 @@ export default function PedirCuentaScreen() {
                             <Text className="text-primary font-black text-xl">${totalNeto.toFixed(2)}</Text>
                         </View>
 
-                        {/* Botón Solicitar Cuenta */}
+                        {/* Boton Solicitar Cuenta */}
                         <TouchableOpacity
                             onPress={solicitarCuenta}
                             activeOpacity={0.9}

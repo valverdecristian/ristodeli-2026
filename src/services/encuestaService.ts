@@ -1,7 +1,3 @@
-// src/services/encuestaService.ts
-// Centraliza toda la lógica de acceso a datos de la tabla `encuestas`.
-// Consumidores: graficoDetalle.tsx
-
 import { supabase } from './SupabaseClient';
 
 export const EncuestaService = {

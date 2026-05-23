@@ -1,7 +1,3 @@
-// src/services/authService.ts
-// Migración de auth.service.ts (Angular/Ionic) → servicio puro de funciones para Expo React Native.
-// Usa el cliente de Supabase ya configurado. El estado reactivo vive en AuthContext.tsx.
-
 import { createClient } from '@supabase/supabase-js';
 import { DetalleRegistro, UsuarioPerfil } from '../models/usuario.model';
 import { supabase } from './SupabaseClient';
@@ -32,7 +28,6 @@ export const AuthService = {
    * Lanza un error en cualquier punto del proceso.
    */
   async registrar(password: string, detalles: DetalleRegistro) {
-    // 1. Crear el usuario en auth.users de Supabase
     const { data: authData, error: authError } = await supabase.auth.signUp({
       email: detalles.email.trim(),
       password,
@@ -41,7 +36,6 @@ export const AuthService = {
     if (authError) throw authError;
     if (!authData.user) throw new Error('No se devolvió un usuario tras el registro.');
 
-    // 2. Insertar los detalles del perfil en public.usuarios
     const nuevoPerfil = {
       id: authData.user.id,
       email: detalles.email.trim().toLowerCase(),
@@ -72,7 +66,6 @@ export const AuthService = {
    * El insert en `usuarios` sigue usando el cliente principal (sesión del admin) que tiene permisos.
    */
   async registrarEmpleado(password: string, detalles: DetalleRegistro) {
-    // 1. Cliente temporal sin storage — no toca la sesión del admin
     const supabaseTemp = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
       auth: {
         persistSession: false,
@@ -81,7 +74,6 @@ export const AuthService = {
       },
     });
 
-    // 2. Crear el usuario en auth.users con el cliente temporal
     const { data: authData, error: authError } = await supabaseTemp.auth.signUp({
       email: detalles.email.trim(),
       password,
@@ -90,7 +82,6 @@ export const AuthService = {
     if (authError) throw authError;
     if (!authData.user) throw new Error('No se devolvió un usuario tras el registro del empleado.');
 
-    // 3. Insertar el perfil en public.usuarios con el cliente PRINCIPAL (sesión admin activa)
     const nuevoPerfil = {
       id: authData.user.id,
       email: detalles.email.trim().toLowerCase(),
@@ -98,7 +89,7 @@ export const AuthService = {
       apellidos: detalles.apellidos.trim(),
       dni: detalles.dni.trim(),
       cuil: detalles.cuil.trim(),
-      perfil: detalles.perfil, // Rol definido por el admin al momento de crear
+      perfil: detalles.perfil,
       foto_url: detalles.foto_url || null,
       push_token: null,
     };
@@ -174,7 +165,6 @@ export const AuthService = {
    * para que el usuario no reciba notificaciones en un dispositivo donde ya salió.
    */
   async cerrarSesion() {
-    // Obtener el userId ANTES de invalidar la sesión
     const { data: { session } } = await supabase.auth.getSession();
     if (session?.user?.id) {
       await NotificationService.limpiarToken(session.user.id);

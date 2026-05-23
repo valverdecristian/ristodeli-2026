@@ -119,7 +119,7 @@ export default function JuegosMenuScreen() {
         contentContainerStyle={{ flexGrow: 1 }}
         className="px-6 pt-8 pb-8"
       >
-        {/* Título descriptivo */}
+        {/* Titulo descriptivo */}
         <View className="mb-8">
           <Text className="text-secondary font-bold text-lg uppercase text-center">
             Gana Descuentos
@@ -132,7 +132,7 @@ export default function JuegosMenuScreen() {
         {/* Grid de juegos */}
         <View className="gap-6">
           {JUEGOS.map((juego) => {
-            // Evaluamos la elegibilidad de este juego para descuento
+
             const primerJuegoSeleccionado = sessionState?.juegoSeleccionado;
             const esEsteJuegoSeleccionado = primerJuegoSeleccionado === juego.id;
             const yaJugoAlgono = !!primerJuegoSeleccionado;
@@ -198,7 +198,7 @@ export default function JuegosMenuScreen() {
                   </View>
                 </View>
 
-                {/* Línea divisoria */}
+                {/* Linea divisoria */}
                 <View className="h-px bg-primary/10 mb-4" />
 
                 {/* Footer con botón */}

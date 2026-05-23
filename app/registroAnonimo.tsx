@@ -6,15 +6,7 @@ import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
-import {
-    ActivityIndicator,
-    Image,
-    Modal,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
-} from "react-native";
+import { ActivityIndicator, Image, Modal, Text, TextInput, TouchableOpacity, View, } from "react-native";
 
 export default function RegistroAnonimoScreen() {
   const router = useRouter();
@@ -92,7 +84,7 @@ export default function RegistroAnonimoScreen() {
           "error",
           "Error de almacenamiento",
           resultadoSubida.message ||
-            "No se pudo guardar la foto en el servidor.",
+          "No se pudo guardar la foto en el servidor.",
         );
         setLoading(false);
         return;
@@ -103,7 +95,6 @@ export default function RegistroAnonimoScreen() {
         "[REG_ANON] 2. Insertando en la tabla anonimos de Supabase...",
       );
 
-      // Registramos en la tabla anonimos de Supabase
       const registroAnonimoCreado = await AuthService.registrarAnonimoAuth(
         nombre.trim(),
         resultadoSubida.url,
@@ -113,7 +104,6 @@ export default function RegistroAnonimoScreen() {
         registroAnonimoCreado.user?.id,
       );
 
-      // 🌟 CAMBIAMOS EL TEXTO DEL SPINNER (Ya no dice más nada de la mesa)
       setLoadingText("Cargando ingreso...");
       await SoundService.reproducir("exito");
       showToast(
@@ -122,11 +112,8 @@ export default function RegistroAnonimoScreen() {
         `¡Hola ${nombre.trim()}! Perfil temporal creado.`,
       );
 
-      // 🚀 APAGAMOS EL LOADING ANTES DE NAVEGAR
       setLoading(false);
 
-      // 🚀 REDIRECCIÓN MANUAL FORZADA A TU HOME ANONIMO (LA PUERTA)
-      // Quitamos de en medio al resolverRutaPorPerfil para que no te tire a la mesa por descarte
       router.replace({
         pathname: "/(tabs)/home" as any,
         params: {

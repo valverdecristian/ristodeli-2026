@@ -9,7 +9,7 @@ export interface UploadResult {
 
 export const ImageService = {
   /**
-   * 1. Abre la cámara del dispositivo de manera obligatoria y captura la foto.
+   * Abre la camara del dispositivo de manera obligatoria y captura la foto.
    * No permite elegir archivos desde la galería.
    */
   takePhoto: async () => {
@@ -19,23 +19,22 @@ export const ImageService = {
       throw new Error("Se requieren permisos de la cámara para capturar la fotografía.");
     }
 
-    // Disparamos de forma directa la interfaz de la cámara
     const result = await ImagePicker.launchCameraAsync({
       mediaTypes: ["images"],
-      allowsEditing: true, 
-      aspect: [1, 1],      
-      quality: 0.5,        
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.5,
     });
 
     if (!result.canceled) {
-      return result.assets[0]; 
+      return result.assets[0];
     }
 
     return null;
   },
 
   /**
-   * 2. Abre la galería del dispositivo y permite seleccionar una imagen.
+   * Abre la galería del dispositivo y permite seleccionar una imagen.
    */
   chooseFromGallery: async () => {
     const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -59,7 +58,7 @@ export const ImageService = {
   },
 
   /**
-   * 2. Sube la foto capturada al Storage de Supabase y devuelve la URL pública.
+   * Sube la foto capturada al Storage de Supabase y devuelve la URL pública.
    */
   uploadToSupabase: async (
     uri: string,
@@ -68,7 +67,7 @@ export const ImageService = {
     fileName: string,
   ): Promise<UploadResult> => {
     try {
-      
+
       const response = await fetch(uri);
       const arrayBuffer = await response.arrayBuffer();
 
@@ -82,7 +81,7 @@ export const ImageService = {
 
       if (error) throw error;
 
-      
+
       const { data: publicUrlData } = supabase.storage
         .from(bucketName)
         .getPublicUrl(`${folderPath}/${fileName}.jpeg`);

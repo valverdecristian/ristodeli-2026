@@ -22,7 +22,6 @@ export default function EstadoPedidoScreen() {
     const [loading, setLoading] = useState(true);
     const [descuentoInfo, setDescuentoInfo] = useState<{ descuento: number; juego: string } | null>(null);
 
-    // Unificamos el número de mesa para asegurar la consulta
     const nroMesaInt = (numeroMesa && !isNaN(parseInt(numeroMesa as string, 10)))
         ? parseInt(numeroMesa as string, 10)
         : parseInt(mesaId as string, 10) || 21;
@@ -31,7 +30,6 @@ export default function EstadoPedidoScreen() {
         fetchPedidosEnCurso();
         cargarDescuentoDeJuego();
 
-        // 🌟 CANAL DINÁMICO: Inmune a errores de caché
         const nombreCanal = `monitoreo_cocina_mesa_${nroMesaInt}_${Date.now()}`;
         const channel = supabase
             .channel(nombreCanal)
@@ -40,7 +38,6 @@ export default function EstadoPedidoScreen() {
                 { event: '*', schema: 'public', table: 'pedidos' },
                 (payload: any) => {
                     const mesaPayload = payload.new?.mesa_numero;
-                    // Si el cambio es de nuestra mesa, recargamos la lista silenciosamente
                     if (mesaPayload && parseInt(mesaPayload, 10) === nroMesaInt) {
                         fetchPedidosEnCurso();
                     }
@@ -55,7 +52,6 @@ export default function EstadoPedidoScreen() {
 
     const fetchPedidosEnCurso = async () => {
         try {
-            // Quitamos el .in() restrictivo y traemos todo para filtrar manualmente con .toLowerCase()
             const { data, error } = await supabase
                 .from('pedidos')
                 .select('*')
@@ -64,7 +60,6 @@ export default function EstadoPedidoScreen() {
 
             if (error) throw error;
 
-            // Filtramos en memoria para asegurar que capturamos todas las variantes
             const filtrados = (data || []).filter(p =>
                 ['pendiente', 'en preparación', 'en preparacion', 'listo cocina', 'listo bar', 'entregado'].includes(p.estado.toLowerCase())
             );
@@ -102,7 +97,6 @@ export default function EstadoPedidoScreen() {
         }
     };
 
-    // 🎨 DICCIONARIO VISUAL: Mapea el estado aburrido de la BD a un diseño atractivo
     const obtenerEstiloEstado = (estadoDB: string) => {
         const e = estadoDB.toLowerCase();
 
@@ -212,7 +206,6 @@ export default function EstadoPedidoScreen() {
                                         </View>
                                     </View>
 
-                                    {/* 🌟 CHIP DINÁMICO DE ESTADO */}
                                     <View className={`flex-row items-center self-start px-3 py-1.5 rounded-full border ${estilo.bg} ${estilo.borde}`}>
                                         <Ionicons name={estilo.icono as any} size={14} color={estilo.texto.replace('text-', '')} className="mr-1.5" />
                                         <Text className={`font-black text-[10px] uppercase ml-1 ${estilo.texto}`}>

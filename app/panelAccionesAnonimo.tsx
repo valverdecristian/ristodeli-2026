@@ -8,9 +8,8 @@ import { ActivityIndicator, Text, View } from 'react-native';
 export default function PanelAccionesAnonimoScreen() {
     const router = useRouter();
     const { showToast } = useToast();
-    const { currentUser } = useAuth();
+    const { currentUser, cerrarSesion } = useAuth();
 
-    // 🌟 Atrapamos clienteId, nombre y foto
     const { clienteId, nombre, foto } = useLocalSearchParams<{ clienteId?: string; nombre?: string; foto?: string }>();
 
     if (!clienteId) {
@@ -33,7 +32,16 @@ export default function PanelAccionesAnonimoScreen() {
         });
     };
 
-    // 🌟 Generamos una URL por defecto por si el anónimo no tiene foto (El iconito de Ristodeli)
+    const handleJuegos = () => {
+        router.push("/(juegos)" as any);
+    };
+
+    const handleLogout = async () => {
+        showToast("info", "Cerrando sesión", "Volviendo al inicio...");
+        await cerrarSesion();
+        router.replace("/login");
+    };
+
     const fotoSegura = foto || currentUser?.foto_url || 'https://wtjylfdfdwowzzvunlpa.supabase.co/storage/v1/object/public/avatares/icon.png';
 
     return (
@@ -45,6 +53,8 @@ export default function PanelAccionesAnonimoScreen() {
             onEscanearEntrada={() => showToast("info", "Ya registrado", "Ya te encuentras anotado en la lista de espera.")}
             onEscanearMesa={handleEscanearMesaAsignada}
             onVerEncuestas={() => router.push("/(tabs)/encuestasPrevias" as any)}
+            onJuegos={handleJuegos}
+            onLogout={handleLogout}
         />
     );
 }

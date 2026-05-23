@@ -37,7 +37,7 @@ export default function ConsultasClientesScreen() {
                 return;
             }
 
-// AGRUPACION: ultimo mensaje por mesa + no leidos
+            // AGRUPACION: ultimo mensaje por mesa + no leidos
             const mesasVistas = new Set();
             const sesionesAgrupadas: SesionActiva[] = [];
             for (const msg of mensajesData) {
@@ -51,7 +51,7 @@ export default function ConsultasClientesScreen() {
                     sesionesAgrupadas.push({
                         sesion_id: msg.sesion_id || msg.mesa_id,
                         mesa_id: msg.mesa_id,
-                        numero_mesa: msg.mesas?.numero || 0,
+                        numero_mesa: Array.isArray(msg.mesas) ? (msg.mesas[0]?.numero || 0) : ((msg.mesas as any)?.numero || 0),
                         ultimo_mensaje: msg.mensaje || '',
                         ultima_actividad: msg.created_at || '',
                         no_leidos: count ?? 0,

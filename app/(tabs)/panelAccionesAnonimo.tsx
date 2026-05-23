@@ -10,7 +10,6 @@ export default function PanelAccionesAnonimoScreen() {
   const { showToast } = useToast();
   const { currentUser, cerrarSesion } = useAuth();
 
-  // 🌟 Atrapamos clienteId, nombre y foto
   const { clienteId, nombre, foto } = useLocalSearchParams<{
     clienteId?: string;
     nombre?: string;
@@ -53,7 +52,6 @@ export default function PanelAccionesAnonimoScreen() {
     router.replace("/login");
   };
 
-  // 🌟 Generamos una URL por defecto por si el anónimo no tiene foto (El iconito de Ristodeli)
   const fotoSegura =
     foto ||
     currentUser?.foto_url ||

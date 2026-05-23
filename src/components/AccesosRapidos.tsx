@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, Modal, ScrollView } from 'react-native';
-import { Ionicons } from '@expo/vector-icons'; // Para el ícono de cerrar
+import { Ionicons } from '@expo/vector-icons'; // Para el icono de cerrar
 
 interface AccesosRapidosProps {
   onSelect: (email: string, pass: string) => void;
@@ -32,23 +32,23 @@ export default function AccesosRapidos({ onSelect }: AccesosRapidosProps) {
         <Text className="text-secondary text-xl font-bold tracking-wider">ACCESOS RÁPIDOS</Text>
       </TouchableOpacity>
 
-      {/* MODAL SUPERPUESTO (Bottom Sheet) */}
+      {/* MODAL SUPERPUESTO  */}
       <Modal
         visible={modalVisible}
         transparent={true}
-        animationType="slide" // Hace que suba desde abajo
-        onRequestClose={() => setModalVisible(false)} // Para el botón de retroceso en Android
+        animationType="slide"
+        onRequestClose={() => setModalVisible(false)}
       >
         {/* Fondo oscuro semi-transparente */}
         <View className="flex-1 justify-end bg-black/70">
-          
+
           {/* Contenedor principal del Modal (Bordes redondeados arriba) */}
           <View className="bg-primary rounded-t-[40px] pt-4 pb-10 px-6 h-[90%] shadow-2xl border-t-4 border-secondary">
-            
+
             {/* Cabecera del Modal */}
             <View className="flex-row justify-between items-center mb-6 mt-2">
               <Text className="text-secondary text-3xl font-serif font-bold">Perfiles</Text>
-              <TouchableOpacity 
+              <TouchableOpacity
                 onPress={() => setModalVisible(false)}
                 className="bg-secondary/20 p-2 rounded-full"
               >

@@ -33,7 +33,7 @@ export default function ListaPedidosPendientes({ sector }: ListaPedidosProps) {
             setLoading(true);
             const data = await PedidoService.obtenerPendientesPorSector(sector);
 
-            // AGRUPACIÓN POR MESA 
+            // AGRUPACION POR MESA 
             const grupos: { [key: number]: any } = {};
             data.forEach((item) => {
                 if (!grupos[item.mesa_numero]) {
@@ -53,7 +53,7 @@ export default function ListaPedidosPendientes({ sector }: ListaPedidosProps) {
         }
     };
 
-    // Comenzar preparación
+    // Comenzar preparacion
     const handleComenzarMesa = async (mesaNumero: number, items: any[]) => {
         try {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -122,7 +122,7 @@ export default function ListaPedidosPendientes({ sector }: ListaPedidosProps) {
                                 </View>
                             </View>
 
-                            {/* Listado de ítems pertenecientes a este sector */}
+                            {/* Listado de Items pertenecientes a este sector */}
                             <View className="mb-5">
                                 {item.items.map((prod: any) => (
                                     <View key={prod.id} className="flex-row justify-between items-center py-2 border-b border-primary/5">

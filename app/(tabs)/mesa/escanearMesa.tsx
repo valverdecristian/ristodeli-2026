@@ -18,7 +18,6 @@ export default function EscanearMesaScreen() {
     const [numeroMesaEsperada, setNumeroMesaEsperada] = useState<string | null>(null);
     const [clienteId, setClienteId] = useState<string | null>(null);
 
-    //Capturamos 'clienteId' en lugar de 'clienteAnonimoId' para que machee con el panel anterior
     const { clienteId: paramClienteId } = useLocalSearchParams<{ clienteId?: string }>();
 
     useEffect(() => {

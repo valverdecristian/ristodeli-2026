@@ -1,7 +1,3 @@
-// src/services/listaEsperaService.ts
-// Centraliza toda la lógica de acceso a datos de la tabla `lista_espera`.
-// Consumidores: home.tsx, homeAnonimo.tsx, asignarMesa.tsx, escanearMesa.tsx
-
 import { supabase } from './SupabaseClient';
 
 export const ListaEsperaService = {
@@ -68,7 +64,6 @@ export const ListaEsperaService = {
     if (errEspera) throw errEspera;
     if (!esperaData || esperaData.length === 0) return [];
 
-    // Para clientes registrados, enriquecemos con apellidos reales
     const idsRegistrados = esperaData
       .filter(e => e.tipo === 'registrado')
       .map(e => e.cliente_id);

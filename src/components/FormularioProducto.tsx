@@ -27,7 +27,7 @@ export default function FormularioProducto({ tiposPermitidos, onExito }: Formula
     // Array de 3 posiciones para controlar las 3 fotos individuales individuales
     const [fotosUris, setFotosUris] = useState<(string | null)[]>([null, null, null]);
 
-    // Estados para el Modal Selector de fotos (Sin alerts excluyentes)
+    // Estados para el Modal Selector de fotos 
     const [modalVisible, setModalVisible] = useState(false);
     const [indiceFotoSeleccionada, setIndiceFotoSeleccionada] = useState<number | null>(null);
 
@@ -36,7 +36,6 @@ export default function FormularioProducto({ tiposPermitidos, onExito }: Formula
         showToast("error", titulo, mensaje);
     };
 
-    // Abre el modal para que el usuario elija origen (Cámara o Galería)
     const gestionarFoto = (index: number) => {
         setIndiceFotoSeleccionada(index);
         setModalVisible(true);
@@ -150,7 +149,7 @@ export default function FormularioProducto({ tiposPermitidos, onExito }: Formula
 
     return (
         <ScrollView contentContainerStyle={{ flexGrow: 1 }} showsVerticalScrollIndicator={false}>
-            {/* SPINNER OBLIGATORIO CON LOGO EN LAS ESPERAS */}
+            {/* SPINNER  */}
             <LoadingModal visible={loading} message={loadingText} />
 
             {/* Inputs del formulario */}
@@ -208,7 +207,7 @@ export default function FormularioProducto({ tiposPermitidos, onExito }: Formula
                     </View>
                 )}
 
-                {/* SECCIÓN MULTIFOTO INDIVIDUAL Y CENTRADA */}
+                {/* SECCION MULTIFOTO INDIVIDUAL Y CENTRADA */}
                 <Text className="text-secondary font-bold text-xs uppercase tracking-wider mb-3 px-2">
                     Fotos obligatorias del producto (3)
                 </Text>
@@ -240,7 +239,7 @@ export default function FormularioProducto({ tiposPermitidos, onExito }: Formula
                 </TouchableOpacity>
             </View>
 
-            {/* MODAL PERSONALIZADO PARA SELECCIÓN DE IMAGEN (SIN ALERTS) */}
+            {/* MODAL PERSONALIZADO PARA SELECCION DE IMAGEN */}
             <Modal
                 visible={modalVisible}
                 transparent

@@ -31,7 +31,6 @@ export default function PanelMesaClienteScreen() {
         }, [sesion_id, mesaId])
     );
 
-    // Unificamos el número de mesa asegurándonos de que sea un número válido
     const nroMesaInt = (numeroMesa && !isNaN(parseInt(numeroMesa as string, 10)))
         ? parseInt(numeroMesa as string, 10)
         : parseInt(mesaId as string, 10) || 21;
@@ -39,7 +38,6 @@ export default function PanelMesaClienteScreen() {
     useEffect(() => {
         fetchEstadoActual();
 
-        // ⚡ Suscripción en tiempo real a pedidos
         const nombreCanal = `cambios_estadia_${Date.now()}`;
         const channel = supabase
             .channel(nombreCanal)
@@ -58,7 +56,6 @@ export default function PanelMesaClienteScreen() {
             )
             .subscribe();
 
-        // ⚡ Suscripción en tiempo real a mesas para liberar o detectar solicitud de cuenta
         const channelMesa = supabase
             .channel(`cambios_mesa_${Date.now()}`)
             .on(
@@ -87,12 +84,10 @@ export default function PanelMesaClienteScreen() {
         };
     }, [mesaId, nroMesaInt]);
 
-    // 🌟 1. BUSCAMOS LA VERDAD EN LA BASE DE DATOS
     const fetchEstadoActual = async () => {
         try {
             setLoading(true);
 
-            // Consultar primero el estado de la mesa en la tabla mesas
             if (mesaId) {
                 const { data: mesaObj, error: mesaErr } = await supabase
                     .from('mesas')
@@ -115,7 +110,7 @@ export default function PanelMesaClienteScreen() {
                 .from('pedidos')
                 .select('estado')
                 .eq('mesa_numero', nroMesaInt)
-                .order('created_at', { ascending: false }) // Traemos el pedido más reciente de esta mesa
+                .order('created_at', { ascending: false })
                 .limit(1)
                 .maybeSingle();
 
@@ -125,7 +120,7 @@ export default function PanelMesaClienteScreen() {
                 console.log('[PANEL_MESA] Estado inicial de la mesa cargado:', data.estado);
                 adaptarEstadoFlujo(data.estado);
             } else {
-                setEstado('inicial'); // Si no hay pedidos, es una mesa virgen
+                setEstado('inicial');
             }
         } catch (err) {
             console.log("[PANEL_MESA] Error al cargar estado:", err);
@@ -135,7 +130,6 @@ export default function PanelMesaClienteScreen() {
         }
     };
 
-    // 🌟 2. MAPEO AUTOMÁTICO DE ESTADOS
     const adaptarEstadoFlujo = (estadoDB: string) => {
         const e = estadoDB.toLowerCase();
 
@@ -146,8 +140,6 @@ export default function PanelMesaClienteScreen() {
         } else if (e.includes('listo')) {
             setEstado('pedido_listo');
         } else if (e === 'entregado') {
-            // 🌟 CAMBIO: Si el mozo marcó 'entregado', forzamos a 'comido' 
-            // para que aparezcan los botones de cuenta y encuesta automáticamente
             setEstado('comido');
         } else if (e === 'comido' || e === 'pagado') {
             setEstado('comido');
@@ -161,7 +153,6 @@ export default function PanelMesaClienteScreen() {
     }
 
     return (
-        // 🌟 1. El SafeAreaView abraza toda la pantalla y maneja el color de fondo
         <SafeAreaView className="flex-1 bg-primary">
             <ScrollView className="flex-1 bg-primary px-6 pt-6">
                 <View className="bg-secondary p-4 rounded-3xl mb-6 items-center">
@@ -200,7 +191,7 @@ export default function PanelMesaClienteScreen() {
                     </View>
                 )}
 
-                {/* En preparación (Mozo aceptó y está en cocina/bar) */}
+                {/* En preparacion (Mozo acepto y esta en cocina/bar) */}
                 {estado === 'en_preparacion' && (
                     <View className="space-y-4">
                         <TouchableOpacity
@@ -213,7 +204,7 @@ export default function PanelMesaClienteScreen() {
                             <Text className="text-primary font-bold uppercase">Ver Estado del Pedido</Text>
                         </TouchableOpacity>
 
-                        {/* Juegos bloqueados si es anónimo */}
+                        {/* Juegos bloqueados si es anonimo */}
                         <TouchableOpacity
                             disabled={tipoCliente === 'anonimo'}
                             onPress={() => router.push({
@@ -229,7 +220,7 @@ export default function PanelMesaClienteScreen() {
                     </View>
                 )}
 
-                {/* El pedido llegó completo a la mesa (Cocinero/Cantinero terminaron) */}
+                {/* El pedido llego completo a la mesa (Cocinero/Cantinero terminaron) */}
                 {estado === 'pedido_listo' && (
                     <TouchableOpacity
                         onPress={async () => {
@@ -243,7 +234,7 @@ export default function PanelMesaClienteScreen() {
                     </TouchableOpacity>
                 )}
 
-                {/* Fin de la estadía (Ya comieron y confirmaron recepcion) */}
+                {/* Ya comieron y confirmaron recepcion */}
                 {estado === 'comido' && (
                     <View className="space-y-4">
                         {!yaHizoEncuesta && (
@@ -273,7 +264,7 @@ export default function PanelMesaClienteScreen() {
                     </View>
                 )}
 
-                {/* Solicitó la cuenta y está esperando cobro del mozo */}
+                {/* Solicita la cuenta y esta esperando cobro del mozo */}
                 {estado === 'pidiendo_cuenta' && (
                     <View className="bg-secondary p-8 rounded-3xl border border-tertiary/20 items-center justify-center space-y-4 shadow-sm mb-6">
                         <View className="bg-primary/10 p-4 rounded-full mb-2">

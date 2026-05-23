@@ -11,28 +11,25 @@ import { Alert, Text, TouchableOpacity, View, ActivityIndicator } from 'react-na
 export default function MenuProductosScreen() {
     const router = useRouter();
     const { showToast } = useToast();
-    
-    const { mesaId, numeroMesa, clienteId } = useLocalSearchParams<{ 
-        mesaId: string; 
-        numeroMesa: string; 
+
+    const { mesaId, numeroMesa, clienteId } = useLocalSearchParams<{
+        mesaId: string;
+        numeroMesa: string;
         clienteId?: string;
     }>();
-    
+
     const { carrito, actualizarCantidad, importeTotal, tiempoEstimadoMaximo, vaciarCarrito } = useCarritoPedido();
-    
-    // 🌟 ESTADO ELEGANTE: Ya no usamos el modal bloqueante, solo cambiamos el estado del botón
+
     const [estadoComanda, setEstadoComanda] = useState<'edicion' | 'esperando'>('edicion');
 
     const categoriasAMostrar: ('plato' | 'bebida' | 'postre')[] = ['plato', 'bebida', 'postre'];
     const nroMesaInt = (numeroMesa && !isNaN(parseInt(numeroMesa, 10))) ? parseInt(numeroMesa, 10) : 21;
 
-    // 🌟 LA MAGIA DEL POLLING: Consulta silenciosa cada 3 segundos
     useEffect(() => {
         if (estadoComanda !== 'esperando') return;
 
         const intervaloPolling = setInterval(async () => {
             try {
-                // Buscamos el estado del ÚLTIMO pedido de esta mesa
                 const { data, error } = await supabase
                     .from('pedidos')
                     .select('estado')
@@ -44,22 +41,22 @@ export default function MenuProductosScreen() {
                 if (data && !error) {
                     const estadoLimpio = data.estado.toLowerCase();
 
-                    // 🟢 CASO ÉXITO
+                    // CASO ÉXITO
                     if (estadoLimpio === 'pendiente') {
                         clearInterval(intervaloPolling);
                         setEstadoComanda('edicion');
                         vaciarCarrito();
-                        
+
                         await SoundService.reproducir('exito');
                         showToast("success", "¡Pedido Confirmado!", "Tu orden fue enviada a la cocina.");
                         router.replace("/(tabs)/mesa/escanearMesa");
                     }
 
-                    // 🔴 CASO RECHAZO
+                    // CASO RECHAZO
                     if (estadoLimpio.startsWith('rechazado') || estadoLimpio.startsWith('cancelado')) {
                         clearInterval(intervaloPolling);
-                        setEstadoComanda('edicion'); // El botón vuelve a la normalidad para que puedan editar el carrito
-                        
+                        setEstadoComanda('edicion');
+
                         await SoundService.reproducir('error');
 
                         let motivoDelMozo = "Revisá los motivos de rechazo.";
@@ -73,9 +70,8 @@ export default function MenuProductosScreen() {
             } catch (err) {
                 console.log("[POLLING_ERROR] Fallo silencioso en consulta:", err);
             }
-        }, 3000); // 3000 milisegundos = 3 segundos
+        }, 3000);
 
-        // Limpieza de memoria si el usuario sale de la pantalla
         return () => clearInterval(intervaloPolling);
     }, [estadoComanda, nroMesaInt]);
 
@@ -86,7 +82,6 @@ export default function MenuProductosScreen() {
         }
 
         try {
-            // Activamos la UI fluida
             setEstadoComanda('esperando');
 
             await PedidoService.enviarPedidoMesa(nroMesaInt, carrito);
@@ -100,23 +95,21 @@ export default function MenuProductosScreen() {
 
     return (
         <View className="flex-1 bg-primary pt-12 relative">
-            {/* 🚫 Chau LoadingModal bloqueante */}
 
             <View className="px-6 mb-4">
                 <Text className="text-white text-2xl font-black uppercase tracking-wider mb-1">Menú Ristodeli</Text>
                 <Text className="text-tertiary text-xs uppercase font-bold tracking-widest">Mesa N° {numeroMesa || '--'}</Text>
             </View>
 
-            <View 
-                pointerEvents={estadoComanda === 'esperando' ? 'none' : 'auto'} 
+            <View
+                pointerEvents={estadoComanda === 'esperando' ? 'none' : 'auto'}
                 className={`flex-1 px-6 ${estadoComanda === 'esperando' ? 'opacity-40' : ''}`}
             >
-                <VisorProductos 
-                    categoriasFiltradas={categoriasAMostrar} 
+                <VisorProductos
+                    categoriasFiltradas={categoriasAMostrar}
                     modo="pedido"
                     carrito={carrito}
                     onActualizarCantidad={(prod, cambio) => {
-                        // 🌟 CORTOCIRCUITO LÓGICO: Si está esperando, no altera el Hook bajo ningún concepto
                         if (estadoComanda === 'esperando') return;
 
                         actualizarCantidad({
@@ -135,20 +128,19 @@ export default function MenuProductosScreen() {
                         <Text className="text-primary font-bold text-xs uppercase">Tiempo Total Estimado:</Text>
                         <Text className="text-primary font-black text-sm">{tiempoEstimadoMaximo} min</Text>
                     </View>
-                    
+
                     <View className="flex-row justify-between items-center mb-4">
                         <Text className="text-primary font-black text-sm uppercase">Importe Acumulado:</Text>
                         <Text className="text-primary font-black text-2xl text-emerald-800">${importeTotal}</Text>
                     </View>
 
-                    {/* 🌟 BOTÓN DINÁMICO: Cambia de forma según el estado */}
                     {estadoComanda === 'esperando' ? (
                         <View className="w-full bg-orange-400/90 rounded-full py-4 flex-row justify-center items-center">
                             <ActivityIndicator size="small" color="#FFF" style={{ marginRight: 8 }} />
                             <Text className="text-white font-black text-sm uppercase tracking-wider">Esperando al Mozo...</Text>
                         </View>
                     ) : (
-                        <TouchableOpacity 
+                        <TouchableOpacity
                             onPress={handleConfirmarPedidoFinal}
                             className="w-full bg-tertiary rounded-full py-4 items-center border-b-4 border-orange active:mt-1 active:border-b-0"
                         >

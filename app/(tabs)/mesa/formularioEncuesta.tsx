@@ -313,7 +313,7 @@ export default function FormularioEncuestaScreen() {
                         />
                     </View>
 
-                    {/* Satisfacción */}
+                    {/* Satisfaccion */}
                     <View className="border-t border-primary/10 pt-4">
                         <Text className="text-primary font-bold text-sm uppercase text-center mb-2">
                             2. ¿Qué tan satisfecho estás con tu visita?
@@ -337,7 +337,7 @@ export default function FormularioEncuestaScreen() {
                         {renderSelectorLimpieza()}
                     </View>
 
-                    {/* Atención (1-10) */}
+                    {/* Atencion (1-10) */}
                     <View className="border-t border-primary/10 pt-4">
                         <Text className="text-primary font-bold text-sm uppercase mb-1">
                             5. Calificación de la Atención
@@ -387,7 +387,7 @@ export default function FormularioEncuestaScreen() {
                         />
                     </View>
 
-                    {/* Botón enviar */}
+                    {/* Boton enviar */}
                     <TouchableOpacity
                         onPress={enviarEncuesta}
                         activeOpacity={0.9}

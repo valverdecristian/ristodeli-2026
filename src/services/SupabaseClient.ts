@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// Llamamos directamente a las variables de entorno sin usar expo-constants
+// Llama directamente a las variables de entorno sin usar expo-constants
 const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL as string;
 const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY as string;
 
