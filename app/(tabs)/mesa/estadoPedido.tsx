@@ -61,7 +61,7 @@ export default function EstadoPedidoScreen() {
             if (error) throw error;
 
             const filtrados = (data || []).filter(p =>
-                ['pendiente', 'en preparación', 'en preparacion', 'listo cocina', 'listo bar', 'entregado'].includes(p.estado.toLowerCase())
+                ['pendiente', 'en preparación', 'en preparacion', 'listo cocina', 'listo bar', 'entregado', 'recibido'].includes(p.estado.toLowerCase())
             );
 
             setPedidos(filtrados);
@@ -125,6 +125,15 @@ export default function EstadoPedidoScreen() {
                 texto: 'text-blue-700',
                 icono: 'restaurant',
                 label: 'Entregado en mesa'
+            };
+        }
+        if (e === 'recibido') {
+            return {
+                bg: 'bg-green-500/20',
+                borde: 'border-green-500/50',
+                texto: 'text-green-700',
+                icono: 'checkmark-circle',
+                label: 'Recibido / Confirmado'
             };
         }
 
