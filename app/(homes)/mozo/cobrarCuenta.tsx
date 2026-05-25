@@ -352,7 +352,7 @@ export default function CobrarCuentaScreen() {
                                         <View key={item.id} className="flex-row justify-between items-center py-1 border-b border-primary/5">
                                             <View className="flex-1">
                                                 <Text className="text-primary font-bold text-sm">{item.producto_nombre}</Text>
-                                                <Text className="text-primary/50 text-[10px] font-bold uppercase">Cantidad: {item.cantidad}</Text>
+                                                <Text className="text-primary/50 text-[10px] font-bold uppercase">Cantidad: {item.cantidad} x ${item.precio}</Text>
                                             </View>
                                             <Text className="text-primary font-black text-sm">${item.precio * item.cantidad}</Text>
                                         </View>

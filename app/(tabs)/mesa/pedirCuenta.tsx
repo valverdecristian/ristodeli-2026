@@ -24,7 +24,7 @@ interface PedidoConsumo {
 export default function PedirCuentaScreen() {
     const router = useRouter();
     const { showToast } = useToast();
-    const { mesaId, numeroMesa, clienteId, sesion_id } = useLocalSearchParams();
+    const { mesaId, numeroMesa, sesion_id } = useLocalSearchParams();
 
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
@@ -142,15 +142,15 @@ export default function PedirCuentaScreen() {
         let nivel = 'Sin propina';
         let exito = false;
 
-        if (url.includes('/excelente') || url === 'excelente') {
+        if (url.includes('/excelente') || url === 'excelente' || url.includes('qr.link/wrn4ay')) {
             porcentaje = 20;
             nivel = 'Excelente (20%)';
             exito = true;
-        } else if (url.includes('/muy_bueno') || url === 'muy_bueno') {
+        } else if (url.includes('/muy_bueno') || url === 'muy_bueno' || url.includes('muy bueno') || url.includes('muy-bueno') || url.includes('qr.codes/gi8xcq')) {
             porcentaje = 15;
             nivel = 'Muy Bueno (15%)';
             exito = true;
-        } else if (url.includes('/bueno') || url === 'bueno') {
+        } else if (url.includes('/bueno') || url === 'bueno' || url.includes('qr.codes/82shhk')) {
             porcentaje = 10;
             nivel = 'Bueno (10%)';
             exito = true;
@@ -308,7 +308,7 @@ export default function PedirCuentaScreen() {
                                 <View key={item.id} className="flex-row justify-between items-center py-2 border-b border-primary/5">
                                     <View className="flex-1 pr-2">
                                         <Text className="text-primary font-bold text-sm">{item.producto_nombre}</Text>
-                                        <Text className="text-primary/50 text-[10px] uppercase font-bold">Cantidad: {item.cantidad}</Text>
+                                        <Text className="text-primary/50 text-[10px] uppercase font-bold">Cantidad: {item.cantidad} x ${item.precio}</Text>
                                     </View>
                                     <Text className="text-primary font-black text-sm">${item.precio * item.cantidad}</Text>
                                 </View>
