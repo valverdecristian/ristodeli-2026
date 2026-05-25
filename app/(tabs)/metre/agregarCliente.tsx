@@ -1,7 +1,6 @@
 import { useToast } from '@/src/context/ToastContext';
 import { AuthService } from '@/src/services/authService';
 import { ImageService } from '@/src/services/imageService';
-import { NotificationService } from '@/src/services/notificationService';
 import { SoundService } from '@/src/services/soundService';
 import { useRouter } from 'expo-router';
 import { useCameraPermissions } from 'expo-camera';
@@ -20,7 +19,7 @@ import CapturaFoto from '@/src/components/CapturaFoto';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
-export default function RegistroScreen() {
+export default function AgregarClienteMetreScreen() {
     const router = useRouter();
     const { showToast } = useToast();
     const [permission, requestPermission] = useCameraPermissions();
@@ -30,7 +29,7 @@ export default function RegistroScreen() {
 
     // Estados de UI
     const [loading, setLoading] = useState(false);
-    const [loadingText, setLoadingText] = useState('Creando tu cuenta...');
+    const [loadingText, setLoadingText] = useState('Creando cliente...');
     const [showScanner, setShowScanner] = useState(false);
 
     // Estados del formulario
@@ -63,7 +62,7 @@ export default function RegistroScreen() {
             const foto = await ImageService.takePhoto();
             if (foto) {
                 setFotoUri(foto.uri);
-                showToast('success', '¡Foto capturada!', 'La imagen del rostro se tomó correctamente.');
+                showToast('success', '¡Foto capturada!', 'La imagen se tomó correctamente.');
             }
         } catch {
             dispararError('Error de cámara', 'No se pudo acceder a la cámara del dispositivo.');
@@ -80,7 +79,7 @@ export default function RegistroScreen() {
                     setNombres(d[2]?.trim() || '');
                     setDni(d[4]?.trim() || '');
                     if (d[4]?.trim().length === 8) setCuil(`20${d[4].trim()}7`);
-                    showToast('success', 'DNI Escaneado', 'La información de la tarjeta se cargó correctamente.');
+                    showToast('success', 'DNI Escaneado', 'La información se cargó correctamente.');
                 } else {
                     dispararError('Lectura ilegible', 'El formato del código escaneado no es válido.');
                 }
@@ -104,14 +103,14 @@ export default function RegistroScreen() {
     };
 
     const irAlPaso2 = () => {
-        if (!nombres.trim() || !apellidos.trim() || dni.length < 8 || cuil.length < 11 || !fotoUri) {
+        if (!nombres.trim() || !apellidos.trim() || dni.length < 8 || !fotoUri) {
             dispararError('Campos incompletos', 'Verificá los datos y la foto antes de avanzar.');
             return;
         }
         irAPaso(2);
     };
 
-    const handleRegistro = async () => {
+    const handleCrearCliente = async () => {
         const emailRegex = /\S+@\S+\.\S+/;
 
         if (!emailRegex.test(email)) {
@@ -119,7 +118,7 @@ export default function RegistroScreen() {
             return;
         }
         if (password.length < 6) {
-            dispararError('Contraseña corta', 'La contraseña debe tener al menos 6 caracteres.');
+            dispararError('Contraseña corta', 'La contraseña provisoria debe tener al menos 6 caracteres.');
             return;
         }
         if (password !== confirmPassword) {
@@ -133,72 +132,64 @@ export default function RegistroScreen() {
             const resultadoSubida = await ImageService.uploadToSupabase(
                 fotoUri!,
                 'avatares',
-                '',
-                `user_${dni.trim()}`
+                'clientes',
+                `cli_${dni.trim()}`
             );
 
             if (!resultadoSubida.success || !resultadoSubida.url) {
                 setLoading(false);
-                dispararError('Error de almacenamiento', 'No se pudo guardar la foto de perfil en el servidor.');
+                dispararError('Error de almacenamiento', 'No se pudo guardar la foto en el servidor.');
                 return;
             }
 
-            setLoadingText('Creando tu cuenta en Ristodeli...');
-            await AuthService.registrar(password, {
+            setLoadingText('Registrando cliente...');
+            
+            // 🌟 ACÁ USAMOS EL MOTOR SEGURO DEL METRE
+            await AuthService.registrarClienteDesdeMetre(password, {
                 email,
                 nombres,
                 apellidos,
                 dni,
                 cuil,
-                perfil: 'cliente_pendiente',
+                perfil: 'cliente_registrado', // Se aprueba automáticamente
                 foto_url: resultadoSubida.url,
             });
 
             setLoading(false);
-
-            NotificationService.notificarNuevoClientePendiente(`${nombres} ${apellidos}`);
-
             await SoundService.reproducir('exito');
-            showToast('success', 'Registro enviado', 'Cuenta creada. Aguarda la aprobación del Supervisor.');
-            router.replace('/login');
+            showToast('success', 'Cliente Registrado', `${nombres} ya está habilitado en el sistema.`);
+            
+            // 🌟 VOLVEMOS AL PANEL DEL METRE
+            router.back();
 
         } catch (error: any) {
             setLoading(false);
             if (error?.message?.includes('duplicate') || error?.code === '23505') {
-                dispararError('Datos duplicados', 'El DNI, CUIL o Email ya se encuentran registrados.');
-            } else if (error?.message?.includes('Password')) {
-                dispararError('Error de Autenticación', error.message);
+                dispararError('Datos duplicados', 'El DNI o Email ya se encuentran registrados.');
             } else {
                 dispararError('Error crítico', 'Ocurrió un fallo imprevisto. Intenta nuevamente.');
             }
         }
     };
 
-    // Escaner modular
     if (showScanner) {
-        return (
-            <ScannerDNI
-                onScan={procesarDniEscaneado}
-                onCancel={() => setShowScanner(false)}
-            />
-        );
+        return <ScannerDNI onScan={procesarDniEscaneado} onCancel={() => setShowScanner(false)} />;
     }
 
     return (
         <SafeAreaView className="flex-1 bg-primary">
             <LoadingModal visible={loading} message={loadingText} />
 
-            {/* Header con indicador de pasos */}
             <View className="bg-tertiary px-6 pt-4 pb-5 flex-row items-center justify-between shadow-2xl">
                 <View className="flex-row items-center">
                     <TouchableOpacity
-                        onPress={() => paso === 1 ? router.replace('/login') : irAPaso(1)}
+                        onPress={() => paso === 1 ? router.back() : irAPaso(1)}
                         className="mr-3"
                     >
                         <Ionicons name="arrow-back" size={30} color="#31603D" />
                     </TouchableOpacity>
                     <Text className="text-primary font-bold text-xl uppercase tracking-tighter">
-                        {paso === 1 ? 'Datos Personales' : 'Credenciales'}
+                        {paso === 1 ? 'Nuevo Cliente' : 'Credenciales'}
                     </Text>
                 </View>
                 <View className="flex-row items-center gap-2">
@@ -209,20 +200,21 @@ export default function RegistroScreen() {
 
             <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} className="flex-1">
 
-                {/* Foto + datos personales + escaner */}
                 {paso === 1 && (
                     <ScrollView contentContainerStyle={{ flexGrow: 1 }} className="px-8 pt-6" showsVerticalScrollIndicator={false}>
                         <CapturaFoto
                             fotoUri={fotoUri}
                             onPress={tomarFoto}
-                            textoInferior="Sacar foto obligatoria ⚠️"
+                            textoInferior="Foto obligatoria del cliente"
                             size="grande"
                         />
 
                         <CustomInput placeholder="Nombres" value={nombres} onChangeText={setNombres} maxLength={20} />
                         <CustomInput placeholder="Apellidos" value={apellidos} onChangeText={setApellidos} maxLength={20} />
                         <CustomInput placeholder="DNI (8 dígitos)" value={dni} onChangeText={setDni} maxLength={8} keyboardType="numeric" />
-                        <CustomInput placeholder="CUIL (11 dígitos)" value={cuil} onChangeText={setCuil} maxLength={11} keyboardType="numeric" marginBottom="mb-5" />
+                        
+                        {/* El CUIL puede ser opcional para el cliente express en el local */}
+                        <CustomInput placeholder="CUIL (Opcional)" value={cuil} onChangeText={setCuil} maxLength={11} keyboardType="numeric" marginBottom="mb-5" />
 
                         <TouchableOpacity
                             onPress={iniciarEscaneo}
@@ -241,22 +233,17 @@ export default function RegistroScreen() {
                     </ScrollView>
                 )}
 
-                {/* Email + contraseña + confirmación */}
                 {paso === 2 && (
                     <ScrollView contentContainerStyle={{ flexGrow: 1 }} className="px-8 pt-8" showsVerticalScrollIndicator={false}>
                         <CustomInput placeholder="Correo electrónico" value={email} onChangeText={setEmail} autoCapitalize="none" keyboardType="email-address" />
-                        <CustomInput placeholder="Contraseña (Mínimo 6)" value={password} onChangeText={setPassword} secureTextEntry autoCapitalize="none" />
+                        <CustomInput placeholder="Contraseña provisoria" value={password} onChangeText={setPassword} secureTextEntry autoCapitalize="none" />
                         <CustomInput placeholder="Confirmar contraseña" value={confirmPassword} onChangeText={setConfirmPassword} secureTextEntry autoCapitalize="none" marginBottom="mb-8" />
 
                         <TouchableOpacity
-                            onPress={handleRegistro}
+                            onPress={handleCrearCliente}
                             className="w-full bg-tertiary rounded-full py-5 shadow-2xl border-b-4 border-orange mb-4"
                         >
-                            <Text className="text-center font-black text-primary text-xl uppercase">Confirmar Registro</Text>
-                        </TouchableOpacity>
-
-                        <TouchableOpacity onPress={() => router.replace('/login')} className="w-full py-2">
-                            <Text className="text-center font-bold text-secondary text-sm underline">¿Ya tienes cuenta? Inicia sesión</Text>
+                            <Text className="text-center font-black text-primary text-xl uppercase">Registrar Cliente</Text>
                         </TouchableOpacity>
                     </ScrollView>
                 )}

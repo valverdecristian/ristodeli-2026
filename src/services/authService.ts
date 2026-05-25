@@ -230,7 +230,6 @@ export const AuthService = {
     const role = perfil.trim().toLowerCase();
 
     switch (role) {
-      case 'dueño':
       case 'admin':
         return '/(homes)/duenio';
       case 'supervisor':
@@ -240,39 +239,17 @@ export const AuthService = {
       case 'mozo':
         return '/(homes)/mozo';
       case 'cantinero':
-      case 'bartender':
         return '/(homes)/cantinero';
       case 'cocinero':
         return '/(homes)/cocinero';
       case 'cliente_anonimo':
         return '/(tabs)/home';
-      case 'cliente':
-      case 'cliente_reg':
+      case 'cliente_registrado':
         return '/(tabs)/home';
       default:
         throw new Error(`Perfil no reconocido para la navegación: '${role}'`);
     }
   },
-
-  /**
-   * Registra un cliente anónimo en la tabla `anonimos`.
-   * A diferencia de registrar(), este flujo NO crea un usuario en auth.users.
-   * Devuelve el registro creado con su id generado.
-   */
-  // async registrarAnonimo(nombre: string, foto: string) {
-  //   const { data, error } = await supabase
-  //     .from('anonimos')
-  //     .insert([{
-  //       nombre: nombre.trim(),
-  //       foto: foto,
-  //       push_token: null,
-  //     }])
-  //     .select()
-  //     .single();
-
-  //   if (error) throw error;
-  //   return data;
-  // },
 
   /**
    * Obtiene todos los usuarios con perfil 'cliente_pendiente'.
@@ -309,5 +286,49 @@ export const AuthService = {
     }
 
     return data[0];
+  },
+
+  /**
+   * Registra un cliente nuevo desde el panel del Metre.
+   * Usa un cliente temporal para no pisar la sesión activa del Metre.
+   */
+  async registrarClienteDesdeMetre(password: string, detalles: DetalleRegistro) {
+    // 🌟 EL TRUCO MAGICO: Cliente sin persistencia
+    const supabaseTemp = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      auth: {
+        persistSession: false,
+        autoRefreshToken: false,
+        detectSessionInUrl: false,
+      },
+    });
+
+    const { data: authData, error: authError } = await supabaseTemp.auth.signUp({
+      email: detalles.email.trim(),
+      password,
+    });
+
+    if (authError) throw authError;
+    if (!authData.user) throw new Error('No se devolvió un usuario tras el registro.');
+
+    const nuevoPerfil = {
+      id: authData.user.id,
+      email: detalles.email.trim().toLowerCase(),
+      nombres: detalles.nombres.trim(),
+      apellidos: detalles.apellidos.trim(),
+      dni: detalles.dni.trim(),
+      cuil: detalles.cuil?.trim() || '', // Manejo seguro por si el cliente no requiere CUIL
+      perfil: 'cliente_registrado', // 🌟 Forzamos el rol de cliente
+      foto_url: detalles.foto_url || null,
+      push_token: null,
+    };
+
+    // 🌟 Insertamos en la tabla usando la sesión oficial del Metre
+    const { error: profileError } = await supabase
+      .from('usuarios')
+      .insert([nuevoPerfil]);
+
+    if (profileError) throw profileError;
+
+    return { authData };
   },
 };
