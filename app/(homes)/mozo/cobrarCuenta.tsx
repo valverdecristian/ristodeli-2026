@@ -5,6 +5,7 @@ import { supabase } from '@/src/services/SupabaseClient';
 import { SoundService } from '@/src/services/soundService';
 import { useToast } from '@/src/context/ToastContext';
 import { MesaService } from '@/src/services/mesaService';
+import { NotificationService } from '@/src/services/notificationService';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -197,7 +198,7 @@ export default function CobrarCuentaScreen() {
             if (asignacion?.id) {
                 const { error: errUpd } = await supabase
                     .from('lista_espera')
-                    .update({ estado: 'finalizado' })
+                    .delete()
                     .eq('id', asignacion.id);
                 if (errUpd) throw errUpd;
             }
@@ -229,6 +230,12 @@ export default function CobrarCuentaScreen() {
 
             await SoundService.reproducir('exito');
             showToast('success', 'Pago Confirmado', `La Mesa N° ${mesaSeleccionada.numero} ha sido cobrada y liberada con éxito.`);
+
+            // Notifica a admins y supervisores
+            NotificationService.notificarPagoConfirmado(
+                mesaSeleccionada.numero,
+                totalNeto
+            ).catch((err) => console.warn('[cobrarCuenta] Fallo notificación pago al staff:', err));
 
             setMesaSeleccionada(null);
             cargarMesasPendientes();

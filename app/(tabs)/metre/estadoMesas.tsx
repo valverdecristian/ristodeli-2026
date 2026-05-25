@@ -73,7 +73,7 @@ export default function EstadoMesasScreen() {
       if (asignacion?.sesion_id) {
         await supabase
           .from('lista_espera')
-          .update({ estado: 'finalizado' })
+          .delete()
           .eq('sesion_id', asignacion.sesion_id);
         await supabase
           .from('consultas')

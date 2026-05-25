@@ -1,6 +1,7 @@
 import VisorProductos from '@/src/components/VisorProductos';
 import { useToast } from "@/src/context/ToastContext";
 import { useCarritoPedido } from '@/src/hooks/useCarritoPedido';
+import { NotificationService } from '@/src/services/notificationService';
 import { PedidoService } from '@/src/services/pedidoService';
 import { SoundService } from '@/src/services/soundService';
 import { supabase } from '@/src/services/SupabaseClient';
@@ -86,6 +87,12 @@ export default function MenuProductosScreen() {
 
             await PedidoService.enviarPedidoMesa(nroMesaInt, carrito);
             showToast("info", "Comanda enviada", "Aguardando validación del mozo...");
+
+            // Notifica a todos los mozos con push_token registrado
+            const cantItems = carrito.reduce((acc, item) => acc + item.cantidad, 0);
+            NotificationService.notificarComandaAlMozo(nroMesaInt, cantItems, importeTotal).catch(
+                (err) => console.warn('[menuProductos] Fallo notificación push al mozo:', err)
+            );
         } catch (error: any) {
             setEstadoComanda('edicion');
             SoundService.reproducir('error');
