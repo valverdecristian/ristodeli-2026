@@ -57,6 +57,16 @@ export const PedidoService = {
    * Inserta la comanda desde el celular del Cliente
    * Queda retenida en 'A Confirmar Mozo' cumpliendo el Punto 12 del PDF.
    */
+  async confirmarRecepcionCliente(mesaNumero: number) {
+    const { error } = await supabase
+      .from('pedidos')
+      .update({ estado: 'Recibido' })
+      .eq('mesa_numero', mesaNumero)
+      .in('estado', ['Entregado']);
+
+    if (error) throw error;
+  },
+
   async enviarPedidoMesa(mesaNumero: number, items: ItemCarrito[]) {
     const numeroMesaValido = (!mesaNumero || isNaN(mesaNumero)) ? 21 : mesaNumero;
 

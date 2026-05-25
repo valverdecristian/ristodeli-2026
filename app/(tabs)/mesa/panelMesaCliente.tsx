@@ -1,5 +1,6 @@
 import LoadingModal from '@/src/components/LoadingModal';
 import { useToast } from "@/src/context/ToastContext";
+import { PedidoService } from '@/src/services/pedidoService';
 import { supabase } from '@/src/services/SupabaseClient';
 import { SoundService } from '@/src/services/soundService';
 import { Ionicons } from '@expo/vector-icons';
@@ -9,7 +10,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-type EstadoPedidoCliente = 'inicial' | 'en_preparacion' | 'Rechazado Mozo' | 'pedido_listo' | 'comido' | 'pidiendo_cuenta';
+type EstadoPedidoCliente = 'inicial' | 'en_preparacion' | 'Rechazado Mozo' | 'pedido_listo' | 'pendiente_confirmacion' | 'comido' | 'pidiendo_cuenta';
 
 export default function PanelMesaClienteScreen() {
     const router = useRouter();
@@ -140,6 +141,8 @@ export default function PanelMesaClienteScreen() {
         } else if (e.includes('listo')) {
             setEstado('pedido_listo');
         } else if (e === 'entregado') {
+            setEstado('pendiente_confirmacion');
+        } else if (e === 'recibido') {
             setEstado('comido');
         } else if (e === 'comido' || e === 'pagado') {
             setEstado('comido');
@@ -220,13 +223,31 @@ export default function PanelMesaClienteScreen() {
                     </View>
                 )}
 
-                {/* El pedido llego completo a la mesa (Cocinero/Cantinero terminaron) */}
+                {/* El pedido esta listo, el mozo lo esta llevando */}
                 {estado === 'pedido_listo' && (
+                    <View className="bg-secondary p-8 rounded-3xl border border-tertiary/20 items-center justify-center space-y-4 shadow-sm mb-6">
+                        <View className="bg-primary/10 p-4 rounded-full mb-2">
+                            <Ionicons name="walk-outline" size={48} color="#31603D" />
+                        </View>
+                        <Text className="text-primary font-black uppercase text-center text-lg tracking-wider">Pedido en Camino</Text>
+                        <Text className="text-primary/70 text-center text-sm font-semibold leading-5 px-2">
+                            Tu pedido está listo y el mozo lo está llevando a tu mesa. Confirma la recepción cuando lo tengas.
+                        </Text>
+                    </View>
+                )}
+
+                {/* El mozo entrego, el cliente debe confirmar recepcion */}
+                {estado === 'pendiente_confirmacion' && (
                     <TouchableOpacity
                         onPress={async () => {
-                            await SoundService.reproducir('exito');
-                            setEstado('comido');
-                            showToast("success", "¡Buen provecho!", "Confirmaste la recepción. Disfruta tu comida.");
+                            try {
+                                await PedidoService.confirmarRecepcionCliente(nroMesaInt);
+                                await SoundService.reproducir('exito');
+                                setEstado('comido');
+                                showToast("success", "¡Buen provecho!", "Confirmaste la recepción. Disfruta tu comida.");
+                            } catch (err) {
+                                showToast("error", "Error", "No se pudo confirmar la recepción.");
+                            }
                         }}
                         className="w-full bg-tertiary py-6 rounded-[25px] items-center border-b-4 border-orange"
                     >
