@@ -106,27 +106,6 @@ export const NotificationService = {
   },
 
   /**
-   * Obtiene los push tokens válidos de todos los usuarios con perfil 'admin' o 'supervisor'.
-   * Los tokens null o vacíos son filtrados para no generar errores en el envío.
-   */
-  async obtenerTokensStaff(): Promise<string[]> {
-    const { data, error } = await supabase
-      .from('usuarios')
-      .select('push_token')
-      .in('perfil', ['admin', 'supervisor'])
-      .not('push_token', 'is', null);
-
-    if (error) {
-      console.error('[NotificationService] Error obteniendo tokens de staff:', error.message);
-      return [];
-    }
-
-    return (data ?? [])
-      .map((u: { push_token: string | null }) => u.push_token)
-      .filter((t): t is string => !!t && t.startsWith('ExponentPushToken'));
-  },
-
-  /**
    * Envía notificaciones push a uno o más tokens via la Expo Push API.
    * Agrupa los mensajes en un solo request (batch) para eficiencia.
    *
@@ -179,7 +158,7 @@ export const NotificationService = {
    */
   async notificarNuevoClientePendiente(nombreCliente: string): Promise<void> {
     try {
-      const tokens = await NotificationService.obtenerTokensStaff();
+      const tokens = await NotificationService.obtenerTokensPorPerfiles(['admin', 'supervisor']);
       await NotificationService.enviar(
         tokens,
         'Nuevo cliente pendiente',
@@ -189,6 +168,33 @@ export const NotificationService = {
     } catch (error) {
       // Falla silenciosa — no interrumpe el flujo de registro del cliente
       console.error('[NotificationService] Error notificando nuevo cliente:', error);
+    }
+  },
+
+  /**
+   * FLUJO COBRO: El Mozo confirma el pago -> Avisa a Admins y Supervisores.
+   * Se llama desde cobrarCuenta.tsx justo después de liberar la mesa con éxito.
+   *
+   * @param numeroMesa  - Número de mesa cobrada
+   * @param totalNeto   - Importe final cobrado (ya con descuento y propina)
+   * @param mozoNombre  - Nombre del mozo que procesó el cobro (opcional)
+   */
+  async notificarPagoConfirmado(
+    numeroMesa: string | number,
+    totalNeto: number,
+    mozoNombre?: string
+  ): Promise<void> {
+    try {
+      const tokens = await NotificationService.obtenerTokensPorPerfiles(['admin', 'supervisor']);
+      const quien = mozoNombre ? ` · Mozo: ${mozoNombre}` : '';
+      await NotificationService.enviar(
+        tokens,
+        `💰 Pago confirmado — Mesa ${numeroMesa}`,
+        `Total cobrado: $${totalNeto.toFixed(2)}${quien}. Mesa liberada.`,
+        { pantalla: 'reportes', mesa: String(numeroMesa) }
+      );
+    } catch (error) {
+      console.error('[NotificationService] Error notificando pago confirmado:', error);
     }
   },
 
@@ -212,31 +218,11 @@ export const NotificationService = {
   },
 
   /**
-   * Obtiene los push tokens válidos de todos los usuarios con perfil 'metre'.
-   */
-  async obtenerTokensMetres(): Promise<string[]> {
-    const { data, error } = await supabase
-      .from('usuarios')
-      .select('push_token')
-      .eq('perfil', 'metre')
-      .not('push_token', 'is', null);
-
-    if (error) {
-      console.error('[NotificationService] Error obteniendo tokens de metres:', error.message);
-      return [];
-    }
-
-    return (data ?? [])
-      .map((u: { push_token: string | null }) => u.push_token)
-      .filter((t): t is string => !!t && t.startsWith('ExponentPushToken'));
-  },
-
-  /**
    * FLUJO 1: El cliente se anota en la lista -> Avisa al Metre
    */
   async notificarNuevoClienteEnEspera(nombreCliente: string): Promise<void> {
     try {
-      const tokens = await NotificationService.obtenerTokensMetres();
+      const tokens = await NotificationService.obtenerTokensPorPerfiles(['metre']);
       await NotificationService.enviar(
         tokens,
         'Nuevo cliente en lista de espera',
@@ -304,25 +290,65 @@ export const NotificationService = {
   },
 
   /**
+   * Helper genérico: Busca todos los tokens válidos según una lista de perfiles.
+   * Ejemplo de uso: obtenerTokensPorPerfiles(['admin', 'supervisor', 'mozo'])
+   */
+  async obtenerTokensPorPerfiles(perfiles: string[]): Promise<string[]> {
+    try {
+      const { data, error } = await supabase
+        .from('usuarios')
+        .select('push_token')
+        .in('perfil', perfiles) // 🌟 Busca cualquiera de los perfiles en el array
+        .not('push_token', 'is', null);
+
+      if (error) {
+        console.error('[NotificationService] Error obteniendo tokens:', error.message);
+        return [];
+      }
+
+      // Filtramos y validamos que sean tokens reales de Expo
+      return (data ?? [])
+        .map((u: { push_token: string | null }) => u.push_token)
+        .filter((t): t is string => !!t && t.startsWith('ExponentPushToken'));
+      
+    } catch (error) {
+      console.error('[NotificationService] Excepción al buscar tokens por perfil:', error);
+      return [];
+    }
+  },
+
+  /**
+   * FLUJO COMANDA: El cliente envía la comanda -> Avisa a los Mozos.
+   * Se llama desde menuProductos.tsx justo después de PedidoService.enviarPedidoMesa().
+   *
+   * @param numeroMesa   - Número de mesa que generó la comanda
+   * @param cantItems    - Cantidad total de ítems en el pedido
+   * @param importeTotal - Importe acumulado del pedido
+   */
+  async notificarComandaAlMozo(numeroMesa: string | number, cantItems: number, importeTotal: number): Promise<void> {
+    try {
+      const tokens = await NotificationService.obtenerTokensPorPerfiles(['mozo']);
+
+      if (tokens.length > 0) {
+        await NotificationService.enviar(
+          tokens,
+          `Nueva comanda — Mesa ${numeroMesa}`,
+          `${cantItems} ítem${cantItems !== 1 ? 's' : ''} · $${importeTotal}. Revisá el pedido y confirmá.`,
+          { pantalla: 'comandasMozo', mesa: String(numeroMesa) }
+        );
+      }
+    } catch (error) {
+      console.error('[NotificationService] Error notificando comanda al mozo:', error);
+    }
+  },
+
+  /**
    * FLUJO CHAT 2: El Cliente escribe -> Avisa a los Mozos
    */
   async notificarMensajeAMozos(numeroMesa: string | number, mensaje: string): Promise<void> {
     try {
       // Buscamos los tokens de todos los usuarios con perfil 'mozo'
-      const { data, error } = await supabase
-        .from('usuarios')
-        .select('push_token')
-        .eq('perfil', 'mozo')
-        .not('push_token', 'is', null);
-
-      if (error) {
-        console.error('[NotificationService] Error obteniendo tokens de mozos:', error.message);
-        return;
-      }
-
-      const tokens = (data ?? [])
-        .map((u: { push_token: string | null }) => u.push_token)
-        .filter((t): t is string => !!t && t.startsWith('ExponentPushToken'));
+      const tokens = await NotificationService.obtenerTokensPorPerfiles(['mozo']);
 
       if (tokens.length > 0) {
         await NotificationService.enviar(
@@ -334,6 +360,51 @@ export const NotificationService = {
       }
     } catch (error) {
       console.error('[NotificationService] Error notificando mensaje a mozos:', error);
+    }
+  },
+
+  /**
+   * FLUJO PAGO 1: El Cliente paga -> Avisa a Mozo, Admin y Supervisor
+   * Para que puedan ir a la mesa o verificar la cuenta y confirmar.
+   */
+  async notificarPagoRealizado(numeroMesa: string | number, importe: number): Promise<void> {
+    try {
+      // Usamos el nuevo helper para traer a los 3 roles a la vez
+      const tokens = await NotificationService.obtenerTokensPorPerfiles(['mozo', 'admin', 'supervisor']);
+      
+      if (tokens.length > 0) {
+        await NotificationService.enviar(
+          tokens,
+          `💸 Pago recibido - Mesa ${numeroMesa}`,
+          `El cliente ha enviado un pago de $${importe}. Pendiente de confirmación.`,
+          { pantalla: 'confirmacionPagos' } // ⚠️ Ajustá al nombre de la pantalla donde validan el pago
+        );
+      }
+    } catch (error) {
+      console.error('[NotificationService] Error notificando pago realizado:', error);
+    }
+  },
+
+  /**
+   * FLUJO DESPACHO: Cocina o Barra terminan -> Avisa a los Mozos
+   */
+  async notificarPedidoListoParaEntregar(numeroMesa: number | string, sector: string): Promise<void> {
+    try {
+      // Usamos el helper que creamos antes para traer todos los mozos
+      const tokens = await NotificationService.obtenerTokensPorPerfiles(['mozo']);
+      
+      const origen = sector === 'cocina' ? 'Los platos de la cocina' : 'Las bebidas de la barra';
+
+      if (tokens.length > 0) {
+        await NotificationService.enviar(
+          tokens,
+          `🛎️ ¡Pedido Listo! - Mesa ${numeroMesa}`,
+          `${origen} ya están listos para ser entregados.`,
+          { pantalla: 'entregarPedido' } // ⚠️ Lo mandamos directo a la pantalla que me pasaste
+        );
+      }
+    } catch (error) {
+      console.error('[NotificationService] Error notificando pedido listo al mozo:', error);
     }
   },
 };

@@ -6,6 +6,7 @@ import LoadingModal from '@/src/components/LoadingModal';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { SoundService } from '@/src/services/soundService';
+import { NotificationService } from '@/src/services/notificationService';
 
 interface ListaPedidosProps {
     sector: 'cocina' | 'bar';
@@ -75,6 +76,8 @@ export default function ListaPedidosPendientes({ sector }: ListaPedidosProps) {
             const nuevoEstado = sector === 'cocina' ? 'Listo Cocina' : 'Listo Bar';
             await PedidoService.actualizarEstado(idsAModificar, nuevoEstado);
             await SoundService.reproducir('exito');
+            // 🌟 DISPARADOR: Avisamos a los celulares de los mozos
+            NotificationService.notificarPedidoListoParaEntregar(mesaNumero, sector);
             fetchPedidosPendientes();
         } catch (error: any) {
             SoundService.reproducir('error');

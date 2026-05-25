@@ -50,6 +50,8 @@ export default function RootLayout() {
           router.push('/(tabs)/mesa/chatMozo' as any);
         } else if (data.pantalla === 'consultasClientes') {
           router.push('/(homes)/mozo/consultasClientes' as any);
+        } else if (data.pantalla === 'comandasMozo') {
+          router.push('/(homes)/mozo/confirmarPedido' as any);
         }
       }
     });
