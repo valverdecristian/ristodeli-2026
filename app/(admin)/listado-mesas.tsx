@@ -2,55 +2,74 @@ import { supabase } from "@/src/services/SupabaseClient";
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { FlatList, Image, Modal, Text, TouchableOpacity, View } from 'react-native';
+import { FlatList, Image, Modal, Text, TouchableOpacity, View, Dimensions } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import LoadingModal from "@/src/components/LoadingModal";
+
+const { height: SCREEN_HEIGHT } = Dimensions.get('window');
+
+// Calculamos la altura disponible de forma exacta:
+// SCREEN_HEIGHT - Header (~75) - SafeArea/StatusBar (~60)
+// Dividido por 2 para que entren exactamente dos filas verticales sin superposición ni cortes.
+const HEADER_HEIGHT = 75;
+const SAFE_AREA_ESTIMATE = 60;
+const TOTAL_PADDING = 32; // paddingVertical (20) + contenedor (12)
+const AVAILABLE_HEIGHT = SCREEN_HEIGHT - HEADER_HEIGHT - SAFE_AREA_ESTIMATE - TOTAL_PADDING;
+
+const CARD_HEIGHT = AVAILABLE_HEIGHT / 2;
+const VERTICAL_MARGIN = 20; // Margen simétrico para dar separación
+const SNAP_INTERVAL = CARD_HEIGHT + (VERTICAL_MARGIN * 2);
 
 export default function ListadoMesas() {
   const router = useRouter();
   const [mesas, setMesas] = useState<any[]>([]);
   const [mesaQR, setMesaQR] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     supabase.from("mesas").select("*").order("numero", { ascending: true }).then(({ data, error }) => {
       if (!error && data) setMesas(data);
+      setLoading(false);
     });
   }, []);
 
   const renderMesa = ({ item }: { item: any }) => (
-    <View style={{ width: '47%', marginBottom: 20 }} className="bg-secondary rounded-[25px] overflow-hidden shadow-lg">
+    <View style={{ width: '100%', height: CARD_HEIGHT - (VERTICAL_MARGIN * 2), marginTop: VERTICAL_MARGIN, marginBottom: VERTICAL_MARGIN }} className="bg-secondary rounded-[30px] overflow-hidden shadow-xl">
 
-      {/* Foto de la Mesa con Botón QR Flotante */}
-      <View className="relative w-full h-32 bg-primary/20">
+      {/* Foto de la Mesa (Ocupa la parte superior a ancho completo) */}
+      <View className="relative w-full h-[60%] bg-primary/20">
         {item.foto ? (
           <Image source={{ uri: item.foto }} className="w-full h-full" resizeMode="cover" />
         ) : (
           <View className="w-full h-full items-center justify-center">
-            <Ionicons name="image-outline" size={32} color="#31603D" style={{ opacity: 0.3 }} />
+            <Ionicons name="image-outline" size={48} color="#31603D" style={{ opacity: 0.3 }} />
           </View>
         )}
 
         <TouchableOpacity
-          className="absolute top-2 right-2 bg-tertiary p-2 rounded-full shadow-lg"
+          className="absolute top-4 right-4 bg-tertiary p-3 rounded-full shadow-lg"
           style={{ elevation: 5 }}
           onPress={() => setMesaQR(item)}
         >
-          <Ionicons name="qr-code" size={18} color="#31603D" />
+          <Ionicons name="qr-code" size={20} color="#31603D" />
         </TouchableOpacity>
       </View>
 
-      {/* Información de la Mesa */}
-      <View className="p-4 items-center">
-        <Text className="text-primary font-black text-xl uppercase tracking-tighter">Mesa {item.numero}</Text>
+      {/* Información de la Mesa (Abajo) */}
+      <View className="p-4 flex-1 justify-between flex-row items-center">
+        <View>
+          <Text className="text-primary font-black text-2xl uppercase tracking-tighter">Mesa {item.numero}</Text>
 
-        <View className="flex-row items-center mt-1">
-          <Ionicons name={item.tipo === 'vip' ? 'star' : 'restaurant'} size={12} color="#31603D" />
-          <Text className="text-primary/70 font-bold uppercase text-[10px] ml-1">
-            {item.tipo}
-          </Text>
+          <View className="flex-row items-center mt-1">
+            <Ionicons name={item.tipo === 'vip' ? 'star' : 'restaurant'} size={14} color="#31603D" />
+            <Text className="text-primary/70 font-bold uppercase text-xs ml-2">
+              {item.tipo}
+            </Text>
+          </View>
         </View>
 
-        <View className="bg-primary/10 px-3 py-1 rounded-full mt-2 w-full items-center">
+        <View className="bg-primary/10 px-4 py-2 rounded-full items-center">
           <Text className="text-primary font-bold text-xs uppercase">
             {item.comensales} Pax
           </Text>
@@ -76,18 +95,25 @@ export default function ListadoMesas() {
         </TouchableOpacity>
       </View>
 
-      {/* LISTA GRILLA DE 2 COLUMNAS */}
-      <View className="flex-1">
+      {/* LISTA DE 1 COLUMNA (2 FILAS POR PANTALLA) CON SCROLL SNAP */}
+      <View className="flex-1 px-5">
+        <LoadingModal visible={loading} message="Cargando mesas..." />
         <FlatList
           data={mesas}
           keyExtractor={(item) => item.id.toString()}
-          numColumns={2}
-          key={2}
-          columnWrapperStyle={{ justifyContent: 'space-between', paddingHorizontal: 20 }}
-          contentContainerStyle={{ paddingVertical: 24 }}
+          numColumns={1}
+          key={1}
+          contentContainerStyle={{ paddingVertical: 10 }}
           renderItem={renderMesa}
           showsVerticalScrollIndicator={false}
-          ListEmptyComponent={<Text className="text-secondary font-bold text-center mt-10">No hay mesas registradas.</Text>}
+          snapToInterval={SNAP_INTERVAL} 
+          decelerationRate="fast"
+          snapToAlignment="start"
+          ListEmptyComponent={
+            !loading ? (
+              <Text className="text-secondary font-bold text-center mt-10">No hay mesas registradas.</Text>
+            ) : null
+          }
         />
       </View>
 
