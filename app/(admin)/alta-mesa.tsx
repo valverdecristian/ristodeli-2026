@@ -139,6 +139,13 @@ export default function AltaMesa() {
           contentContainerStyle={{ flexGrow: 1 }}
           className="px-10 pt-8"
         >
+          <View className="items-center mb-6">
+          <Image 
+            source={require('@/assets/images/icon.png')} 
+            className="w-24 h-24" 
+            resizeMode="contain" 
+          />
+        </View>
           <View className="mb-8">
             <TextInput
               value={numeroMesa}
