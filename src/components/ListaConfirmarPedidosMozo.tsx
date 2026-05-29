@@ -1,11 +1,11 @@
 import { useToast } from "@/src/context/ToastContext";
-import { SoundService } from '@/src/services/soundService';
 import { supabase } from '@/src/services/SupabaseClient';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, FlatList, Modal, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { NotificationService } from '@/src/services/notificationService';
 
 export default function ListaConfirmarPedidosMozo() {
     const { showToast } = useToast();
@@ -74,7 +74,9 @@ export default function ListaConfirmarPedidosMozo() {
 
             if (error) throw error;
 
-            await SoundService.reproducir('exito');
+            NotificationService.notificarPedidoDerivado(mesaNumero, items)
+                .catch((err) => console.warn('[handleAprobarPedido] Error enviando push a preparación:', err));
+
             showToast("success", "Pedido Confirmado", `Mesa Nº ${mesaNumero} enviada a preparación.`);
             fetchPedidosAConfirmar();
         } catch (error: any) {
@@ -108,8 +110,10 @@ export default function ListaConfirmarPedidosMozo() {
 
             if (error) throw error;
 
-            await SoundService.reproducir('error');
-            showToast("error", "Pedido Rechazado", `Se notificó a la Mesa Nº ${mesaSeleccionada}.`);
+            if (mesaSeleccionada !== null) {
+                NotificationService.notificarPedidoRechazado(mesaSeleccionada, motivoRechazo.trim())
+                    .catch((err) => console.warn('[confirmarRechazo] Error enviando push:', err));
+            }
 
             setModalRechazoVisible(false);
             fetchPedidosAConfirmar();

@@ -4,7 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
 import { FlatList, KeyboardAvoidingView, Platform, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { NotificationService } from '@/src/services/notificationService';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 interface Consulta {
     id: number;
@@ -103,15 +103,6 @@ export default function ChatMozoScreen() {
         if (tipoCliente === 'anonimo') {
             nombreRemitente = 'Cliente (Express)';
         }
-        const msgOptimista: Consulta = {
-            id: Date.now(),
-            created_at: new Date().toISOString(),
-            id_usuario: miId,
-            mesa_id: mesaId,
-            mensaje: textoAEnviar,
-            nombre_remitente: nombreRemitente,
-        };
-        setMensajes(prev => [...prev, msgOptimista]);
         try {
             const { error } = await supabase.from('consultas').insert({
                 sesion_id: sesionActiva,
@@ -122,16 +113,11 @@ export default function ChatMozoScreen() {
             });
             if (error) {
                 showToast("error", "Error", "No se pudo enviar el mensaje.");
-                setMensajes(prev => prev.filter(m => m.id !== msgOptimista.id));
                 return;
             }
             
-            console.log('[CHAT_MOZO] ¡Mensaje enviado con éxito!');
-            NotificationService.notificarMensajeAMozos(numeroMesa || 'Desconocida', textoAEnviar);
-            
         } catch (error: any) {
             showToast("error", "Error", "No se pudo enviar el mensaje.");
-            setMensajes(prev => prev.filter(m => m.id !== msgOptimista.id));
         }
     };
     return (
@@ -150,7 +136,7 @@ export default function ChatMozoScreen() {
                     </View>
                 </View>
             </View>
-            <View className="flex-1 bg-secondary rounded-t-[32px] p-6 border-t border-tertiary/20">
+            <SafeAreaView edges={['bottom']} className="flex-1 bg-secondary rounded-t-[32px] px-6 pt-6 pb-4 border-t border-tertiary/20">
                 <FlatList
                     ref={flatListRef}
                     data={mensajes}
@@ -189,7 +175,7 @@ export default function ChatMozoScreen() {
                         <Ionicons name="send" size={16} color="#31603D" />
                     </TouchableOpacity>
                 </View>
-            </View>
+            </SafeAreaView>
         </KeyboardAvoidingView>
     );
 }

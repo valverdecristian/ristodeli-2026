@@ -4,7 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, FlatList, KeyboardAvoidingView, Platform, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { NotificationService } from '@/src/services/notificationService';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 interface Consulta {
     id: number;
@@ -137,16 +137,6 @@ export default function ChatMozoScreen() {
         const textoAEnviar = nuevoMensaje.trim();
         setNuevoMensaje('');
 
-        const msgOptimista: Consulta = {
-            id: Date.now(),
-            created_at: new Date().toISOString(),
-            id_usuario: miId,
-            mesa_id: mesaId,
-            mensaje: textoAEnviar,
-            nombre_remitente: miNombre,
-        };
-        setMensajes(prev => [...prev, msgOptimista]);
-
         try {
             const { error } = await supabase.from('consultas').insert({
                 sesion_id: sesionId,
@@ -158,23 +148,11 @@ export default function ChatMozoScreen() {
 
             if (error) {
                 showToast("error", "Error", "No se pudo enviar el mensaje.");
-                setMensajes(prev => prev.filter(m => m.id !== msgOptimista.id));
+                return;
             }
-
-            const { data: listaData } = await supabase
-                .from('lista_espera')
-                .select('cliente_id')
-                .eq('sesion_id', sesionId)
-                .single();
-
-            if (listaData?.cliente_id) {
-                NotificationService.notificarMensajeACliente(listaData.cliente_id, textoAEnviar);
-            }
-
 
         } catch (error: any) {
             showToast("error", "Error", "No se pudo enviar el mensaje.");
-            setMensajes(prev => prev.filter(m => m.id !== msgOptimista.id));
         }
     };
 
@@ -195,7 +173,7 @@ export default function ChatMozoScreen() {
                 </View>
             </View>
 
-            <View className="flex-1 bg-secondary rounded-t-[32px] p-6 border-t border-tertiary/20">
+            <SafeAreaView edges={['bottom']} className="flex-1 bg-secondary rounded-t-[32px] px-6 pt-6 pb-4 border-t border-tertiary/20">
                 {loading && mensajes.length === 0 ? (
                     <View className="flex-1 justify-center items-center">
                         <ActivityIndicator size="large" color="#31603D" />
@@ -247,7 +225,7 @@ export default function ChatMozoScreen() {
                         <Ionicons name="send" size={16} color="#31603D" />
                     </TouchableOpacity>
                 </View>
-            </View>
+            </SafeAreaView>
         </KeyboardAvoidingView>
     );
 }
