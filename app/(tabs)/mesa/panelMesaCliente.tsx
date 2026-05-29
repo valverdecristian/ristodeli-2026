@@ -70,7 +70,10 @@ export default function PanelMesaClienteScreen() {
                         } else if (payload.new.estado === 'Libre') {
                             SoundService.reproducir('exito');
                             showToast('success', '¡Gracias por visitarnos!', 'Vuelve pronto.');
-                            router.replace('/(tabs)/home' as any);
+                            router.replace({
+                                pathname: "/(tabs)/home" as any,
+                                params: { usuarioId: clienteId }
+                            });
                         } else {
                             fetchEstadoActual();
                         }

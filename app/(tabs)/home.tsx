@@ -16,6 +16,7 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { supabase } from "@/src/services/SupabaseClient";
 
 export default function HomeEntradaScreen() {
   const router = useRouter();
@@ -92,6 +93,24 @@ export default function HomeEntradaScreen() {
 
     setLoading(true);
     try {
+      if (currentId && currentId !== "undefined" && currentId !== "null" && currentId !== "") {
+        const { data: cicloCompletado } = await supabase
+          .from("lista_espera")
+          .select("id")
+          .eq("cliente_id", currentId)
+          .eq("estado", "completado")
+          .limit(1)
+          .maybeSingle();
+
+        if (cicloCompletado) {
+          await supabase.from("lista_espera").delete().eq("id", cicloCompletado.id);
+          await SoundService.reproducir("exito");
+          showToast("success", "Visita Completada", "Gracias por tu visita. Resultados de encuestas.");
+          router.replace("/(tabs)/encuestasPrevias" as any);
+          return;
+        }
+      }
+
       if (isAnonimo) {
         await ListaEsperaService.agregarClienteAnonimo({
           nombre: currentNombre,
