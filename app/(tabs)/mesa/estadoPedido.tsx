@@ -4,6 +4,9 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList, Text, TouchableOpacity, View } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useToast } from "@/src/context/ToastContext";
+import { SoundService } from '@/src/services/soundService';
+import * as Haptics from 'expo-haptics';
 
 interface PedidoItem {
     id: number;
@@ -16,6 +19,7 @@ interface PedidoItem {
 
 export default function EstadoPedidoScreen() {
     const router = useRouter();
+    const { showToast } = useToast();
     const { mesaId, numeroMesa, sesion_id } = useLocalSearchParams<{ mesaId?: string; numeroMesa?: string; sesion_id?: string }>();
 
     const [pedidos, setPedidos] = useState<PedidoItem[]>([]);
@@ -97,6 +101,25 @@ export default function EstadoPedidoScreen() {
         }
     };
 
+    const handleConfirmarEntregaItem = async (itemId: number) => {
+        try {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+
+            const { error } = await supabase
+                .from('pedidos')
+                .update({ estado: 'Recibido' })
+                .eq('id', itemId);
+
+            if (error) throw error;
+
+            await SoundService.reproducir('exito');
+            showToast("success", "Entrega Confirmada", "¡Buen provecho!");
+            fetchPedidosEnCurso();
+        } catch (error: any) {
+            showToast("error", "Error", "No se pudo confirmar la entrega.");
+        }
+    };
+
     const obtenerEstiloEstado = (estadoDB: string) => {
         const e = estadoDB.toLowerCase();
 
@@ -124,7 +147,7 @@ export default function EstadoPedidoScreen() {
                 borde: 'border-blue-500/50',
                 texto: 'text-blue-700',
                 icono: 'restaurant',
-                label: 'Entregado en mesa'
+                label: 'Entregado (Pendiente)'
             };
         }
         if (e === 'recibido') {
@@ -133,7 +156,7 @@ export default function EstadoPedidoScreen() {
                 borde: 'border-green-500/50',
                 texto: 'text-green-700',
                 icono: 'checkmark-circle',
-                label: 'Recibido / Confirmado'
+                label: 'Entregado en mesa'
             };
         }
 
@@ -221,6 +244,15 @@ export default function EstadoPedidoScreen() {
                                             {estilo.label}
                                         </Text>
                                     </View>
+
+                                    {item.estado.toLowerCase() === 'entregado' && (
+                                        <TouchableOpacity
+                                            onPress={() => handleConfirmarEntregaItem(item.id)}
+                                            className="w-full mt-4 bg-tertiary rounded-full py-3 items-center justify-center border-b-4 border-orange active:mt-[17px] active:border-b-0 shadow-sm"
+                                        >
+                                            <Text className="text-primary font-black text-xs uppercase tracking-wider">Confirmar Entrega</Text>
+                                        </TouchableOpacity>
+                                    )}
                                 </View>
                             );
                         }}

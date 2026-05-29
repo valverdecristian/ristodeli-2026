@@ -407,4 +407,91 @@ export const NotificationService = {
       console.error('[NotificationService] Error notificando pedido listo al mozo:', error);
     }
   },
+
+  /**
+   * FLUJO RECHAZO: El Mozo rechaza el pedido -> Avisa al Cliente
+   * Se llama desde ListaConfirmarPedidosMozo.tsx al confirmar el rechazo.
+   */
+  async notificarPedidoRechazado(numeroMesa: number | string, motivo: string): Promise<void> {
+    try {
+      const { data: mesa, error: mesaErr } = await supabase
+        .from('mesas')
+        .select('id')
+        .eq('numero', numeroMesa)
+        .single();
+
+      if (mesaErr || !mesa) {
+        console.warn(`[NotificationService] No se encontró la mesa número ${numeroMesa}`);
+        return;
+      }
+
+      const { data: asignacion, error: asignErr } = await supabase
+        .from('lista_espera')
+        .select('cliente_id')
+        .eq('mesa_asignada', mesa.id)
+        .eq('estado', 'asignado')
+        .maybeSingle();
+
+      if (asignErr || !asignacion?.cliente_id) {
+        console.warn(`[NotificationService] No hay cliente asignado a la mesa ${numeroMesa}`);
+        return;
+      }
+
+      const token = await NotificationService.obtenerTokenCliente(asignacion.cliente_id);
+
+      if (token && token.startsWith('ExponentPushToken')) {
+        await NotificationService.enviar(
+          [token],
+          '❌ Pedido Rechazado',
+          `Tu pedido de la Mesa ${numeroMesa} fue rechazado. Motivo: ${motivo}`,
+          { pantalla: 'homeCliente' }
+        );
+      }
+    } catch (error) {
+      console.error('[NotificationService] Error notificando pedido rechazado al cliente:', error);
+    }
+  },
+
+  /**
+   * FLUJO DERIVACIÓN: El Mozo confirma pedido -> Se envían notificaciones a Cocina (cocinero) y/o Bar (cantinero).
+   */
+  async notificarPedidoDerivado(
+    mesaNumero: number | string,
+    items: { categoria: string; producto_nombre: string; cantidad: number }[]
+  ): Promise<void> {
+    try {
+      const tieneBebida = items.some(item => item.categoria === 'bebida');
+      const tieneCocina = items.some(item => item.categoria !== 'bebida');
+
+      if (tieneCocina) {
+        const tokensCocinero = await NotificationService.obtenerTokensPorPerfiles(['cocinero']);
+        if (tokensCocinero.length > 0) {
+          const cocinaItems = items.filter(item => item.categoria !== 'bebida');
+          const desc = cocinaItems.map(i => `${i.producto_nombre} (x${i.cantidad})`).join(', ');
+          await NotificationService.enviar(
+            tokensCocinero,
+            `👨‍🍳 Nuevo pedido a Cocina — Mesa ${mesaNumero}`,
+            `Preparar: ${desc}`,
+            { pantalla: 'pedidos' }
+          );
+        }
+      }
+
+      if (tieneBebida) {
+        const tokensCantinero = await NotificationService.obtenerTokensPorPerfiles(['cantinero']);
+        if (tokensCantinero.length > 0) {
+          const bebidaItems = items.filter(item => item.categoria === 'bebida');
+          const desc = bebidaItems.map(i => `${i.producto_nombre} (x${i.cantidad})`).join(', ');
+          await NotificationService.enviar(
+            tokensCantinero,
+            `🍹 Nuevo pedido a Barra — Mesa ${mesaNumero}`,
+            `Preparar: ${desc}`,
+            { pantalla: 'pedidos' }
+          );
+        }
+      }
+    } catch (error) {
+      console.error('[NotificationService] Error al notificar pedido derivado:', error);
+    }
+  },
 };

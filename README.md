@@ -89,17 +89,17 @@ De acuerdo a los requerimientos de la cátedra, se detallan las tareas asignadas
 | 9. Ingresar al local | cliente anónimo | 🚀 Listo para Demo |  |
 | 10. Asignar una mesa a un cliente registrado | metre | 🚀 Listo para Demo |  |
 | 11. Ver el listado de los productos | cliente registrado o anónimo | 🚀 Listo para Demo |  |
-| 12. Realizar el pedido para todos los comensales de la mesa | cliente registrado o anónimo | 🏗️ En Desarrollo |  |
-| 13. Rechazar el pedido, para que el usuario lo modifique | mozo | 🏗️ En Desarrollo |  |
-| 14. Confirmar el pedido | mozo | 🏗️ En Desarrollo |  |
-| 15. Acceder a los juegos | cliente registrado o anónimo | 🏗️ En Desarrollo |  |
-| 16. Recepción de los productos correspondientes | cocinero | 🏗️ En Desarrollo |  |
-| 17. Recepción de los productos correspondientes | cantinero | 🏗️ En Desarrollo |  |
-| 18. Realizar las tareas correspondientes | cocinero y cantinero | 🏗️ En Desarrollo |  |
-| 19. Entrega del pedido completo | mozo | 🏗️ En Desarrollo |  |
-| 20. Acceder a la encuesta de satisfacción | cliente registrado o anónimo |  |  |
-| 21. Solicitar cuenta al mozo | cliente registrado o anónimo |  |  |
-| 22. Confirmar el pago y liberar mesa | mozo |  |  |
+| 12. Realizar el pedido para todos los comensales de la mesa | cliente registrado o anónimo | 🚀 Listo para Demo |  |
+| 13. Rechazar el pedido, para que el usuario lo modifique | mozo | 🚀 Listo para Demo |  |
+| 14. Confirmar el pedido | mozo | 🚀 Listo para Demo |  |
+| 15. Acceder a los juegos | cliente registrado o anónimo | 🚀 Listo para Demo |  |
+| 16. Recepción de los productos correspondientes | cocinero | 🚀 Listo para Demo |  |
+| 17. Recepción de los productos correspondientes | cantinero | 🚀 Listo para Demo |  |
+| 18. Realizar las tareas correspondientes | cocinero y cantinero | 🚀 Listo para Demo |  |
+| 19. Entrega del pedido completo | mozo | 🚀 Listo para Demo |  |
+| 20. Acceder a la encuesta de satisfacción | cliente registrado o anónimo | 🚀 Listo para Demo |  |
+| 21. Solicitar cuenta al mozo | cliente registrado o anónimo | 🚀 Listo para Demo |  |
+| 22. Confirmar el pago y liberar mesa | mozo | 🚀 Listo para Demo |  |
 
 ### Estados
 
@@ -183,11 +183,28 @@ De acuerdo a los requerimientos de la cátedra, se detallan las tareas asignadas
 <p align="center">
   <img src="assets/qr/MESA_05.jpg" alt="QR MESA 5" width="300">
 </p>
+<p align="center">
+  <img src="assets/qr/MESA_06.jpg" alt="QR MESA 6" width="300">
+</p>
 
 <br>
 
 <p align="center">QR de Propinas</p>
-<p align="center">PROXIMAMENTE...</p>
+<p align="center">
+  <img src="assets/qr/EXCELENTE.jpg" alt="QR EXCELENTE" width="300">
+</p>
+<p align="center">
+  <img src="assets/qr/MUY_BUENO.jpg" alt="QR MUY BUENO" width="300">
+</p>
+<p align="center">
+  <img src="assets/qr/BUENO.jpg" alt="QR BUENO" width="300">
+</p>
+<p align="center">
+  <img src="assets/qr/REGULAR.jpg" alt="QR REGULAR" width="300">
+</p>
+<p align="center">
+  <img src="assets/qr/MALO.jpg" alt="QR MALO" width="300">
+</p>
 
 <br>
 

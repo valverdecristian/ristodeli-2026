@@ -323,7 +323,7 @@ export default function CobrarCuentaScreen() {
                 onRequestClose={() => setMesaSeleccionada(null)}
             >
                 <View className="flex-1 bg-black/60 justify-end">
-                    <View className="bg-secondary rounded-t-[35px] max-h-[85%] p-6 border-t-2 border-tertiary shadow-2xl">
+                    <SafeAreaView edges={['bottom']} className="bg-secondary rounded-t-[35px] max-h-[85%] px-6 pt-6 pb-2 border-t-2 border-tertiary shadow-2xl">
                         {/* Encabezado */}
                         <View className="flex-row justify-between items-center mb-4">
                             <View>
@@ -347,53 +347,53 @@ export default function CobrarCuentaScreen() {
                             <ScrollView showsVerticalScrollIndicator={false} className="space-y-4">
                                 {/* Detalle de Consumos */}
                                 <View className="bg-secondary/40 border border-primary/10 rounded-2xl p-4 space-y-3">
-                                    <Text className="text-primary/70 font-bold text-[10px] uppercase tracking-widest border-b border-primary/5 pb-2">Consumos</Text>
+                                    <Text className="text-primary/70 font-bold text-xs uppercase tracking-widest border-b border-primary/5 pb-2">Consumos</Text>
                                     {itemsConsumo.map((item) => (
                                         <View key={item.id} className="flex-row justify-between items-center py-1 border-b border-primary/5">
                                             <View className="flex-1">
-                                                <Text className="text-primary font-bold text-sm">{item.producto_nombre}</Text>
-                                                <Text className="text-primary/50 text-[10px] font-bold uppercase">Cantidad: {item.cantidad} x ${item.precio}</Text>
+                                                <Text className="text-primary font-bold text-base">{item.producto_nombre}</Text>
+                                                <Text className="text-primary/50 text-xs font-bold uppercase">Cantidad: {item.cantidad} x ${item.precio}</Text>
                                             </View>
-                                            <Text className="text-primary font-black text-sm">${item.precio * item.cantidad}</Text>
+                                            <Text className="text-primary font-black text-base">${item.precio * item.cantidad}</Text>
                                         </View>
                                     ))}
                                     {itemsConsumo.length === 0 && (
-                                        <Text className="text-primary/40 text-center py-4 font-bold text-xs uppercase">Sin consumos cargados</Text>
+                                        <Text className="text-primary/40 text-center py-4 font-bold text-sm uppercase">Sin consumos cargados</Text>
                                     )}
                                 </View>
 
                                 {/* Desglose financiero */}
                                 <View className="bg-secondary/40 border border-primary/10 rounded-2xl p-4 space-y-2.5">
-                                    <Text className="text-primary/70 font-bold text-[10px] uppercase tracking-widest border-b border-primary/5 pb-2">Resumen Financiero</Text>
+                                    <Text className="text-primary/70 font-bold text-xs uppercase tracking-widest border-b border-primary/5 pb-2">Resumen Financiero</Text>
 
                                     <View className="flex-row justify-between items-center">
-                                        <Text className="text-primary text-xs font-semibold uppercase">Subtotal</Text>
-                                        <Text className="text-primary font-black text-sm">${subtotal}</Text>
+                                        <Text className="text-primary text-sm font-semibold uppercase">Subtotal</Text>
+                                        <Text className="text-primary font-black text-base">${subtotal}</Text>
                                     </View>
 
                                     {descuentoPorcentaje > 0 && (
                                         <View className="flex-row justify-between items-center">
                                             <View>
-                                                <Text className="text-emerald-600 text-xs font-semibold uppercase">Descuento ({descuentoPorcentaje}%)</Text>
-                                                <Text className="text-emerald-500/70 text-[9px] font-bold uppercase">{descuentoInfo}</Text>
+                                                <Text className="text-emerald-600 text-sm font-semibold uppercase">Descuento ({descuentoPorcentaje}%)</Text>
+                                                <Text className="text-emerald-500/70 text-[11px] font-bold uppercase">{descuentoInfo}</Text>
                                             </View>
-                                            <Text className="text-emerald-600 font-black text-sm">-${descuentoMonto.toFixed(2)}</Text>
+                                            <Text className="text-emerald-600 font-black text-base">-${descuentoMonto.toFixed(2)}</Text>
                                         </View>
                                     )}
 
                                     <View className="flex-row justify-between items-center">
                                         <View>
-                                            <Text className="text-primary text-xs font-semibold uppercase">Propina ({propinaPorcentaje}%)</Text>
-                                            <Text className="text-primary/50 text-[9px] font-bold uppercase">{propinaInfo || 'Sin propina'}</Text>
+                                            <Text className="text-primary text-sm font-semibold uppercase">Propina ({propinaPorcentaje}%)</Text>
+                                            <Text className="text-primary/50 text-[11px] font-bold uppercase">{propinaInfo || 'Sin propina'}</Text>
                                         </View>
-                                        <Text className="text-primary font-black text-sm">+${propinaMonto.toFixed(2)}</Text>
+                                        <Text className="text-primary font-black text-base">+${propinaMonto.toFixed(2)}</Text>
                                     </View>
 
                                     <View className="h-px bg-primary/10 w-full my-2" />
 
                                     <View className="flex-row justify-between items-center">
-                                        <Text className="text-primary font-black text-base uppercase">Total a Cobrar</Text>
-                                        <Text className="text-primary font-black text-lg">${totalNeto.toFixed(2)}</Text>
+                                        <Text className="text-primary font-black text-lg uppercase">Total a Cobrar</Text>
+                                        <Text className="text-primary font-black text-xl">${totalNeto.toFixed(2)}</Text>
                                     </View>
                                 </View>
 
@@ -401,15 +401,15 @@ export default function CobrarCuentaScreen() {
                                 <TouchableOpacity
                                     onPress={confirmarPago}
                                     activeOpacity={0.9}
-                                    className="w-full bg-primary py-4.5 rounded-[22px] items-center justify-center border-b-4 border-[#1E3D25] shadow-lg mt-4 mb-2"
+                                    className="w-full bg-primary py-4.5 rounded-[22px] items-center justify-center border-b-4 border-[#1E3D25] shadow-lg mt-4 mb-6"
                                 >
-                                    <Text className="text-secondary font-black uppercase text-sm tracking-wider">
-                                        Confirmar Pago y Liberar Mesa
+                                    <Text className="text-secondary font-black uppercase text-base tracking-wider">
+                                        Confirmar Pago
                                     </Text>
                                 </TouchableOpacity>
                             </ScrollView>
                         )}
-                    </View>
+                    </SafeAreaView>
                 </View>
             </Modal>
         </SafeAreaView>
