@@ -86,7 +86,7 @@ function TarjetaProducto({
             </View>
 
             {item.fotos && item.fotos.length > 0 ? (
-                <View className="w-full aspect-[16/10] bg-primary/10 rounded-2xl overflow-hidden border border-tertiary/30 relative justify-center items-center mb-2">
+                <View className="w-full aspect-[16/10] bg-white rounded-2xl overflow-hidden border border-tertiary/30 relative justify-center items-center mb-2">
                     <Image
                         source={{ uri: item.fotos[fotoIndex] }}
                         className="w-full h-full"

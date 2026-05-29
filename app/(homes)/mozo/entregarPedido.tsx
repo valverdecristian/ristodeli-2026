@@ -3,19 +3,29 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function EntregarPedidoMozoScreen() {
     const router = useRouter();
     return (
-        <View className="flex-1 bg-primary px-6 pt-12">
-        <View className="flex-row items-center mb-4">
-            <TouchableOpacity onPress={() => router.back()} className="bg-secondary p-2.5 rounded-full mr-4"><Ionicons name="arrow-back" size={18} color="#31603D" /></TouchableOpacity>
-            <View>
-            <Text className="text-white text-xl font-black uppercase tracking-wider">Pedidos Listos</Text>
-            <Text className="text-tertiary text-[10px] uppercase font-bold tracking-widest">Despacho de Cocina y Barra</Text>
+        <SafeAreaView className="flex-1 bg-primary">
+            {/* ENCABEZADO PREMIUM INTEGRADO */}
+            <View className="bg-tertiary px-6 pt-4 pb-5 flex-row items-center justify-between shadow-2xl">
+                <View className="flex-row items-center flex-1">
+                    <TouchableOpacity onPress={() => router.back()} className="mr-3 p-1 active:opacity-75">
+                        <Ionicons name="arrow-back" size={30} color="#31603D" />
+                    </TouchableOpacity>
+                    <View className="flex-1">
+                        <Text className="text-primary font-black text-2xl uppercase tracking-tighter leading-none">Pedidos Listos</Text>
+                        <Text className="text-primary/70 font-bold text-[9px] uppercase tracking-widest mt-1">Despacho de Cocina y Barra</Text>
+                    </View>
+                </View>
             </View>
-        </View>
-        <View className="flex-1 mt-2"><ListaEntregarPedidosMozo /></View>
-        </View>
+
+            {/* Consumo del listado reactivo */}
+            <View className="flex-1 bg-secondary rounded-t-[32px] border-t border-tertiary/20 pt-6">
+                <ListaEntregarPedidosMozo />
+            </View>
+        </SafeAreaView>
     );
 }

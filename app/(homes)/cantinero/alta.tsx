@@ -9,21 +9,27 @@ export default function AltaProductoCantinero() {
     const router = useRouter();
 
     return (
-        <SafeAreaView className="flex-1 bg-primary px-6 pt-4">
-        <View className="flex-row items-center mb-6">
-            <TouchableOpacity onPress={() => router.back()} className="mr-3">
-            <Ionicons name="arrow-back-outline" size={28} color="#31603D" />
-            </TouchableOpacity>
-            <Text className="text-secondary font-bold text-2xl uppercase tracking-tight">
-            Alta Barra
-            </Text>
-        </View>
+        <SafeAreaView className="flex-1 bg-primary">
+            {/* ENCABEZADO PREMIUM INTEGRADO */}
+            <View className="bg-tertiary px-6 pt-4 pb-5 flex-row items-center justify-between shadow-2xl">
+                <View className="flex-row items-center flex-1">
+                    <TouchableOpacity onPress={() => router.back()} className="mr-3 p-1 active:opacity-75">
+                        <Ionicons name="arrow-back" size={30} color="#31603D" />
+                    </TouchableOpacity>
+                    <View className="flex-1">
+                        <Text className="text-primary font-black text-2xl uppercase tracking-tighter leading-none">Alta Barra</Text>
+                        <Text className="text-primary/70 font-bold text-[9px] uppercase tracking-widest mt-1">Registrar nueva bebida en la carta</Text>
+                    </View>
+                </View>
+            </View>
 
-        {/* El cantinero esta restringido a bebidas */}
-        <FormularioProducto 
-            tiposPermitidos={['bebida']} 
-            onExito={() => router.replace('/(homes)/cantinero')} 
-        />
+            {/* Contenedor del formulario */}
+            <View className="flex-1 bg-secondary rounded-t-[32px] border-t border-tertiary/20 px-6 pt-2">
+                <FormularioProducto
+                    tiposPermitidos={['bebida']}
+                    onExito={() => router.replace('/(homes)/cantinero')}
+                />
+            </View>
         </SafeAreaView>
     );
 }

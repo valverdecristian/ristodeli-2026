@@ -147,6 +147,8 @@ export default function FormularioProducto({ tiposPermitidos, onExito }: Formula
         }
     };
 
+    const esSoloBebida = tiposPermitidos.length === 1 && tiposPermitidos[0] === 'bebida';
+
     return (
         <ScrollView contentContainerStyle={{ flexGrow: 1 }} showsVerticalScrollIndicator={false}>
             {/* SPINNER  */}
@@ -156,38 +158,38 @@ export default function FormularioProducto({ tiposPermitidos, onExito }: Formula
             <View className="w-full pt-4">
                 <TextInput
                     placeholder="Nombre del Producto"
-                    placeholderTextColor="#555"
+                    placeholderTextColor="#777"
                     value={nombre}
                     onChangeText={setNombre}
-                    className="w-full bg-secondary rounded-full px-6 py-3.5 text-center text-base shadow-sm mb-4 text-primary font-semibold"
+                    className="w-full bg-primary/5 border border-primary/10 rounded-full px-6 py-3.5 text-center text-base mb-4 text-primary font-semibold"
                 />
 
                 <TextInput
                     placeholder="Descripción / Ingredientes"
-                    placeholderTextColor="#555"
+                    placeholderTextColor="#777"
                     value={descripcion}
                     onChangeText={setDescripcion}
                     multiline
                     numberOfLines={2}
-                    className="w-full bg-secondary rounded-[25px] px-6 py-3.5 text-center text-base shadow-sm mb-4 text-primary font-semibold"
+                    className="w-full bg-primary/5 border border-primary/10 rounded-[25px] px-6 py-3.5 text-center text-base mb-4 text-primary font-semibold"
                 />
 
                 <TextInput
                     placeholder="Tiempo de elaboración (minutos)"
-                    placeholderTextColor="#555"
+                    placeholderTextColor="#777"
                     value={tiempo}
                     onChangeText={setTiempo}
                     keyboardType="numeric"
-                    className="w-full bg-secondary rounded-full px-6 py-3.5 text-center text-base shadow-sm mb-4 text-primary font-semibold"
+                    className="w-full bg-primary/5 border border-primary/10 rounded-full px-6 py-3.5 text-center text-base mb-4 text-primary font-semibold"
                 />
 
                 <TextInput
                     placeholder="Precio ($)"
-                    placeholderTextColor="#555"
+                    placeholderTextColor="#777"
                     value={precio}
                     onChangeText={setPrecio}
                     keyboardType="numeric"
-                    className="w-full bg-secondary rounded-full px-6 py-3.5 text-center text-base shadow-sm mb-4 text-primary font-semibold"
+                    className="w-full bg-primary/5 border border-primary/10 rounded-full px-6 py-3.5 text-center text-base mb-4 text-primary font-semibold"
                 />
 
                 {/* Selector de tipo (Solo si tiene más de un rol permitido, como el cocinero) */}
@@ -197,9 +199,9 @@ export default function FormularioProducto({ tiposPermitidos, onExito }: Formula
                             <TouchableOpacity
                                 key={t}
                                 onPress={() => setTipoSeleccionado(t)}
-                                className={`w-[48%] py-2.5 rounded-full border ${tipoSeleccionado === t ? 'bg-secondary border-tertiary' : 'bg-primary border-secondary'}`}
+                                className={`w-[48%] py-3 rounded-full border-2 ${tipoSeleccionado === t ? 'bg-primary border-primary' : 'bg-transparent border-primary/20'}`}
                             >
-                                <Text className={`text-center font-bold uppercase text-xs ${tipoSeleccionado === t ? 'text-tertiary' : 'text-secondary'}`}>
+                                <Text className={`text-center font-bold uppercase text-xs ${tipoSeleccionado === t ? 'text-white' : 'text-primary/60'}`}>
                                     {t}
                                 </Text>
                             </TouchableOpacity>
@@ -208,16 +210,16 @@ export default function FormularioProducto({ tiposPermitidos, onExito }: Formula
                 )}
 
                 {/* SECCION MULTIFOTO INDIVIDUAL Y CENTRADA */}
-                <Text className="text-secondary font-bold text-xs uppercase tracking-wider mb-3 px-2">
+                <Text className="text-primary font-black text-xs uppercase tracking-wider mb-3 px-2">
                     Fotos obligatorias del producto (3)
                 </Text>
 
-                <View className="flex-row justify-between mb-8">
+                <View className="flex-row justify-between mb-6">
                     {fotosUris.map((uri, index) => (
                         <TouchableOpacity
                             key={index}
                             onPress={() => gestionarFoto(index)}
-                            className="w-[31%] aspect-square bg-secondary rounded-2xl items-center justify-center border-2 border-dashed border-tertiary overflow-hidden shadow-sm"
+                            className="w-[31%] aspect-square bg-primary/5 rounded-2xl items-center justify-center border-2 border-dashed border-primary/20 overflow-hidden shadow-sm"
                         >
                             {uri ? (
                                 <Image source={{ uri }} className="w-full h-full" resizeMode="cover" />
@@ -231,11 +233,29 @@ export default function FormularioProducto({ tiposPermitidos, onExito }: Formula
                     ))}
                 </View>
 
+                {/* Banner decorativo o caja de tips para llenar el espacio vacío */}
+                <View className="bg-primary/5 border border-primary/10 rounded-[24px] p-4 flex-row items-center mt-2 mb-6">
+                    <View className="bg-tertiary/20 p-2.5 rounded-full mr-3.5">
+                        <Ionicons name={esSoloBebida ? "beer" : "restaurant"} size={22} color="#31603D" />
+                    </View>
+                    <View className="flex-1">
+                        <Text className="text-primary font-black text-xs uppercase mb-0.5">
+                            {esSoloBebida ? "Consejo del Cantinero" : "Consejo del Chef"}
+                        </Text>
+                        <Text className="text-primary/70 text-[10.5px] font-medium leading-4">
+                            {esSoloBebida
+                                ? "Presenta las bebidas con guarniciones frescas (limón, menta, etc.) y cristalería impecable. ¡Una buena presentación vende mucho más!"
+                                : "Describe detalladamente si el plato contiene alérgenos o si es apto para celíacos. La claridad genera total confianza en tus clientes."
+                            }
+                        </Text>
+                    </View>
+                </View>
+
                 <TouchableOpacity
                     onPress={handleGuardarProducto}
-                    className="w-full bg-tertiary rounded-full py-4 shadow-lg border-b-4 border-orange active:opacity-90 mb-6"
+                    className="w-full bg-tertiary rounded-full py-4 shadow-lg border-b-4 border-orange active:opacity-95 mb-6"
                 >
-                    <Text className="text-center font-bold text-primary text-lg uppercase">Guardar en la Carta</Text>
+                    <Text className="text-center font-black text-primary text-base uppercase tracking-wider">Guardar en la Carta</Text>
                 </TouchableOpacity>
             </View>
 
