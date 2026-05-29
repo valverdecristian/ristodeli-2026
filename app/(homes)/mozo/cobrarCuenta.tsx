@@ -198,7 +198,7 @@ export default function CobrarCuentaScreen() {
             if (asignacion?.id) {
                 const { error: errUpd } = await supabase
                     .from('lista_espera')
-                    .delete()
+                    .update({ estado: 'completado' })
                     .eq('id', asignacion.id);
                 if (errUpd) throw errUpd;
             }

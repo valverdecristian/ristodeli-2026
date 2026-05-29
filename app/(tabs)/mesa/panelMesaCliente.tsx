@@ -70,7 +70,10 @@ export default function PanelMesaClienteScreen() {
                         } else if (payload.new.estado === 'Libre') {
                             SoundService.reproducir('exito');
                             showToast('success', '¡Gracias por visitarnos!', 'Vuelve pronto.');
-                            router.replace('/(tabs)/home' as any);
+                            router.replace({
+                                pathname: "/(tabs)/home" as any,
+                                params: { usuarioId: clienteId }
+                            });
                         } else {
                             fetchEstadoActual();
                         }
@@ -107,10 +110,23 @@ export default function PanelMesaClienteScreen() {
                 }
             }
 
+            let sessionStart = new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString();
+            if (sesion_id) {
+                const { data: asignacion } = await supabase
+                    .from('lista_espera')
+                    .select('created_at')
+                    .eq('sesion_id', sesion_id)
+                    .maybeSingle();
+                if (asignacion?.created_at) {
+                    sessionStart = asignacion.created_at;
+                }
+            }
+
             const { data, error } = await supabase
                 .from('pedidos')
                 .select('estado')
                 .eq('mesa_numero', nroMesaInt)
+                .gte('created_at', sessionStart)
                 .order('created_at', { ascending: false })
                 .limit(1)
                 .maybeSingle();
