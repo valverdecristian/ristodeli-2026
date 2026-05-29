@@ -74,6 +74,14 @@ De acuerdo a los requerimientos de la cátedra, se detallan las tareas asignadas
 | **Valverde, Cristian Jorge** | Notificación del pedido derivado a los sectores cocina/bar. | 28/05/2026 | 28/05/2026 |
 | **Valverde, Cristian Jorge** | Desarrollo de tres juegos simples. | 19/05/2026 | 19/05/2026 |
 | **Trkmic Torres, Ignacio** | Logica y vista del listado de pedidos pendientes cocina/bar. | 17/05/2026 | 17/05/2026 |
+| **Chavez, Alejo** | Generación de QR para las propinas. | 23/05/2026 | 23/05/2026 |
+| **Chavez, Alejo** | Correcciones de vistas: Estado del pedido por mesa. | 25/05/2026 | 25/05/2026 |
+| **Trkmic Torres, Ignacio** | Logica para que el cliente realice la encuesta. | 23/05/2026 | 23/05/2026 |
+| **Trkmic Torres, Ignacio** | Logica para solicitar cuenta al mozo. | 23/05/2026 | 23/05/2026 |
+| **Trkmic Torres, Ignacio** | Logica para confirmar pago y liberar mesa. | 23/05/2026 | 23/05/2026 |
+| **Valverde, Cristian Jorge** | Push Notifications: solicitud de cuenta, pago realizado y confirmación de pago. | 28/05/2026 | 28/05/2026 |
+| **Valverde, Cristian Jorge** | Correciones de vistas (ADMIN): alta mesa, listado de mesas y aprobaciones. | 26/05/2026 | 26/05/2026 |
+| **Valverde, Cristian Jorge** | Correciones de vistas: sala de chat, vistas del cocinero y vistas del mozo. | 28/05/2026 | 28/05/2026 |
 
 
 </details>

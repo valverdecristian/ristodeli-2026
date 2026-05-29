@@ -1,44 +1,44 @@
 ## 📋 Tareas Asignadas
 
-1. Agregar un empleado (cocinero) desde admin. ✅
+1. Agregar un empleado (cocinero) desde admin. ✅ // IGNACIO
 * Mostrar que funciona el lector de QR del DNI y que los campos del formulario se completan automáticamente. ✅
 ---
-2. Agregar un nuevo plato desde el cocinero. ✅
+2. Agregar un nuevo plato desde el cocinero. ✅ // ALEJO
 * Una vez credo el plato verificar la existencia en el catálogo. ✅
 ---
-3. Agregar una nueva bebida desde el cantinero. ✅
+3. Agregar una nueva bebida desde el cantinero. ✅ // CRISTIAN
 * Una vez credo la bebida verificar su existencia en el catálogo. ✅
 ---
-4. Agregar una nueva mesa desde supervisor. ✅
+4. Agregar una nueva mesa desde supervisor. ✅ // IGNACIO
 * Una vez que se crea la mesa mostrar el QR correspondiente. ✅
 * Verificar la existencia de la nueva mesa. ✅
 ---
 **PUNTOS 5-6-7-8 SE MUESTRAN JUNTOS** <br>
 
-5. Crear un cliente registrado desde el cliente. ✅
+5. Crear un cliente registrado desde el cliente. ✅ // CRISTIAN
 * Mostrar nuevamente que el lector del QR del DNI funcine. ✅
 * Validamos que si algun campo falta por completar no se envia el formulario. ✅
 * Aclarar que una vez que se crea el cliente se redirige al login a la espera de la aprobación del administrador. ✅
 * Mostrar que nos llega un correo indicando el estado "pendiente". ✅
 * Mostrar que queremos ingresar a la app y nos indica que no podemos ingresar aun. ✅
 ---
-6. Verificar ingreso del cliente registrado desde supervisor. ✅
+6. Verificar ingreso del cliente registrado desde supervisor. ✅ // IGNACIO
 * Mostramos que nos llego una push notificación de que un cliente solicita acceso. ✅
 * luego mostramos que dicho clientes aparece en la lista de "aprobar clientes" y que podemos aprobarlo o rechazarlo. ✅
 ---
-7. Rechazar a un cliente registrado desde admin. ✅
+7. Rechazar a un cliente registrado desde admin. ✅ // ALEJO
 * Al realizar esta acción, al usuario le llega un correo electronico indicando que su solicitud ha sido rechazada. ✅
 * Mostramos el correo recibido y que se visualiza claramente su rechazo y el logo de la empresa. ✅
 * Mostramos que el cliente intente ingresar a la app y se le indique que no puede ingresar debido al rechazo. ✅
 ---
-8. Aceptar a un cliente registrado desde admin. ✅
+8. Aceptar a un cliente registrado desde admin. ✅ // ALEJO
 * Para agilizar este punto se cambia el estado del cliente rechazado anteriormente a "cliente_pendiente" en la base de datos. ✅
 * Desde el panel del admin vemos nuevamente al cliente y lo aceptamos. ✅
 * El cliente recibe un correo electrónico de aceptación mostramos el mensaje personalizado y el logo de la app. ✅
 * Ingresamos a la app como cliente registrado. ✅
 * Continua en el punto 10
 ---
-9. Ingresar al local como cliente anonimo. ✅
+9. Ingresar al local como cliente anonimo. ✅ // CRISTIAN (CLIENTE) ; IGNACIO (METRE)
 * Ingresamos nombre y foto y nos registramos. ✅
 * Mostramos que no necesitamos aprobación para ingresar. ✅
 * Antes de escanear el QR de entrada, procedemos a escanear el QR de cualquier mesa y vemos que la app nos indica que "debemos colocarnos en la lista de espera" ✅
@@ -47,7 +47,7 @@
 * Desde el Metre vemos que nos llego una notificación indicando que hay un nuevo cliente en la lista de espera. ✅
 * Desde el Metre verificamos que aparecemos en la lista de espera. ✅
 ---
-10. Asignar una mesa a un cliente registrado desde el Metre. ✅
+10. Asignar una mesa a un cliente registrado desde el Metre. ✅ // CRISTIAN (CLIENTE); IGNACIO (METRE)
 * Continuando desde el punto 8. ✅
 * Escaneamos el QR de entrada y rapidamente nos colocamos en la lista de espera. ✅
 * Desde el Metre verificamos nuevamente que este cliente aparece en la lista de espera y le asignamos una mesa. ✅
@@ -56,13 +56,13 @@
 * Procedemos a escanear el QR de nuestra mesa y nos vinculamos correctamente. El cliente procede a ver el menú. ✅
 * Mostramos que la mesa asignada no esta disponible para otro cliente. ✅
 ---
-11. Continuando con el punto 10 mostramos que como cliente podemos ver el menú de los productos disponibles. ✅
+11. Continuando con el punto 10 mostramos que como cliente podemos ver el menú de los productos disponibles. ✅ // CRISTIAN (CLIENTE) ; ALEJO (MOZO)
 * Volvemos para atras y mostramos que podemos hacer una consulta al mozo. ✅
 * Realizamos una consulta y al mozo le llega una push notificación. ✅
 * Desde el panel del mozo vemos la consulta y respondemos. ✅
 * Al cliente le llega una push notification de que el mozo le respondio la consulta y mostramos el mensaje recibido. ✅
 ---
-12. Realizar el pedido para todos los comensales de la mesa. ✅
+12. Realizar el pedido para todos los comensales de la mesa. ✅ // CRISTIAN (CLIENTE); ALEJO (MOZO); IGNACIO (COCINERO)
 * **En este punto participamos LOS TRES: cliente, mozo y cocinero. Realizamos los puntos 12, 13 y 14 juntos.**
 * Realizamos un pedido con varias cantidades y mostramos luego el listado con el precio grande (en el carrito). Agregar dos postres al pedido ya que luego lo vamos a necesitar. ✅
 * Indicamos que podemos ver el tiempo estimado de elaboracion. ✅
@@ -70,51 +70,51 @@
 * Desde el panel del cocinero vemos que no nos llego ningun pedido, porque primero lo tiene que confirmar el mozo. ✅
 * El cliente vuelve a escanear el QR de la mesa y ve que su pedido esta pendiente de confirmacion. ✅
 ---
-13. Luego de que el mozo recibio la notificación del pedido, procede a rechazarlo, para que el cliente lo modifique. ✅
+13. Luego de que el mozo recibio la notificación del pedido, procede a rechazarlo, para que el cliente lo modifique. ✅ // ALEJO (MOZO); CRISTIAN (CLIENTE)
 * El cliente modifica el pedido, elimina uno de los postres y agrega una bebida. Y lo envia nuevamente. ✅
 * Le llega una notificación al mozo del pedido. ✅
 ---
-14. El mozo confirma el pedido, y esto es derivado al sector correspondiente. ✅
+14. El mozo confirma el pedido, y esto es derivado al sector correspondiente. ✅ // ALEJO (MOZO); IGNACIO (COCINERO); CRISTIAN (CLIENTE)
 * Estando logueado como cocinero mostramos que nos llego una notificación de un nuevo pedido de preparación. ⏳
 * Mostramos que el pedido se encuentra en la cola de preparacion. ✅
 * El cliente escanea el QR de mesa nuevamente y ve que su pedido esta en preparación. ✅
 * Vuelve atras para acceder a los juegos. ✅
 ---
-15. Acceder a los juegos
+15. Acceder a los juegos // CRISTIAN (CLIENTE)
 * El cliente visualiza los tres juegos disponibles. ✅
 * Cada juego indicara que porcentaje de descuento le corresponde en caso de ganar SOLO EN EL PRIMER INTENTO DEL PRIMER JUEGO QUE SELECCIONE. ✅
 * Jugar un juego y obtener el descuento ✅, que se podra visualizar en el "estado del pedido". ⏳
 * Jugar a otro juego y verificar que no se obtuvo otro descuento, ya que no es acumulativo. ✅
 ---
-16. Recepción de los productos correspondientes (cocina).
+16. Recepción de los productos correspondientes (cocina). // IGNACIO (COCINERO)
 * Mostrar que en "pedidos pendientes" se visualiza bien el numero de mesa, fecha con hora y minutos y los items a elaborar. ✅
 * Mostramos que el listado esta agrupado por numero de mesas ✅
 * Desde el cliente mostramos el cambio de "estado del pedido" que aparece ahora como "preparando en cocina/bar" ✅
 ---
-17.  Recepción de los productos correspondientes (bar)
+17.  Recepción de los productos correspondientes (bar). // IGNACIO (COCINERO); CRISTIAN (CLIENTE)
 * Mostrar que en "pedidos pendientes" se visualiza bien el numero de mesa, fecha con hora y minutos y los items a elaborar. ✅
 * Mostramos que el listado esta agrupado por numero de mesas ✅
 * Desde el cliente mostramos el cambio de "estado del pedido" que aparece ahora como "preparando en cocina/bar" ✅
 ---
-18.  Realizar las tareas correspondientes desde cocina y bar
+18.  Realizar las tareas correspondientes desde cocina y bar // IGNACIO (COCINERO); ALEJO (CANTINERO)
 * Al mozo le llega una notificación de que el pedido esta confirmado desde cocina o bar ⏳
 * El cliente verifica el cambio de estado de su pedido ✅
 ---
-19. El Mozo entrega el pedido completo.
+19. El Mozo entrega el pedido completo. // ALEJO (MOZO); CRISTIAN (CLIENTE)
 * El cliente confirma la recepcion del pedido. ✅
 * El cliente verifica el cambio del estado de su pedido ✅
 * El cliente vuelve a escanear el QR de la mesa y ve que puede acceder a la encuesta y a la opcion de "pedir cuenta" ✅
 ---
-20.  Acceder a la encuesta de satisfacción
+20.  Acceder a la encuesta de satisfacción // CRISTIAN (CLIENTE)
 * Realizamos la encuesta y verificamos que solo se pueda realizar 1 sola vez ✅
 * Volvemos para atras y vemos que podemos ver los resultados previos de la encuesta ✅
 ---
-21. El cliente solicita cuenta al mozo.
+21. El cliente solicita cuenta al mozo. // ALEJO (MOZO); CRISTIAN (CLIENTE); IGNACIO (ADMIN)
 * Mostrar que se puede escanear el QR de propinas y eso sumarlo a la cuenta. ✅
 * Confirmar el pedido y derivarlo al mozo. ✅
 * Al mozo le llega una push notification de que el cliente solicito la cuenta (le llega al mozo, admin y supervisor)
 ---
-22. Confirmar el pago y liberar mesa desde el mozo.
+22. Confirmar el pago y liberar mesa desde el mozo. // ALEJO (MOZO); CRISTIAN (CLIENTE); IGNACIO (ADMIN)
 * Mostrar que cuando se confirme el pago, le llegue la notificacion al admin y supervisor. ✅
 * Verificar que la mesa este libre nuevamente (haciendo que el cliente vuelva a escanear el QR de la mesa)
 * El cliente escanea el QR de lista de espera y visualiza los resultados de las encuestas.
