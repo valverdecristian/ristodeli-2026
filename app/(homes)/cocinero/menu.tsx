@@ -25,7 +25,7 @@ export default function MenuCocineroScreen() {
             onPress={() => setCategoriaActual('plato')}
             className={`w-[48%] py-3 rounded-full border-b-4 ${categoriaActual === 'plato' ? 'bg-tertiary border-orange' : 'bg-secondary border-gray-400'} active:opacity-90`}
             >
-            <Text className={`text-center font-bold uppercase text-xs ${categoriaActual === 'plato' ? 'text-primary' : 'text-secondary'}`}>
+            <Text className={`text-center font-bold uppercase text-xl ${categoriaActual === 'plato' ? 'text-primary' : 'text-dark'}`}>
                 Ver Platos
             </Text>
             </TouchableOpacity>
@@ -34,7 +34,7 @@ export default function MenuCocineroScreen() {
             onPress={() => setCategoriaActual('postre')}
             className={`w-[48%] py-3 rounded-full border-b-4 ${categoriaActual === 'postre' ? 'bg-tertiary border-orange' : 'bg-secondary border-gray-400'} active:opacity-90`}
             >
-            <Text className={`text-center font-bold uppercase text-xs ${categoriaActual === 'postre' ? 'text-primary' : 'text-secondary'}`}>
+            <Text className={`text-center font-bold uppercase text-xl ${categoriaActual === 'postre' ? 'text-primary' : 'text-dark'}`}>
                 Ver Postres
             </Text>
             </TouchableOpacity>

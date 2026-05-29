@@ -4,7 +4,7 @@ import { supabase } from '@/src/services/SupabaseClient';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, FlatList, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, FlatList, Text, TouchableOpacity, View, Image } from 'react-native';
 
 export default function ListaEntregarPedidosMozo() {
     const { showToast } = useToast();
@@ -74,8 +74,16 @@ export default function ListaEntregarPedidosMozo() {
         showsVerticalScrollIndicator={false}
         ListEmptyComponent={
             <View className="bg-secondary p-8 rounded-3xl items-center mt-6">
+                {/* Logo de la aplicación */}
+                <View className="items-center mb-6">
+                    <Image 
+                    source={require('@/assets/images/icon.png')} 
+                    className="w-56 h-56" 
+                    resizeMode="contain" 
+                    />
+                </View>
             <Ionicons name="restaurant-outline" size={42} color="#31603D" />
-            <Text className="text-primary font-black text-center mt-3 uppercase text-xs tracking-wider">No hay bandejas listas</Text>
+            <Text className="text-primary font-black text-center mt-3 uppercase text-2xl tracking-wider">No hay bandejas listas</Text>
             </View>
         }
         renderItem={({ item }) => (

@@ -58,17 +58,23 @@ De acuerdo a los requerimientos de la cátedra, se detallan las tareas asignadas
 | **Trkmic Torres, Ignacio** | Flujo de Entrada: Cliente Anónimo. | 17/04/2026 | 21/04/2026 |
 | **Chavez, Alejo** | Gestión de Mesas para Admin/Supervisor. | 17/04/2026 | 17/04/2026|
 | **Chavez, Alejo** | Botón "Consulta al Mozo" en Home. | 16/04/2026 | 23/04/2026 |
-| **Chavez, Alejo** | Notificación masiva de consulta a mozos. | 22/04/2026 | ⏳ pendiente |
+| **Chavez, Alejo** | Notificación masiva de consulta a mozos. | 22/04/2026 | 25/04/2026 |
 | **Chavez, Alejo** | Componente de Chat Reutilizable. | 22/04/2026 | 23/04/2026 |
-| **Chavez, Alejo** | Vista de Consultas y Chat del Mozo. | 23/04/2026 | ⏳ pendiente |
-| **Chavez, Alejo** | Gestión de Pedidos: Confirmar/Rechazar. | ⏳ pendiente | ⏳ pendiente |
+| **Chavez, Alejo** | Vista de Consultas y Chat del Mozo. | 23/04/2026 | 25/04/2026 |
+| **Chavez, Alejo** | Gestión de Pedidos: Confirmar/Rechazar. | 16/05/2026 | 16/05/2026 |
 | **Valverde, Cristian Jorge** | Notificación de solicitud de mesa al Metre. | 22/04/2026 | 22/04/2026 |
 | **Valverde, Cristian Jorge** | Vista de Detalle de Producto y Cantidad. | 24/04/2026 | 24/04/2026 |
 | **Valverde, Cristian Jorge** | Carrito de Compra e Importe Total. | 24/04/2026 | 24/04/2026 |
-| **Valverde, Cristian Jorge** | Confirmación de Pedido y Aviso al Mozo. | ⏳ pendiente | ⏳ pendiente |
+| **Valverde, Cristian Jorge** | Confirmación de Pedido y Aviso al Mozo. | 18/05/2026 | 18/05/2026 |
 | **Trkmic Torres, Ignacio** | Lógica de acceso por QR de Mesa. | 23/04/2026 | 23/04/2026 |
 | **Trkmic Torres, Ignacio** | Sistema de Flags para re-escaneo de QR. | 23/04/2026 | 23/04/2026 |
 | **Trkmic Torres, Ignacio** | Visualización de Encuestas con Gráficos. | 22/04/2026 | 23/04/2026 |
+| **Trkmic Torres, Ignacio** | Logica y vista del menú de productos para el cliente. | 18/05/2026 | 18/05/2026 |
+| **Valverde, Cristian Jorge** | Notificación del pedido al mozo y rechazo. | 25/05/2026 | 25/05/2026 |
+| **Valverde, Cristian Jorge** | Notificación del pedido derivado a los sectores cocina/bar. | 28/05/2026 | 28/05/2026 |
+| **Valverde, Cristian Jorge** | Desarrollo de tres juegos simples. | 19/05/2026 | 19/05/2026 |
+| **Trkmic Torres, Ignacio** | Logica y vista del listado de pedidos pendientes cocina/bar. | 17/05/2026 | 17/05/2026 |
+
 
 </details>
 
