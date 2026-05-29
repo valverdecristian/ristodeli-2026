@@ -7,19 +7,16 @@ import QRCode from 'react-native-qrcode-svg';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import LoadingModal from "@/src/components/LoadingModal";
 
-const { height: SCREEN_HEIGHT } = Dimensions.get('window');
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 // Calculamos la altura disponible de forma exacta:
 // SCREEN_HEIGHT - Header (~75) - SafeArea/StatusBar (~60)
-// Dividido por 2 para que entren exactamente dos filas verticales sin superposición ni cortes.
 const HEADER_HEIGHT = 75;
 const SAFE_AREA_ESTIMATE = 60;
-const TOTAL_PADDING = 32; // paddingVertical (20) + contenedor (12)
-const AVAILABLE_HEIGHT = SCREEN_HEIGHT - HEADER_HEIGHT - SAFE_AREA_ESTIMATE - TOTAL_PADDING;
+const VERTICAL_PADDING = 40;
+const AVAILABLE_HEIGHT = SCREEN_HEIGHT - HEADER_HEIGHT - SAFE_AREA_ESTIMATE - VERTICAL_PADDING;
 
-const CARD_HEIGHT = AVAILABLE_HEIGHT / 2;
-const VERTICAL_MARGIN = 20; // Margen simétrico para dar separación
-const SNAP_INTERVAL = CARD_HEIGHT + (VERTICAL_MARGIN * 2);
+const CARD_HEIGHT = AVAILABLE_HEIGHT * 0.95;
 
 export default function ListadoMesas() {
   const router = useRouter();
@@ -35,47 +32,49 @@ export default function ListadoMesas() {
   }, []);
 
   const renderMesa = ({ item }: { item: any }) => (
-    <View style={{ width: '100%', height: CARD_HEIGHT - (VERTICAL_MARGIN * 2), marginTop: VERTICAL_MARGIN, marginBottom: VERTICAL_MARGIN }} className="bg-secondary rounded-[30px] overflow-hidden shadow-xl">
+    <View style={{ width: SCREEN_WIDTH, height: AVAILABLE_HEIGHT, justifyContent: 'center', alignItems: 'center' }}>
+      <View style={{ width: SCREEN_WIDTH - 40, height: CARD_HEIGHT }} className="bg-secondary rounded-[30px] overflow-hidden shadow-xl">
 
-      {/* Foto de la Mesa (Ocupa la parte superior a ancho completo) */}
-      <View className="relative w-full h-[60%] bg-primary/20">
-        {item.foto ? (
-          <Image source={{ uri: item.foto }} className="w-full h-full" resizeMode="cover" />
-        ) : (
-          <View className="w-full h-full items-center justify-center">
-            <Ionicons name="image-outline" size={48} color="#31603D" style={{ opacity: 0.3 }} />
+        {/* Foto de la Mesa (Ocupa la parte superior a ancho completo) */}
+        <View className="relative w-full h-[65%] bg-primary/20">
+          {item.foto ? (
+            <Image source={{ uri: item.foto }} className="w-full h-full" resizeMode="cover" />
+          ) : (
+            <View className="w-full h-full items-center justify-center">
+              <Ionicons name="image-outline" size={64} color="#31603D" style={{ opacity: 0.3 }} />
+            </View>
+          )}
+
+          <TouchableOpacity
+            className="absolute top-4 right-4 bg-tertiary p-3 rounded-full shadow-lg"
+            style={{ elevation: 5 }}
+            onPress={() => setMesaQR(item)}
+          >
+            <Ionicons name="qr-code" size={24} color="#31603D" />
+          </TouchableOpacity>
+        </View>
+
+        {/* Información de la Mesa (Abajo) */}
+        <View className="p-6 flex-1 justify-between flex-row items-center">
+          <View>
+            <Text className="text-primary font-black text-3xl uppercase tracking-tighter">Mesa {item.numero}</Text>
+
+            <View className="flex-row items-center mt-2">
+              <Ionicons name={item.tipo === 'vip' ? 'star' : 'restaurant'} size={18} color="#31603D" />
+              <Text className="text-primary/70 font-bold uppercase text-sm ml-2">
+                {item.tipo}
+              </Text>
+            </View>
           </View>
-        )}
 
-        <TouchableOpacity
-          className="absolute top-4 right-4 bg-tertiary p-3 rounded-full shadow-lg"
-          style={{ elevation: 5 }}
-          onPress={() => setMesaQR(item)}
-        >
-          <Ionicons name="qr-code" size={20} color="#31603D" />
-        </TouchableOpacity>
-      </View>
-
-      {/* Información de la Mesa (Abajo) */}
-      <View className="p-4 flex-1 justify-between flex-row items-center">
-        <View>
-          <Text className="text-primary font-black text-2xl uppercase tracking-tighter">Mesa {item.numero}</Text>
-
-          <View className="flex-row items-center mt-1">
-            <Ionicons name={item.tipo === 'vip' ? 'star' : 'restaurant'} size={14} color="#31603D" />
-            <Text className="text-primary/70 font-bold uppercase text-xs ml-2">
-              {item.tipo}
+          <View className="bg-primary/10 px-5 py-3 rounded-full items-center">
+            <Text className="text-primary font-bold text-sm uppercase">
+              {item.comensales} Pax
             </Text>
           </View>
         </View>
 
-        <View className="bg-primary/10 px-4 py-2 rounded-full items-center">
-          <Text className="text-primary font-bold text-xs uppercase">
-            {item.comensales} Pax
-          </Text>
-        </View>
       </View>
-
     </View>
   );
 
@@ -95,23 +94,22 @@ export default function ListadoMesas() {
         </TouchableOpacity>
       </View>
 
-      {/* LISTA DE 1 COLUMNA (2 FILAS POR PANTALLA) CON SCROLL SNAP */}
-      <View className="flex-1 px-5">
+      {/* LISTADO HORIZONTAL DE MESAS CON DESPLAZAMIENTO LATERAL */}
+      <View className="flex-1">
         <LoadingModal visible={loading} message="Cargando mesas..." />
         <FlatList
           data={mesas}
           keyExtractor={(item) => item.id.toString()}
-          numColumns={1}
-          key={1}
-          contentContainerStyle={{ paddingVertical: 10 }}
+          horizontal={true}
+          pagingEnabled={true}
+          showsHorizontalScrollIndicator={false}
           renderItem={renderMesa}
-          showsVerticalScrollIndicator={false}
-          snapToInterval={SNAP_INTERVAL} 
           decelerationRate="fast"
-          snapToAlignment="start"
           ListEmptyComponent={
             !loading ? (
-              <Text className="text-secondary font-bold text-center mt-10">No hay mesas registradas.</Text>
+              <View style={{ width: SCREEN_WIDTH, height: AVAILABLE_HEIGHT, justifyContent: 'center', alignItems: 'center' }}>
+                <Text className="text-secondary font-bold text-center">No hay mesas registradas.</Text>
+              </View>
             ) : null
           }
         />

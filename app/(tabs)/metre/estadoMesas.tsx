@@ -1,11 +1,18 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity, Image, Modal, Switch, ActivityIndicator } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, Image, Modal, Switch, ActivityIndicator, Dimensions } from 'react-native';
 import { supabase } from '@/src/services/SupabaseClient';
 import { MesaService } from '@/src/services/mesaService';
 import LoadingModal from '@/src/components/LoadingModal';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import * as Haptics from 'expo-haptics';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
+
+const HEADER_HEIGHT = 80;
+const TITLE_SECTION_HEIGHT = 100;
+const AVAILABLE_HEIGHT = SCREEN_HEIGHT - HEADER_HEIGHT - TITLE_SECTION_HEIGHT - 60;
 
 export default function EstadoMesasScreen() {
   const router = useRouter();
@@ -93,59 +100,37 @@ export default function EstadoMesasScreen() {
     fetchEstadoMesas();
   };
 
-  return (
-    <View className="flex-1 bg-primary px-6 pt-12">
-      {/* Cabecera / Boton Volver */}
-      <View className="flex-row justify-between items-center mb-6">
-        <TouchableOpacity
-          onPress={() => router.back()}
-          className="flex-row items-center bg-secondary py-2 px-4 rounded-full border border-tertiary/10"
-        >
-          <Ionicons name="arrow-back" size={18} color="#31603D" style={{ marginRight: 6 }} />
-          <Text className="text-primary font-bold text-xs uppercase">Volver</Text>
-        </TouchableOpacity>
+  const chunkArray = (arr: any[], size: number) => {
+    const chunked = [];
+    for (let i = 0; i < arr.length; i += size) {
+      chunked.push(arr.slice(i, i + size));
+    }
+    return chunked;
+  };
 
-        <TouchableOpacity
-          onPress={handleRefreshVisual}
-          className="bg-secondary p-2 rounded-full border border-tertiary/10"
-        >
-          <Ionicons name="refresh" size={18} color="#31603D" />
-        </TouchableOpacity>
-      </View>
-
-      <Text className="text-white text-2xl font-black uppercase tracking-wider mb-2">Estado del Salón</Text>
-      <Text className="text-tertiary text-xs uppercase font-bold mb-6 tracking-widest">Monitoreo de Ocupación</Text>
-
-      <LoadingModal visible={loading && mesas.length === 0} message="Cargando estado del salón..." />
-
-      {(!loading || mesas.length > 0) && (
-        <FlatList
-          data={mesas}
-          keyExtractor={(item) => item.id}
-          numColumns={2}
-          columnWrapperStyle={{ justifyContent: 'space-between' }}
-          showsVerticalScrollIndicator={false}
-          ListEmptyComponent={
-            <View className="bg-secondary p-8 rounded-3xl items-center mt-6 w-full">
-              <Ionicons name="grid-outline" size={40} color="#31603D" />
-              <Text className="text-primary font-bold text-center mt-3 uppercase text-xs">No hay mesas dadas de alta</Text>
-            </View>
-          }
-          renderItem={({ item }) => {
-            const estaLibre = item.estado?.toLowerCase() === 'libre';
+  const renderPaginaMesas = ({ item: grupoMesas }: { item: any[] }) => {
+    return (
+      <View style={{ width: SCREEN_WIDTH, height: AVAILABLE_HEIGHT, paddingHorizontal: 24, justifyContent: 'center' }}>
+        <View className="flex-row flex-wrap justify-between">
+          {grupoMesas.map((mesa) => {
+            const estaLibre = mesa.estado?.toLowerCase() === 'libre';
+            const CARD_WIDTH = (SCREEN_WIDTH - 64) / 2;
+            const CARD_HEIGHT = (AVAILABLE_HEIGHT - 32) / 2;
 
             return (
               <TouchableOpacity
-                onPress={() => handleAbrirModal(item)}
+                key={mesa.id}
+                onPress={() => handleAbrirModal(mesa)}
                 activeOpacity={0.7}
-                style={{ elevation: 2 }}
-                className={`bg-secondary w-[48%] mb-5 rounded-[28px] overflow-hidden border-2 shadow-sm ${estaLibre ? 'border-emerald-500/30' : 'border-red-500/30'
+                style={{ width: CARD_WIDTH, height: CARD_HEIGHT, elevation: 2, marginBottom: 16 }}
+                className={`bg-secondary rounded-[28px] overflow-hidden border-2 shadow-sm ${estaLibre ? 'border-emerald-500/30' : 'border-red-500/30'
                   }`}
               >
-                <View className="w-full h-28 bg-primary/10 relative">
-                  {item.foto ? (
+                {/* Foto de la mesa */}
+                <View className="w-full h-[50%] bg-primary/10 relative">
+                  {mesa.foto ? (
                     <Image
-                      source={{ uri: item.foto }}
+                      source={{ uri: mesa.foto }}
                       className="w-full h-full"
                       resizeMode="cover"
                     />
@@ -155,38 +140,90 @@ export default function EstadoMesasScreen() {
                     </View>
                   )}
 
-                  <View className={`absolute top-2 right-2 px-2 py-1 rounded-full border ${estaLibre ? 'bg-emerald-100 border-emerald-400' : 'bg-red-100 border-red-400'
+                  <View className={`absolute top-2 right-2 px-2.5 py-1 rounded-full border ${estaLibre ? 'bg-emerald-100 border-emerald-400' : 'bg-red-100 border-red-400'
                     }`}>
-                    <Text className={`text-[9px] font-black uppercase tracking-wider ${estaLibre ? 'text-emerald-700' : 'text-red-700'
+                    <Text className={`text-[10px] font-black uppercase tracking-wider ${estaLibre ? 'text-emerald-700' : 'text-red-700'
                       }`}>
-                      {item.estado}
+                      {mesa.estado}
                     </Text>
                   </View>
                 </View>
 
-                <View className="p-4 bg-secondary">
-                  <View className="flex-row justify-between items-center mb-1">
-                    <Text className="text-primary font-black text-base uppercase">Mesa {item.numero}</Text>
-                    {item.tipo?.toLowerCase() === 'vip' && (
+                {/* Detalles de la mesa */}
+                <View className="p-4 justify-between flex-1">
+                  <View className="flex-row justify-between items-center">
+                    <Text className="text-primary font-black text-lg uppercase tracking-tight">Mesa {mesa.numero}</Text>
+                    {mesa.tipo?.toLowerCase() === 'vip' && (
                       <Ionicons name="star" size={14} color="#F5C065" />
                     )}
                   </View>
 
-                  <View className="flex-row items-center mt-0.5">
-                    <Ionicons name="people" size={12} color="#6E433D" style={{ marginRight: 4 }} />
-                    <Text className="text-tertiary text-[11px] font-bold uppercase">
-                      Capacidad: {item.comensales}
+                  <View className="flex-row items-center mt-1">
+                    <Ionicons name="people" size={13} color="#6E433D" style={{ marginRight: 5 }} />
+                    <Text className="text-tertiary text-xs font-bold uppercase">
+                      Capacidad: {mesa.comensales} pax
                     </Text>
                   </View>
 
-                  <Text className="text-primary text-[9px] font-bold uppercase mt-2 tracking-widest bg-primary/5 align-middle py-1 text-center rounded-lg">
-                    Tipo: {item.tipo}
+                  <Text className="text-primary text-[10px] font-bold uppercase mt-1 tracking-widest bg-primary/5 py-1 text-center rounded-lg">
+                    Tipo: {mesa.tipo}
                   </Text>
                 </View>
               </TouchableOpacity>
             );
-          }}
-        />
+          })}
+        </View>
+      </View>
+    );
+  };
+
+  const paginasMesas = chunkArray(mesas, 4);
+
+  return (
+    <SafeAreaView className="flex-1 bg-primary">
+      {/* ENCABEZADO PREMIUM INTEGRADO */}
+      <View className="bg-tertiary px-6 pt-4 pb-5 flex-row items-center justify-between shadow-2xl mb-6">
+        <View className="flex-row items-center flex-1">
+          <TouchableOpacity onPress={() => router.back()} className="mr-3 p-1 active:opacity-75">
+            <Ionicons name="arrow-back" size={30} color="#31603D" />
+          </TouchableOpacity>
+          <View className="flex-1">
+            <Text className="text-primary font-black text-2xl uppercase tracking-tighter leading-none">Estado Salón</Text>
+            <Text className="text-primary/70 font-bold text-[9px] uppercase tracking-widest mt-1">Monitoreo de Ocupación</Text>
+          </View>
+        </View>
+
+        <TouchableOpacity
+          onPress={handleRefreshVisual}
+          className="bg-primary/10 p-2.5 rounded-full border border-primary/10 active:opacity-75"
+        >
+          <Ionicons name="refresh" size={20} color="#31603D" />
+        </TouchableOpacity>
+      </View>
+
+      <LoadingModal visible={loading && mesas.length === 0} message="Cargando estado del salón..." />
+
+      {(!loading || mesas.length > 0) && (
+        <View className="flex-1">
+          {mesas.length === 0 ? (
+            <View className="px-6 justify-center items-center">
+              <View className="bg-secondary p-8 rounded-3xl items-center mt-6 w-full">
+                <Ionicons name="grid-outline" size={40} color="#31603D" />
+                <Text className="text-primary font-bold text-center mt-3 uppercase text-xs">No hay mesas dadas de alta</Text>
+              </View>
+            </View>
+          ) : (
+            <FlatList
+              data={paginasMesas}
+              keyExtractor={(item, index) => index.toString()}
+              horizontal={true}
+              pagingEnabled={true}
+              showsHorizontalScrollIndicator={false}
+              renderItem={renderPaginaMesas}
+              decelerationRate="fast"
+            />
+          )}
+        </View>
       )}
 
       <Modal visible={modalVisible} transparent animationType="fade" onRequestClose={() => setModalVisible(false)}>
@@ -279,6 +316,6 @@ export default function EstadoMesasScreen() {
           </View>
         </View>
       </Modal>
-    </View>
+    </SafeAreaView>
   );
 }

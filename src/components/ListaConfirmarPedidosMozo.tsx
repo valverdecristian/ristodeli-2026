@@ -13,6 +13,8 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  Dimensions,
+  ScrollView,
 } from "react-native";
 import { NotificationService } from "@/src/services/notificationService";
 
@@ -151,6 +153,10 @@ export default function ListaConfirmarPedidosMozo() {
     }
   };
 
+  const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
+  const HEADER_HEIGHT = 80;
+  const AVAILABLE_HEIGHT = SCREEN_HEIGHT - HEADER_HEIGHT - 120;
+
   if (loading && pedidosAConfirmar.length === 0) {
     return (
       <View className="flex-1 justify-center items-center">
@@ -164,88 +170,110 @@ export default function ListaConfirmarPedidosMozo() {
       <FlatList
         data={pedidosAConfirmar}
         keyExtractor={(item) => item.mesa.toString()}
-        showsVerticalScrollIndicator={false}
+        horizontal={true}
+        pagingEnabled={true}
+        showsHorizontalScrollIndicator={false}
+        decelerationRate="fast"
         ListEmptyComponent={
-          <View className="bg-secondary p-8 rounded-3xl items-center mt-6">
-            {/* Logo de la aplicación */}
-            <View className="items-center mb-6">
+          <View style={{ width: SCREEN_WIDTH, height: AVAILABLE_HEIGHT }} className="justify-center items-center px-6">
+            <View className="items-center mb-4">
               <Image
                 source={require("@/assets/images/icon.png")}
-                className="w-56 h-56" 
+                className="w-48 h-48"
                 resizeMode="contain"
               />
             </View>
             <Ionicons
               name="notifications-off-outline"
-              size={42}
+              size={40}
               color="#31603D"
+              style={{ opacity: 0.5 }}
             />
-            <Text className="text-primary font-black text-center mt-3 uppercase text-2xl tracking-wider">
-              No hay pedidos pendientes de confirmación
+            <Text className="text-primary font-black text-center mt-3 uppercase text-lg tracking-wider">
+              No hay pedidos pendientes
             </Text>
           </View>
         }
         renderItem={({ item }) => {
           const hora = item.fecha
             ? new Date(item.fecha).toLocaleTimeString([], {
-                hour: "2-digit",
-                minute: "2-digit",
-              })
+              hour: "2-digit",
+              minute: "2-digit",
+            })
             : "--:--";
 
-          return (
-            <View
-              style={{ elevation: 3 }}
-              className="bg-secondary rounded-[32px] p-6 mb-6 border border-tertiary/10 shadow-sm"
-            >
-              <View className="flex-row justify-between items-center border-b border-primary/10 pb-3 mb-3">
-                <Text className="text-primary font-black text-base uppercase">
-                  Mesa N° {item.mesa}
-                </Text>
-                <Text className="text-tertiary font-bold text-[10px] uppercase">
-                  Recibido: {hora}
-                </Text>
-              </View>
+          const CARD_WIDTH = SCREEN_WIDTH - 48;
+          const CARD_HEIGHT = AVAILABLE_HEIGHT - 40;
 
-              <View className="mb-4">
-                {item.items.map((prod: any) => (
-                  <View
-                    key={prod.id}
-                    className="flex-row justify-between py-1.5 border-b border-primary/5"
-                  >
-                    <Text className="text-primary font-medium text-xs uppercase max-w-[80%]">
-                      {prod.producto_nombre}
-                    </Text>
-                    <Text className="text-primary font-black text-xs">
-                      x{prod.cantidad}
+          return (
+            <View style={{ width: SCREEN_WIDTH, height: AVAILABLE_HEIGHT, paddingHorizontal: 24, justifyContent: 'center' }}>
+              <View
+                style={{ width: CARD_WIDTH, height: CARD_HEIGHT, elevation: 3 }}
+                className="bg-primary rounded-[32px] p-6 border border-tertiary/30 shadow-lg justify-between"
+              >
+                {/* Header de la mesa */}
+                <View className="flex-row justify-between items-center border-b border-tertiary/20 pb-3 mb-3">
+                  <Text className="text-white font-black text-lg uppercase">
+                    Mesa N° {item.mesa}
+                  </Text>
+                  <View className="bg-secondary/15 px-3 py-1 rounded-full border border-tertiary/20">
+                    <Text className="text-tertiary font-bold text-[9px] uppercase tracking-wider">
+                      Recibido: {hora}
                     </Text>
                   </View>
-                ))}
-              </View>
+                </View>
 
-              <View className="flex-row justify-between space-x-3 gap-2">
-                <TouchableOpacity
-                  onPress={() => iniciarRechazo(item.mesa, item.items)}
-                  className="flex-1 bg-red-500 rounded-full py-3 items-center justify-center border-b-4 border-red-700 active:mt-1 active:border-b-0"
-                >
-                  <Text className="text-white font-black text-[11px] uppercase tracking-wider">
-                    Rechazar
-                  </Text>
-                </TouchableOpacity>
+                {/* Lista de productos scrollable adentro de la tarjeta fija */}
+                <ScrollView showsVerticalScrollIndicator={false} className="flex-1 my-2">
+                  {item.items.map((prod: any) => (
+                    <View
+                      key={prod.id}
+                      className="flex-row justify-between py-2 border-b border-tertiary/10"
+                    >
+                      <Text className="text-white/90 font-medium text-sm uppercase max-w-[80%]">
+                        {prod.producto_nombre}
+                      </Text>
+                      <Text className="text-tertiary font-black text-sm">
+                        x{prod.cantidad}
+                      </Text>
+                    </View>
+                  ))}
+                </ScrollView>
 
-                <TouchableOpacity
-                  onPress={() => handleAprobarPedido(item.mesa, item.items)}
-                  className="flex-1 bg-tertiary rounded-full py-3 items-center justify-center border-b-4 border-orange active:mt-1 active:border-b-0"
-                >
-                  <Text className="text-primary font-black text-[11px] uppercase tracking-wider">
-                    Confirmar
-                  </Text>
-                </TouchableOpacity>
+                {/* Botones de acción */}
+                <View className="flex-row justify-between space-x-3 gap-2 mt-3">
+                  <TouchableOpacity
+                    onPress={() => iniciarRechazo(item.mesa, item.items)}
+                    className="flex-1 bg-red-500 rounded-full py-4 items-center justify-center border-b-4 border-red-700 active:mt-1 active:border-b-0"
+                  >
+                    <Text className="text-white font-black text-xs uppercase tracking-wider">
+                      Rechazar
+                    </Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    onPress={() => handleAprobarPedido(item.mesa, item.items)}
+                    className="flex-1 bg-tertiary rounded-full py-4 items-center justify-center border-b-4 border-orange active:mt-1 active:border-b-0"
+                  >
+                    <Text className="text-primary font-black text-xs uppercase tracking-wider">
+                      Confirmar
+                    </Text>
+                  </TouchableOpacity>
+                </View>
               </View>
             </View>
           );
         }}
       />
+
+      {pedidosAConfirmar.length > 1 && (
+        <View className="flex-row justify-center items-center pb-6 bg-secondary">
+          <Ionicons name="swap-horizontal" size={14} color="#31603D" style={{ marginRight: 6 }} />
+          <Text className="text-primary/75 font-bold text-[10px] uppercase tracking-widest">
+            Desliza para ver más ({pedidosAConfirmar.length} comandas)
+          </Text>
+        </View>
+      )}
 
       <Modal visible={modalRechazoVisible} transparent animationType="fade">
         <View className="flex-1 justify-center items-center bg-black/60 px-6">

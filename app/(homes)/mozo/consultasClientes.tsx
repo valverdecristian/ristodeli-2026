@@ -2,7 +2,14 @@ import { supabase } from '@/src/services/SupabaseClient';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Text, TouchableOpacity, View, Dimensions, FlatList } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import * as Haptics from 'expo-haptics';
+
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
+
+const HEADER_HEIGHT = 80;
+const AVAILABLE_HEIGHT = SCREEN_HEIGHT - HEADER_HEIGHT - 120; // safe space calculation to avoid overflow/scroll
 
 interface SesionActiva {
     sesion_id: string;
@@ -102,8 +109,6 @@ export default function ConsultasClientesScreen() {
         return d.toLocaleDateString();
     };
 
-    const cantidad = sesiones.length;
-
     const navegarAChat = async (item: SesionActiva) => {
         await marcarLeido(item.sesion_id);
         router.push({
@@ -112,134 +117,149 @@ export default function ConsultasClientesScreen() {
         });
     };
 
-    const renderContenido = () => {
-        if (cantidad === 0) {
-            return (
-                <View className="flex-1 justify-center items-center">
-                    <View className="bg-secondary/30 p-6 rounded-full mb-4">
-                        <Ionicons name="chatbubbles-outline" size={48} color="#31603D" style={{ opacity: 0.3 }} />
-                    </View>
-                    <Text className="text-primary/40 font-bold text-sm uppercase">Sin consultas activas</Text>
-                </View>
-            );
-        }
+    const handleRefreshVisual = () => {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        cargarSesionesActivas();
+    };
 
-        if (cantidad <= 2) {
-            return (
-                <View className="px-2">
-                    {sesiones.map((item) => (
-                        <TouchableOpacity
-                            key={item.sesion_id}
-                            onPress={() => navegarAChat(item)}
-                            className="bg-primary border border-tertiary/30 p-5 rounded-[24px] mb-4"
-                        >
-                            <View className="flex-row items-center mb-2">
-                                <View className="bg-tertiary/20 p-3 rounded-full mr-3">
-                                    <Ionicons name="chatbubble-ellipses" size={20} color="#F5C065" />
-                                </View>
-                                <View className="flex-1 flex-row items-center">
-                                    <Text className="text-white font-black text-base uppercase">Mesa N° {item.numero_mesa}</Text>
-                                    {item.no_leidos > 0 && (
-                                        <View className="bg-red-500 rounded-full min-w-[20px] h-5 px-1.5 items-center justify-center ml-2">
-                                            <Text className="text-white font-black text-[10px]">{item.no_leidos}</Text>
-                                        </View>
-                                    )}
-                                </View>
-                            </View>
-                            {item.ultimo_mensaje ? (
-                                <Text className="text-white/60 text-xs ml-2" numberOfLines={2}>{item.ultimo_mensaje}</Text>
-                            ) : (
-                                <Text className="text-white/30 text-xs ml-2 italic">Sin mensajes aún</Text>
-                            )}
-                            {item.ultima_actividad && (
-                                <Text className="text-tertiary/60 text-[9px] mt-1 ml-2 uppercase font-bold">{formatearTimestamp(item.ultima_actividad)}</Text>
-                            )}
-                        </TouchableOpacity>
-                    ))}
-                </View>
-            );
+    const chunkArray = (arr: any[], size: number) => {
+        const chunked = [];
+        for (let i = 0; i < arr.length; i += size) {
+            chunked.push(arr.slice(i, i + size));
         }
+        return chunked;
+    };
 
-        if (cantidad <= 6) {
-            return (
-                <View className="flex-row flex-wrap justify-between px-1">
-                    {sesiones.map((item) => (
-                        <TouchableOpacity
-                            key={item.sesion_id}
-                            onPress={() => navegarAChat(item)}
-                            className="w-[48%] bg-primary border border-tertiary/30 p-4 rounded-[24px] mb-4 items-center relative"
-                        >
-                            {item.no_leidos > 0 && (
-                                <View className="absolute -top-2 -right-2 bg-red-500 rounded-full min-w-[22px] h-[22px] px-1.5 items-center justify-center z-10 border-2 border-secondary">
-                                    <Text className="text-white font-black text-[10px]">{item.no_leidos}</Text>
-                                </View>
-                            )}
-                            <View className="bg-tertiary/20 p-3 rounded-full mb-2">
-                                <Ionicons name="chatbubble-ellipses" size={22} color="#F5C065" />
-                            </View>
-                            <Text className="text-white font-black text-sm uppercase mb-1">Mesa N° {item.numero_mesa}</Text>
-                            <View className="bg-tertiary px-2 py-0.5 rounded-full">
-                                <Text className="text-primary font-bold text-[8px] uppercase">Activo</Text>
-                            </View>
-                        </TouchableOpacity>
-                    ))}
-                </View>
-            );
-        }
-
+    const renderPaginaSesiones = ({ item: grupoSesiones }: { item: SesionActiva[] }) => {
         return (
-            <View className="px-1">
-                {sesiones.map((item) => (
-                    <TouchableOpacity
-                        key={item.sesion_id}
-                        onPress={() => navegarAChat(item)}
-                        className="flex-row items-center bg-primary border border-tertiary/20 p-4 rounded-[20px] mb-3"
-                    >
-                        <View className="w-10 h-10 bg-tertiary/20 rounded-full items-center justify-center mr-3 relative">
-                            <Text className="text-tertiary font-black text-sm">{item.numero_mesa}</Text>
-                            {item.no_leidos > 0 && (
-                                <View className="absolute -top-1 -right-1 bg-red-500 rounded-full w-4 h-4 items-center justify-center">
-                                    <Text className="text-white font-black text-[8px]">{item.no_leidos > 9 ? '9+' : item.no_leidos}</Text>
+            <View style={{ width: SCREEN_WIDTH, height: AVAILABLE_HEIGHT, paddingHorizontal: 24, justifyContent: 'center' }}>
+                {grupoSesiones.map((item) => {
+                    const CARD_WIDTH = SCREEN_WIDTH - 48;
+                    const CARD_HEIGHT = (AVAILABLE_HEIGHT - 32) / 2;
+
+                    return (
+                        <TouchableOpacity
+                            key={item.sesion_id}
+                            onPress={() => navegarAChat(item)}
+                            activeOpacity={0.7}
+                            style={{ width: CARD_WIDTH, height: CARD_HEIGHT, marginBottom: 16 }}
+                            className="bg-primary rounded-[28px] border border-tertiary/30 p-5 justify-between shadow-lg"
+                        >
+                            {/* Header de la tarjeta */}
+                            <View className="flex-row justify-between items-center">
+                                <View className="flex-row items-center">
+                                    <View className="bg-tertiary/20 w-12 h-12 rounded-full items-center justify-center mr-3">
+                                        <Ionicons name="chatbubble-ellipses" size={24} color="#F5C065" />
+                                    </View>
+                                    <View>
+                                        <Text className="text-white font-black text-lg uppercase tracking-tight">Mesa N° {item.numero_mesa}</Text>
+                                        {item.no_leidos > 0 ? (
+                                            <View className="bg-red-500 rounded-full px-2 py-0.5 mt-0.5 align-start self-start flex-row items-center">
+                                                <View className="w-1.5 h-1.5 rounded-full bg-white mr-1.5" />
+                                                <Text className="text-white font-black text-[9px] uppercase">{item.no_leidos} sin leer</Text>
+                                            </View>
+                                        ) : (
+                                            <Text className="text-tertiary/60 text-[10px] uppercase font-bold tracking-widest mt-0.5">Leído</Text>
+                                        )}
+                                    </View>
                                 </View>
-                            )}
-                        </View>
-                        <View className="flex-1">
-                            {item.ultimo_mensaje ? (
-                                <Text className="text-white font-medium text-xs" numberOfLines={1}>{item.ultimo_mensaje}</Text>
-                            ) : (
-                                <Text className="text-white/30 text-xs italic">Sin mensajes aún</Text>
-                            )}
-                        </View>
-                        {item.ultima_actividad && (
-                            <Text className="text-tertiary/60 text-[9px] uppercase font-bold ml-2">{formatearTimestamp(item.ultima_actividad)}</Text>
-                        )}
-                    </TouchableOpacity>
-                ))}
+                                {item.ultima_actividad && (
+                                    <View className="bg-secondary/15 px-3 py-1 rounded-full border border-tertiary/20">
+                                        <Text className="text-tertiary font-bold text-[9px] uppercase tracking-wider">{formatearTimestamp(item.ultima_actividad)}</Text>
+                                    </View>
+                                )}
+                            </View>
+
+                            {/* Mensaje */}
+                            <View className="bg-black/25 p-4 rounded-[20px] flex-1 my-3 justify-center">
+                                {item.ultimo_mensaje ? (
+                                    <Text className="text-white/90 text-sm italic font-medium leading-5" numberOfLines={2}>
+                                        "{item.ultimo_mensaje}"
+                                    </Text>
+                                ) : (
+                                    <Text className="text-white/30 text-sm italic font-light">Sin mensajes en esta consulta</Text>
+                                )}
+                            </View>
+
+                            {/* Botón de acción */}
+                            <View className="flex-row justify-between items-center">
+                                <Text className="text-tertiary font-bold text-xs uppercase tracking-widest">Responder consulta</Text>
+                                <View className="bg-tertiary p-2 rounded-full">
+                                    <Ionicons name="chevron-forward" size={16} color="#31603D" />
+                                </View>
+                            </View>
+                        </TouchableOpacity>
+                    );
+                })}
+                {/* Relleno si hay un solo item para evitar saltos en la altura disponible */}
+                {grupoSesiones.length === 1 && (
+                    <View style={{ width: SCREEN_WIDTH - 48, height: (AVAILABLE_HEIGHT - 32) / 2, marginBottom: 16 }} />
+                )}
             </View>
         );
     };
 
+    const paginas = chunkArray(sesiones, 2);
+
     return (
-        <View className="flex-1 bg-primary pt-12 px-6">
-            <View className="flex-row items-center mb-6">
-                <TouchableOpacity onPress={() => router.back()} className="bg-secondary p-2.5 rounded-full mr-4">
-                    <Ionicons name="arrow-back" size={18} color="#31603D" />
-                </TouchableOpacity>
-                <View>
-                    <Text className="text-white text-xl font-black uppercase tracking-wider">Consultas</Text>
-                    <Text className="text-tertiary text-[10px] uppercase font-bold tracking-widest">Sesiones activas en salón</Text>
+        <SafeAreaView className="flex-1 bg-primary">
+            {/* ENCABEZADO PREMIUM INTEGRADO */}
+            <View className="bg-tertiary px-6 pt-4 pb-5 flex-row items-center justify-between shadow-2xl">
+                <View className="flex-row items-center flex-1">
+                    <TouchableOpacity onPress={() => router.back()} className="mr-3 p-1 active:opacity-75">
+                        <Ionicons name="arrow-back" size={30} color="#31603D" />
+                    </TouchableOpacity>
+                    <View className="flex-1">
+                        <Text className="text-primary font-black text-2xl uppercase tracking-tighter leading-none">Consultas</Text>
+                        <Text className="text-primary/70 font-bold text-[9px] uppercase tracking-widest mt-1">Sesiones activas en salón</Text>
+                    </View>
                 </View>
+
+                <TouchableOpacity
+                    onPress={handleRefreshVisual}
+                    className="bg-primary/10 p-2.5 rounded-full border border-primary/10 active:opacity-75"
+                >
+                    <Ionicons name="refresh" size={20} color="#31603D" />
+                </TouchableOpacity>
             </View>
 
-            <View className="flex-1 bg-secondary rounded-t-[32px] p-6 border-t border-tertiary/20">
-                {loading ? (
-                    <View className="flex-1 justify-center items-center">
-                        <ActivityIndicator size="large" color="#F5C065" />
-                    </View>
-                ) : (
-                    renderContenido()
-                )}
-            </View>
-        </View>
+            {loading && sesiones.length === 0 ? (
+                <View className="flex-1 justify-center items-center bg-secondary">
+                    <ActivityIndicator size="large" color="#F5C065" />
+                </View>
+            ) : (
+                <View className="flex-1 bg-secondary rounded-t-[32px] border-t border-tertiary/20 pt-6">
+                    {sesiones.length === 0 ? (
+                        <View style={{ height: AVAILABLE_HEIGHT }} className="justify-center items-center px-6">
+                            <View className="bg-secondary p-8 rounded-full mb-4 border border-tertiary/20">
+                                <Ionicons name="chatbubbles-outline" size={48} color="#31603D" style={{ opacity: 0.3 }} />
+                            </View>
+                            <Text className="text-primary/60 font-bold text-xs uppercase tracking-widest text-center">Sin consultas activas</Text>
+                        </View>
+                    ) : (
+                        <>
+                            <FlatList
+                                data={paginas}
+                                keyExtractor={(item, index) => index.toString()}
+                                horizontal={true}
+                                pagingEnabled={true}
+                                showsHorizontalScrollIndicator={false}
+                                renderItem={renderPaginaSesiones}
+                                decelerationRate="fast"
+                            />
+                            {paginas.length > 1 && (
+                                <View className="flex-row justify-center items-center pb-6">
+                                    <Ionicons name="swap-horizontal" size={14} color="#31603D" style={{ marginRight: 6 }} />
+                                    <Text className="text-primary/75 font-bold text-[10px] uppercase tracking-widest">
+                                        Desliza para ver más ({paginas.length} páginas)
+                                    </Text>
+                                </View>
+                            )}
+                        </>
+                    )}
+                </View>
+            )}
+        </SafeAreaView>
     );
 }
+

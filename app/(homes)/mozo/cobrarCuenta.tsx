@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, FlatList, ActivityIndicator, Modal } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, FlatList, ActivityIndicator, Modal, Dimensions } from 'react-native';
 import { useRouter } from 'expo-router';
 import { supabase } from '@/src/services/SupabaseClient';
 import { SoundService } from '@/src/services/soundService';
@@ -11,6 +11,10 @@ import * as Haptics from 'expo-haptics';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import LoadingModal from '@/src/components/LoadingModal';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
+const HEADER_HEIGHT = 80;
+const AVAILABLE_HEIGHT = SCREEN_HEIGHT - HEADER_HEIGHT - 120;
 
 interface MesaCobro {
     id: string;
@@ -196,6 +200,7 @@ export default function CobrarCuentaScreen() {
             const targetSesionId = asignacion?.sesion_id || sesionId;
 
             if (asignacion?.id) {
+                // Modificado para conservar el fix del compañero (completar estado en vez de borrar)
                 const { error: errUpd } = await supabase
                     .from('lista_espera')
                     .update({ estado: 'completado' })
@@ -254,65 +259,107 @@ export default function CobrarCuentaScreen() {
     const propinaMonto = subtotal * (propinaPorcentaje / 100);
     const totalNeto = subtotal - descuentoMonto + propinaMonto;
 
+    const chunkArray = (arr: any[], size: number) => {
+        const chunked = [];
+        for (let i = 0; i < arr.length; i += size) {
+            chunked.push(arr.slice(i, i + size));
+        }
+        return chunked;
+    };
+
+    const renderPaginaMesasCobro = ({ item: grupoMesas }: { item: MesaCobro[] }) => {
+        return (
+            <View style={{ width: SCREEN_WIDTH, height: AVAILABLE_HEIGHT, paddingHorizontal: 24, justifyContent: 'center' }}>
+                {grupoMesas.map((item) => {
+                    const CARD_WIDTH = SCREEN_WIDTH - 48;
+                    const CARD_HEIGHT = (AVAILABLE_HEIGHT - 32) / 2;
+
+                    return (
+                        <TouchableOpacity
+                            key={item.id}
+                            onPress={() => { SoundService.reproducir('exito'); handleSeleccionarMesa(item); }}
+                            activeOpacity={0.7}
+                            style={{ width: CARD_WIDTH, height: CARD_HEIGHT, marginBottom: 16 }}
+                            className="bg-primary rounded-[28px] border border-tertiary/30 p-5 justify-between shadow-lg flex-row items-center"
+                        >
+                            <View className="flex-row items-center">
+                                <View className="bg-tertiary/20 p-4 rounded-full mr-4">
+                                    <Ionicons name="restaurant-outline" size={26} color="#F5C065" />
+                                </View>
+                                <View>
+                                    <Text className="text-white font-black text-lg uppercase tracking-tight">Mesa N° {item.numero}</Text>
+                                    <Text className="text-tertiary text-xs font-bold uppercase mt-1">Estado: Esperando Pago</Text>
+                                </View>
+                            </View>
+                            <View className="bg-tertiary p-2 rounded-full">
+                                <Ionicons name="chevron-forward" size={18} color="#31603D" />
+                            </View>
+                        </TouchableOpacity>
+                    );
+                })}
+                {/* Relleno si hay un solo item */}
+                {grupoMesas.length === 1 && (
+                    <View style={{ width: SCREEN_WIDTH - 48, height: (AVAILABLE_HEIGHT - 32) / 2, marginBottom: 16 }} />
+                )}
+            </View>
+        );
+    };
+
+    const paginas = chunkArray(mesas, 2);
+
     return (
         <SafeAreaView className="flex-1 bg-primary">
             <LoadingModal visible={submittingPago} message="Confirmando Pago y Liberando..." />
 
-            <View className="px-6 pt-4 flex-row items-center justify-between">
-                <TouchableOpacity
-                    onPress={() => { SoundService.reproducir('exito'); router.back(); }}
-                    className="flex-row items-center bg-secondary/20 py-2 px-4 rounded-full border border-tertiary/20"
-                >
-                    <Ionicons name="arrow-back" size={16} color="#F5C065" style={{ marginRight: 6 }} />
-                    <Text className="text-secondary font-bold text-xs uppercase">Volver</Text>
-                </TouchableOpacity>
-
-                <Text className="text-secondary font-black text-lg uppercase">
-                    Cobrar Cuenta
-                </Text>
-            </View>
-
-            <View className="px-6 mt-4 mb-2">
-                <Text className="text-white text-xs uppercase font-bold tracking-widest text-left">
-                    Mesas Solicitantes
-                </Text>
+            {/* ENCABEZADO PREMIUM INTEGRADO */}
+            <View className="bg-tertiary px-6 pt-4 pb-5 flex-row items-center justify-between shadow-2xl">
+                <View className="flex-row items-center flex-1">
+                    <TouchableOpacity onPress={() => router.back()} className="mr-3 p-1 active:opacity-75">
+                        <Ionicons name="arrow-back" size={30} color="#31603D" />
+                    </TouchableOpacity>
+                    <View className="flex-1">
+                        <Text className="text-primary font-black text-2xl uppercase tracking-tighter leading-none">Cobrar Cuenta</Text>
+                        <Text className="text-primary/70 font-bold text-[9px] uppercase tracking-widest mt-1">Mesas Solicitantes</Text>
+                    </View>
+                </View>
             </View>
 
             {loadingMesas && mesas.length === 0 ? (
-                <View className="flex-1 justify-center items-center">
+                <View className="flex-1 justify-center items-center bg-secondary">
                     <ActivityIndicator size="large" color="#F5C065" />
-                    <Text className="text-secondary font-bold mt-4 text-xs uppercase">Buscando solicitudes...</Text>
+                    <Text className="text-primary font-bold mt-4 text-xs uppercase">Buscando solicitudes...</Text>
                 </View>
             ) : (
-                <FlatList
-                    data={mesas}
-                    keyExtractor={(item) => item.id}
-                    showsVerticalScrollIndicator={false}
-                    className="px-6 mt-4"
-                    ListEmptyComponent={
-                        <View className="bg-secondary p-8 rounded-3xl items-center mt-6 w-full border border-tertiary/10">
-                            <Ionicons name="receipt-outline" size={40} color="#31603D" />
-                            <Text className="text-primary font-bold text-center mt-3 uppercase text-xs">No hay mesas solicitando la cuenta</Text>
-                        </View>
-                    }
-                    renderItem={({ item }) => (
-                        <TouchableOpacity
-                            onPress={() => { SoundService.reproducir('exito'); handleSeleccionarMesa(item); }}
-                            className="bg-secondary p-5 rounded-[24px] border border-tertiary/20 flex-row items-center justify-between mb-4 shadow-sm"
-                        >
-                            <View className="flex-row items-center">
-                                <View className="bg-primary/10 p-3 rounded-full mr-4">
-                                    <Ionicons name="restaurant-outline" size={24} color="#31603D" />
-                                </View>
-                                <View>
-                                    <Text className="text-primary font-bold text-base">Mesa N° {item.numero}</Text>
-                                    <Text className="text-tertiary text-[10px] font-bold uppercase">Estado: Esperando Pago</Text>
-                                </View>
+                <View className="flex-1 bg-secondary rounded-t-[32px] border-t border-tertiary/20 pt-6">
+                    {mesas.length === 0 ? (
+                        <View style={{ height: AVAILABLE_HEIGHT }} className="justify-center items-center px-6">
+                            <View className="bg-secondary p-8 rounded-full mb-4 border border-tertiary/20">
+                                <Ionicons name="receipt-outline" size={48} color="#31603D" style={{ opacity: 0.3 }} />
                             </View>
-                            <Ionicons name="chevron-forward" size={20} color="#31603D" />
-                        </TouchableOpacity>
+                            <Text className="text-primary font-bold text-xs uppercase tracking-widest text-center">No hay mesas solicitando la cuenta</Text>
+                        </View>
+                    ) : (
+                        <>
+                            <FlatList
+                                data={paginas}
+                                keyExtractor={(item, index) => index.toString()}
+                                horizontal={true}
+                                pagingEnabled={true}
+                                showsHorizontalScrollIndicator={false}
+                                renderItem={renderPaginaMesasCobro}
+                                decelerationRate="fast"
+                            />
+                            {paginas.length > 1 && (
+                                <View className="flex-row justify-center items-center pb-6">
+                                    <Ionicons name="swap-horizontal" size={14} color="#31603D" style={{ marginRight: 6 }} />
+                                    <Text className="text-primary/75 font-bold text-[10px] uppercase tracking-widest">
+                                        Desliza para ver más ({paginas.length} páginas)
+                                    </Text>
+                                </View>
+                            )}
+                        </>
                     )}
-                />
+                </View>
             )}
 
             {/* Modal de cobro de mesa */}
