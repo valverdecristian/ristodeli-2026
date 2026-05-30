@@ -1,5 +1,6 @@
 import { useToast } from "@/src/context/ToastContext";
 import { supabase } from '@/src/services/SupabaseClient';
+import { NotificationService } from '@/src/services/notificationService';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
@@ -149,6 +150,18 @@ export default function ChatMozoScreen() {
             if (error) {
                 showToast("error", "Error", "No se pudo enviar el mensaje.");
                 return;
+            }
+
+            const { data: le } = await supabase
+                .from('lista_espera')
+                .select('cliente_id')
+                .eq('mesa_asignada', mesaId)
+                .eq('estado', 'asignado')
+                .maybeSingle();
+
+            if (le?.cliente_id) {
+                NotificationService.notificarMensajeACliente(le.cliente_id, textoAEnviar)
+                    .catch(err => console.warn('[chatMozo] Error push al cliente:', err));
             }
 
         } catch (error: any) {
