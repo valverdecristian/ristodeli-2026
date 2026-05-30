@@ -7,6 +7,7 @@ import { NotificationService } from '@/src/services/notificationService';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
+import { useToast } from '@/src/context/ToastContext';
 import React, { useEffect, useState } from 'react';
 import { Alert, FlatList, Modal, Text, TouchableOpacity, View, Dimensions, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -22,6 +23,7 @@ const CARD_HEIGHT = AVAILABLE_HEIGHT * 0.95;
 
 export default function AsignarMesaScreen() {
     const router = useRouter();
+    const { showToast } = useToast();
     const [loading, setLoading] = useState(true);
     const [esperaList, setEsperaList] = useState<any[]>([]);
     const [mesasLibres, setMesasLibres] = useState<any[]>([]);
@@ -68,6 +70,7 @@ export default function AsignarMesaScreen() {
             await ListaEsperaService.asignarMesa(clienteSeleccionado.id, mesa.id);
 
             SoundService.reproducir('exito');
+            showToast('success', 'Mesa asignada', `Mesa N°${mesa.numero} asignada correctamente.`);
 
             NotificationService.notificarMesaAsignada(clienteSeleccionado.cliente_id, mesa.numero);
 
