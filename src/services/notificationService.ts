@@ -273,15 +273,23 @@ export const NotificationService = {
    */
   async notificarMensajeACliente(clienteId: string, mensaje: string): Promise<void> {
     try {
-      // Reutilizamos tu helper existente para buscar el token del cliente
-      const token = await NotificationService.obtenerTokenCliente(clienteId);
+      let token = await NotificationService.obtenerTokenCliente(clienteId);
+
+      if (!token) {
+        const { data } = await supabase
+          .from('anonimos')
+          .select('push_token')
+          .eq('id', clienteId)
+          .maybeSingle();
+        token = data?.push_token ?? null;
+      }
 
       if (token && token.startsWith('ExponentPushToken')) {
         await NotificationService.enviar(
           [token],
           'Mensaje del Mozo',
           mensaje,
-          { pantalla: 'chatCliente' } // ⚠️ Ajustá este string al nombre real de la ruta del chat del cliente
+          { pantalla: 'chatCliente' }
         );
       }
     } catch (error) {
