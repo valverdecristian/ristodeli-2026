@@ -1,4 +1,5 @@
 import { useToast } from "@/src/context/ToastContext";
+import { NotificationService } from "@/src/services/notificationService";
 import { supabase } from "@/src/services/SupabaseClient";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
@@ -6,17 +7,16 @@ import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
+  Dimensions,
   FlatList,
   Image,
   Modal,
+  ScrollView,
   Text,
   TextInput,
   TouchableOpacity,
   View,
-  Dimensions,
-  ScrollView,
 } from "react-native";
-import { NotificationService } from "@/src/services/notificationService";
 
 export default function ListaConfirmarPedidosMozo() {
   const { showToast } = useToast();
@@ -36,9 +36,22 @@ export default function ListaConfirmarPedidosMozo() {
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "pedidos" },
-        () => fetchPedidosAConfirmar(),
+        () => {
+          console.log(
+            "[ListaConfirmarPedidosMozo] Cambios detectados en pedidos",
+          );
+          fetchPedidosAConfirmar();
+        },
       )
-      .subscribe();
+      .subscribe((status) => {
+        if (status === "SUBSCRIBED") {
+          console.log(
+            "[ListaConfirmarPedidosMozo] Canal subscrito exitosamente",
+          );
+        } else if (status === "CLOSED" || status === "CHANNEL_ERROR") {
+          console.warn("[ListaConfirmarPedidosMozo] Error en canal:", status);
+        }
+      });
 
     return () => {
       supabase.removeChannel(channel);
@@ -153,7 +166,8 @@ export default function ListaConfirmarPedidosMozo() {
     }
   };
 
-  const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
+  const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } =
+    Dimensions.get("window");
   const HEADER_HEIGHT = 80;
   const AVAILABLE_HEIGHT = SCREEN_HEIGHT - HEADER_HEIGHT - 120;
 
@@ -175,7 +189,10 @@ export default function ListaConfirmarPedidosMozo() {
         showsHorizontalScrollIndicator={false}
         decelerationRate="fast"
         ListEmptyComponent={
-          <View style={{ width: SCREEN_WIDTH, height: AVAILABLE_HEIGHT }} className="justify-center items-center px-6">
+          <View
+            style={{ width: SCREEN_WIDTH, height: AVAILABLE_HEIGHT }}
+            className="justify-center items-center px-6"
+          >
             <View className="items-center mb-4">
               <Image
                 source={require("@/assets/images/icon.png")}
@@ -197,16 +214,23 @@ export default function ListaConfirmarPedidosMozo() {
         renderItem={({ item }) => {
           const hora = item.fecha
             ? new Date(item.fecha).toLocaleTimeString([], {
-              hour: "2-digit",
-              minute: "2-digit",
-            })
+                hour: "2-digit",
+                minute: "2-digit",
+              })
             : "--:--";
 
           const CARD_WIDTH = SCREEN_WIDTH - 48;
           const CARD_HEIGHT = AVAILABLE_HEIGHT - 40;
 
           return (
-            <View style={{ width: SCREEN_WIDTH, height: AVAILABLE_HEIGHT, paddingHorizontal: 24, justifyContent: 'center' }}>
+            <View
+              style={{
+                width: SCREEN_WIDTH,
+                height: AVAILABLE_HEIGHT,
+                paddingHorizontal: 24,
+                justifyContent: "center",
+              }}
+            >
               <View
                 style={{ width: CARD_WIDTH, height: CARD_HEIGHT, elevation: 3 }}
                 className="bg-primary rounded-[32px] p-6 border border-tertiary/30 shadow-lg justify-between"
@@ -224,7 +248,10 @@ export default function ListaConfirmarPedidosMozo() {
                 </View>
 
                 {/* Lista de productos scrollable adentro de la tarjeta fija */}
-                <ScrollView showsVerticalScrollIndicator={false} className="flex-1 my-2">
+                <ScrollView
+                  showsVerticalScrollIndicator={false}
+                  className="flex-1 my-2"
+                >
                   {item.items.map((prod: any) => (
                     <View
                       key={prod.id}
@@ -268,7 +295,12 @@ export default function ListaConfirmarPedidosMozo() {
 
       {pedidosAConfirmar.length > 1 && (
         <View className="flex-row justify-center items-center pb-6 bg-secondary">
-          <Ionicons name="swap-horizontal" size={14} color="#31603D" style={{ marginRight: 6 }} />
+          <Ionicons
+            name="swap-horizontal"
+            size={14}
+            color="#31603D"
+            style={{ marginRight: 6 }}
+          />
           <Text className="text-primary/75 font-bold text-[10px] uppercase tracking-widest">
             Desliza para ver más ({pedidosAConfirmar.length} comandas)
           </Text>

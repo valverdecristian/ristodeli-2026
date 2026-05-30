@@ -75,7 +75,7 @@
 * Le llega una notificación al mozo del pedido. ✅
 ---
 14. El mozo confirma el pedido, y esto es derivado al sector correspondiente. ✅ // ALEJO (MOZO); IGNACIO (COCINERO); CRISTIAN (CLIENTE)
-* Estando logueado como cocinero mostramos que nos llego una notificación de un nuevo pedido de preparación. ⏳
+* Estando logueado como cocinero mostramos que nos llego una notificación de un nuevo pedido de preparación. ✅
 * Mostramos que el pedido se encuentra en la cola de preparacion. ✅
 * El cliente escanea el QR de mesa nuevamente y ve que su pedido esta en preparación. ✅
 * Vuelve atras para acceder a los juegos. ✅
