@@ -97,7 +97,7 @@
 * Desde el cliente mostramos el cambio de "estado del pedido" que aparece ahora como "preparando en cocina/bar" ✅
 ---
 18.  Realizar las tareas correspondientes desde cocina y bar // IGNACIO (COCINERO); ALEJO (CANTINERO)
-* Al mozo le llega una notificación de que el pedido esta confirmado desde cocina o bar ⏳
+* Al mozo le llega una notificación de que el pedido esta confirmado desde cocina o bar ✅
 * El cliente verifica el cambio de estado de su pedido ✅
 ---
 19. El Mozo entrega el pedido completo. // ALEJO (MOZO); CRISTIAN (CLIENTE)

@@ -98,7 +98,8 @@ export default function HomeEntradaScreen() {
           .from("lista_espera")
           .select("id")
           .eq("cliente_id", currentId)
-          .eq("estado", "completado")
+          .eq("estado", "asignado")
+          .is("mesa_asignada", null)
           .limit(1)
           .maybeSingle();
 
