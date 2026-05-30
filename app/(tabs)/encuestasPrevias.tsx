@@ -57,7 +57,7 @@ export default function EncuestasPreviasScreen() {
                 <View className="bg-secondary rounded-[30px] p-6 border border-tertiary/15 shadow-xl mb-6 relative overflow-hidden">
                     <View className="flex-row justify-between items-center z-10">
                         <View className="flex-1 pr-4">
-                            <Text className="text-primary font-black text-xl uppercase tracking-tight">RistoDeli Analytics</Text>
+                            <Text className="text-primary font-black text-xl uppercase tracking-tight">RistoDeli Analítica</Text>
                             <Text className="text-primary/70 text-xs mt-1 uppercase font-bold tracking-wider">Métricas de Satisfacción y Calidad</Text>
 
                             <View className="flex-row items-center mt-4">

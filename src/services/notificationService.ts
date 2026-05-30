@@ -1,8 +1,8 @@
 //   - AuthContext.tsx   → usuarios registrados (todos los roles)
 //   - registroAnonimo.tsx → clientes anónimos
 
-import * as Notifications from 'expo-notifications';
-import { supabase } from './SupabaseClient';
+import * as Notifications from "expo-notifications";
+import { supabase } from "./SupabaseClient";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -13,11 +13,10 @@ Notifications.setNotificationHandler({
   }),
 });
 
-// Project ID de EAS 
-const EAS_PROJECT_ID = 'e747ca2a-d49f-40cd-8cfa-e0bb41e14b37';
+// Project ID de EAS
+const EAS_PROJECT_ID = "e747ca2a-d49f-40cd-8cfa-e0bb41e14b37";
 
 export const NotificationService = {
-
   /**
    * Solicita permisos de notificación al sistema operativo.
    * En iOS muestra el cartel nativo "Permitir que Ristodeli envíe notificaciones".
@@ -25,12 +24,14 @@ export const NotificationService = {
    * Devuelve true si se concedió el permiso, false en caso contrario.
    */
   async solicitarPermisos(): Promise<boolean> {
-    const { status: statusExistente } = await Notifications.getPermissionsAsync();
+    const { status: statusExistente } =
+      await Notifications.getPermissionsAsync();
 
-    if (statusExistente === 'granted') return true;
+    if (statusExistente === "granted") return true;
 
-    const { status: statusNuevo } = await Notifications.requestPermissionsAsync();
-    return statusNuevo === 'granted';
+    const { status: statusNuevo } =
+      await Notifications.requestPermissionsAsync();
+    return statusNuevo === "granted";
   },
 
   /**
@@ -47,7 +48,10 @@ export const NotificationService = {
     } catch (error) {
       // Falla silenciosa: ocurre en emuladores o si el permiso fue denegado.
       // No interrumpe el flujo de autenticación.
-      console.warn('[NotificationService] No se pudo obtener el push token:', error);
+      console.warn(
+        "[NotificationService] No se pudo obtener el push token:",
+        error,
+      );
       return null;
     }
   },
@@ -64,15 +68,18 @@ export const NotificationService = {
   async guardarToken(
     id: string,
     token: string,
-    tabla: 'usuarios' | 'anonimos'
+    tabla: "usuarios" | "anonimos",
   ): Promise<void> {
     const { error } = await supabase
       .from(tabla)
       .update({ push_token: token })
-      .eq('id', id);
+      .eq("id", id);
 
     if (error) {
-      console.error('[NotificationService] Error al guardar el push token:', error.message);
+      console.error(
+        "[NotificationService] Error al guardar el push token:",
+        error.message,
+      );
     }
   },
 
@@ -83,14 +90,13 @@ export const NotificationService = {
    * @param id - UUID del usuario o anónimo
    * @param tabla - Tabla donde persiste el token
    */
-  async registrar(
-    id: string,
-    tabla: 'usuarios' | 'anonimos'
-  ): Promise<void> {
+  async registrar(id: string, tabla: "usuarios" | "anonimos"): Promise<void> {
     try {
       const permisoConcedido = await NotificationService.solicitarPermisos();
       if (!permisoConcedido) {
-        console.warn('[NotificationService] El usuario denegó los permisos de notificación.');
+        console.warn(
+          "[NotificationService] El usuario denegó los permisos de notificación.",
+        );
         return;
       }
 
@@ -101,7 +107,10 @@ export const NotificationService = {
       console.log(`[NotificationService] Token registrado para ${tabla}:${id}`);
     } catch (error) {
       // Falla silenciosa — un error en las notificaciones nunca debe romper el login
-      console.error('[NotificationService] Error en el flujo de registro:', error);
+      console.error(
+        "[NotificationService] Error en el flujo de registro:",
+        error,
+      );
     }
   },
 
@@ -118,34 +127,37 @@ export const NotificationService = {
     tokens: string[],
     titulo: string,
     cuerpo: string,
-    datos?: Record<string, unknown>
+    datos?: Record<string, unknown>,
   ): Promise<void> {
     if (tokens.length === 0) return;
 
-    const mensajes = tokens.map(token => ({
+    const mensajes = tokens.map((token) => ({
       to: token,
-      sound: 'default',
+      sound: "default",
       title: titulo,
       body: cuerpo,
       data: datos ?? {},
     }));
 
     try {
-      const response = await fetch('https://exp.host/--/api/v2/push/send', {
-        method: 'POST',
+      const response = await fetch("https://exp.host/--/api/v2/push/send", {
+        method: "POST",
         headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
+          Accept: "application/json",
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(mensajes),
       });
 
       if (!response.ok) {
         const errBody = await response.text();
-        console.error('[NotificationService] Error en Expo Push API:', errBody);
+        console.error("[NotificationService] Error en Expo Push API:", errBody);
       }
     } catch (error) {
-      console.error('[NotificationService] Error de red al enviar notificaciones:', error);
+      console.error(
+        "[NotificationService] Error de red al enviar notificaciones:",
+        error,
+      );
     }
   },
 
@@ -158,16 +170,22 @@ export const NotificationService = {
    */
   async notificarNuevoClientePendiente(nombreCliente: string): Promise<void> {
     try {
-      const tokens = await NotificationService.obtenerTokensPorPerfiles(['admin', 'supervisor']);
+      const tokens = await NotificationService.obtenerTokensPorPerfiles([
+        "admin",
+        "supervisor",
+      ]);
       await NotificationService.enviar(
         tokens,
-        'Nuevo cliente pendiente',
+        "Nuevo cliente pendiente",
         `${nombreCliente} se registró y requiere tu aprobación.`,
-        { pantalla: 'aprobaciones' }
+        { pantalla: "aprobaciones" },
       );
     } catch (error) {
       // Falla silenciosa — no interrumpe el flujo de registro del cliente
-      console.error('[NotificationService] Error notificando nuevo cliente:', error);
+      console.error(
+        "[NotificationService] Error notificando nuevo cliente:",
+        error,
+      );
     }
   },
 
@@ -182,19 +200,25 @@ export const NotificationService = {
   async notificarPagoConfirmado(
     numeroMesa: string | number,
     totalNeto: number,
-    mozoNombre?: string
+    mozoNombre?: string,
   ): Promise<void> {
     try {
-      const tokens = await NotificationService.obtenerTokensPorPerfiles(['admin', 'supervisor']);
-      const quien = mozoNombre ? ` · Mozo: ${mozoNombre}` : '';
+      const tokens = await NotificationService.obtenerTokensPorPerfiles([
+        "admin",
+        "supervisor",
+      ]);
+      const quien = mozoNombre ? ` · Mozo: ${mozoNombre}` : "";
       await NotificationService.enviar(
         tokens,
         `💰 Pago confirmado — Mesa ${numeroMesa}`,
         `Total cobrado: $${totalNeto.toFixed(2)}${quien}. Mesa liberada.`,
-        { pantalla: 'reportes', mesa: String(numeroMesa) }
+        { pantalla: "reportes", mesa: String(numeroMesa) },
       );
     } catch (error) {
-      console.error('[NotificationService] Error notificando pago confirmado:', error);
+      console.error(
+        "[NotificationService] Error notificando pago confirmado:",
+        error,
+      );
     }
   },
 
@@ -208,12 +232,15 @@ export const NotificationService = {
    */
   async limpiarToken(id: string): Promise<void> {
     const { error } = await supabase
-      .from('usuarios')
+      .from("usuarios")
       .update({ push_token: null })
-      .eq('id', id);
+      .eq("id", id);
 
     if (error) {
-      console.error('[NotificationService] Error al limpiar el push token:', error.message);
+      console.error(
+        "[NotificationService] Error al limpiar el push token:",
+        error.message,
+      );
     }
   },
 
@@ -222,15 +249,17 @@ export const NotificationService = {
    */
   async notificarNuevoClienteEnEspera(nombreCliente: string): Promise<void> {
     try {
-      const tokens = await NotificationService.obtenerTokensPorPerfiles(['metre']);
+      const tokens = await NotificationService.obtenerTokensPorPerfiles([
+        "metre",
+      ]);
       await NotificationService.enviar(
         tokens,
-        'Nuevo cliente en lista de espera',
+        "Nuevo cliente en lista de espera",
         `${nombreCliente} ingresó a la lista de espera y aguarda una mesa.`,
-        { pantalla: 'listaEspera' }
+        { pantalla: "listaEspera" },
       );
     } catch (error) {
-      console.error('[NotificationService] Error notificando al metre:', error);
+      console.error("[NotificationService] Error notificando al metre:", error);
     }
   },
 
@@ -239,9 +268,9 @@ export const NotificationService = {
    */
   async obtenerTokenCliente(clienteId: string): Promise<string | null> {
     const { data, error } = await supabase
-      .from('usuarios')
-      .select('push_token')
-      .eq('id', clienteId)
+      .from("usuarios")
+      .select("push_token")
+      .eq("id", clienteId)
       .single();
 
     if (error || !data) return null;
@@ -251,27 +280,36 @@ export const NotificationService = {
   /**
    * FLUJO 2: El Metre asigna la mesa -> Avisa al Cliente
    */
-  async notificarMesaAsignada(clienteId: string, numeroMesa: string | number): Promise<void> {
+  async notificarMesaAsignada(
+    clienteId: string,
+    numeroMesa: string | number,
+  ): Promise<void> {
     try {
       const token = await NotificationService.obtenerTokenCliente(clienteId);
-      if (token && token.startsWith('ExponentPushToken')) {
+      if (token && token.startsWith("ExponentPushToken")) {
         // 🌟 Envolvemos el token en un array [token] porque enviar() espera un string[]
         await NotificationService.enviar(
           [token],
-          '¡Tu mesa está lista!',
+          "¡Tu mesa está lista!",
           `El metre te ha asignado la Mesa ${numeroMesa}. Ya podés acercarte y escanear el QR en la mesa.`,
-          { pantalla: 'homeCliente' }
+          { pantalla: "homeCliente" },
         );
       }
     } catch (error) {
-      console.error('[NotificationService] Error notificando asignación de mesa al cliente:', error);
+      console.error(
+        "[NotificationService] Error notificando asignación de mesa al cliente:",
+        error,
+      );
     }
   },
 
   /**
    * FLUJO CHAT 1: El Mozo escribe -> Avisa al Cliente específico
    */
-  async notificarMensajeACliente(clienteId: string, mensaje: string): Promise<void> {
+  async notificarMensajeACliente(
+    clienteId: string,
+    mensaje: string,
+  ): Promise<void> {
     try {
       let token = await NotificationService.obtenerTokenCliente(clienteId);
 
@@ -284,16 +322,19 @@ export const NotificationService = {
         token = data?.push_token ?? null;
       }
 
-      if (token && token.startsWith('ExponentPushToken')) {
+      if (token && token.startsWith("ExponentPushToken")) {
         await NotificationService.enviar(
           [token],
-          'Mensaje del Mozo',
+          "Mensaje del Mozo",
           mensaje,
-          { pantalla: 'chatCliente' }
+          { pantalla: "chatCliente" }, // ⚠️ Ajustá este string al nombre real de la ruta del chat del cliente
         );
       }
     } catch (error) {
-      console.error('[NotificationService] Error notificando mensaje al cliente:', error);
+      console.error(
+        "[NotificationService] Error notificando mensaje al cliente:",
+        error,
+      );
     }
   },
 
@@ -304,23 +345,28 @@ export const NotificationService = {
   async obtenerTokensPorPerfiles(perfiles: string[]): Promise<string[]> {
     try {
       const { data, error } = await supabase
-        .from('usuarios')
-        .select('push_token')
-        .in('perfil', perfiles) // 🌟 Busca cualquiera de los perfiles en el array
-        .not('push_token', 'is', null);
+        .from("usuarios")
+        .select("push_token")
+        .in("perfil", perfiles) // 🌟 Busca cualquiera de los perfiles en el array
+        .not("push_token", "is", null);
 
       if (error) {
-        console.error('[NotificationService] Error obteniendo tokens:', error.message);
+        console.error(
+          "[NotificationService] Error obteniendo tokens:",
+          error.message,
+        );
         return [];
       }
 
       // Filtramos y validamos que sean tokens reales de Expo
       return (data ?? [])
         .map((u: { push_token: string | null }) => u.push_token)
-        .filter((t): t is string => !!t && t.startsWith('ExponentPushToken'));
-      
+        .filter((t): t is string => !!t && t.startsWith("ExponentPushToken"));
     } catch (error) {
-      console.error('[NotificationService] Excepción al buscar tokens por perfil:', error);
+      console.error(
+        "[NotificationService] Excepción al buscar tokens por perfil:",
+        error,
+      );
       return [];
     }
   },
@@ -333,41 +379,58 @@ export const NotificationService = {
    * @param cantItems    - Cantidad total de ítems en el pedido
    * @param importeTotal - Importe acumulado del pedido
    */
-  async notificarComandaAlMozo(numeroMesa: string | number, cantItems: number, importeTotal: number): Promise<void> {
+  async notificarComandaAlMozo(
+    numeroMesa: string | number,
+    cantItems: number,
+    importeTotal: number,
+  ): Promise<void> {
     try {
-      const tokens = await NotificationService.obtenerTokensPorPerfiles(['mozo']);
+      const tokens = await NotificationService.obtenerTokensPorPerfiles([
+        "mozo",
+      ]);
 
       if (tokens.length > 0) {
         await NotificationService.enviar(
           tokens,
           `Nueva comanda — Mesa ${numeroMesa}`,
-          `${cantItems} ítem${cantItems !== 1 ? 's' : ''} · $${importeTotal}. Revisá el pedido y confirmá.`,
-          { pantalla: 'comandasMozo', mesa: String(numeroMesa) }
+          `${cantItems} ítem${cantItems !== 1 ? "s" : ""} · $${importeTotal}. Revisá el pedido y confirmá.`,
+          { pantalla: "comandasMozo", mesa: String(numeroMesa) },
         );
       }
     } catch (error) {
-      console.error('[NotificationService] Error notificando comanda al mozo:', error);
+      console.error(
+        "[NotificationService] Error notificando comanda al mozo:",
+        error,
+      );
     }
   },
 
   /**
    * FLUJO CHAT 2: El Cliente escribe -> Avisa a los Mozos
    */
-  async notificarMensajeAMozos(numeroMesa: string | number, mensaje: string): Promise<void> {
+  async notificarMensajeAMozos(
+    numeroMesa: string | number,
+    mensaje: string,
+  ): Promise<void> {
     try {
       // Buscamos los tokens de todos los usuarios con perfil 'mozo'
-      const tokens = await NotificationService.obtenerTokensPorPerfiles(['mozo']);
+      const tokens = await NotificationService.obtenerTokensPorPerfiles([
+        "mozo",
+      ]);
 
       if (tokens.length > 0) {
         await NotificationService.enviar(
           tokens,
           `🔔 Mensaje de la Mesa ${numeroMesa}`,
           mensaje,
-          { pantalla: 'consultasClientes' } // La pantalla donde los mozos ven la lista de chats
+          { pantalla: "consultasClientes" }, // La pantalla donde los mozos ven la lista de chats
         );
       }
     } catch (error) {
-      console.error('[NotificationService] Error notificando mensaje a mozos:', error);
+      console.error(
+        "[NotificationService] Error notificando mensaje a mozos:",
+        error,
+      );
     }
   },
 
@@ -375,44 +438,65 @@ export const NotificationService = {
    * FLUJO PAGO 1: El Cliente paga -> Avisa a Mozo, Admin y Supervisor
    * Para que puedan ir a la mesa o verificar la cuenta y confirmar.
    */
-  async notificarPagoRealizado(numeroMesa: string | number, importe: number): Promise<void> {
+  async notificarPagoRealizado(
+    numeroMesa: string | number,
+    importe: number,
+  ): Promise<void> {
     try {
       // Usamos el nuevo helper para traer a los 3 roles a la vez
-      const tokens = await NotificationService.obtenerTokensPorPerfiles(['mozo', 'admin', 'supervisor']);
-      
+      const tokens = await NotificationService.obtenerTokensPorPerfiles([
+        "mozo",
+        "admin",
+        "supervisor",
+      ]);
+
       if (tokens.length > 0) {
         await NotificationService.enviar(
           tokens,
           `💸 Pago recibido - Mesa ${numeroMesa}`,
           `El cliente ha enviado un pago de $${importe}. Pendiente de confirmación.`,
-          { pantalla: 'confirmacionPagos' } // ⚠️ Ajustá al nombre de la pantalla donde validan el pago
+          { pantalla: "confirmacionPagos" }, // ⚠️ Ajustá al nombre de la pantalla donde validan el pago
         );
       }
     } catch (error) {
-      console.error('[NotificationService] Error notificando pago realizado:', error);
+      console.error(
+        "[NotificationService] Error notificando pago realizado:",
+        error,
+      );
     }
   },
 
   /**
    * FLUJO DESPACHO: Cocina o Barra terminan -> Avisa a los Mozos
    */
-  async notificarPedidoListoParaEntregar(numeroMesa: number | string, sector: string): Promise<void> {
+  async notificarPedidoListoParaEntregar(
+    numeroMesa: number | string,
+    sector: string,
+  ): Promise<void> {
     try {
       // Usamos el helper que creamos antes para traer todos los mozos
-      const tokens = await NotificationService.obtenerTokensPorPerfiles(['mozo']);
-      
-      const origen = sector === 'cocina' ? 'Los platos de la cocina' : 'Las bebidas de la barra';
+      const tokens = await NotificationService.obtenerTokensPorPerfiles([
+        "mozo",
+      ]);
+
+      const origen =
+        sector === "cocina"
+          ? "Los platos de la cocina"
+          : "Las bebidas de la barra";
 
       if (tokens.length > 0) {
         await NotificationService.enviar(
           tokens,
           `🛎️ ¡Pedido Listo! - Mesa ${numeroMesa}`,
           `${origen} ya están listos para ser entregados.`,
-          { pantalla: 'entregarPedido' } // ⚠️ Lo mandamos directo a la pantalla que me pasaste
+          { pantalla: "entregarPedido" }, // ⚠️ Lo mandamos directo a la pantalla que me pasaste
         );
       }
     } catch (error) {
-      console.error('[NotificationService] Error notificando pedido listo al mozo:', error);
+      console.error(
+        "[NotificationService] Error notificando pedido listo al mozo:",
+        error,
+      );
     }
   },
 
@@ -420,43 +504,64 @@ export const NotificationService = {
    * FLUJO RECHAZO: El Mozo rechaza el pedido -> Avisa al Cliente
    * Se llama desde ListaConfirmarPedidosMozo.tsx al confirmar el rechazo.
    */
-  async notificarPedidoRechazado(numeroMesa: number | string, motivo: string): Promise<void> {
+  async notificarPedidoRechazado(
+    numeroMesa: number | string,
+    motivo: string,
+  ): Promise<void> {
     try {
       const { data: mesa, error: mesaErr } = await supabase
-        .from('mesas')
-        .select('id')
-        .eq('numero', numeroMesa)
+        .from("mesas")
+        .select("id")
+        .eq("numero", numeroMesa)
         .single();
 
       if (mesaErr || !mesa) {
-        console.warn(`[NotificationService] No se encontró la mesa número ${numeroMesa}`);
+        console.warn(
+          `[NotificationService] No se encontró la mesa número ${numeroMesa}`,
+        );
         return;
       }
 
-      const { data: asignacion, error: asignErr } = await supabase
-        .from('lista_espera')
-        .select('cliente_id')
-        .eq('mesa_asignada', mesa.id)
-        .eq('estado', 'asignado')
-        .maybeSingle();
+      const { data: asignacionList, error: asignErr } = await supabase
+        .from("lista_espera")
+        .select("cliente_id")
+        .eq("mesa_asignada", mesa.id)
+        .eq("estado", "asignado")
+        .order("created_at", { ascending: false })
+        .limit(1);
 
-      if (asignErr || !asignacion?.cliente_id) {
-        console.warn(`[NotificationService] No hay cliente asignado a la mesa ${numeroMesa}`);
+      if (asignErr || !asignacionList || asignacionList.length === 0) {
+        console.warn(
+          `[NotificationService] No hay cliente asignado a la mesa ${numeroMesa}`,
+        );
         return;
       }
 
-      const token = await NotificationService.obtenerTokenCliente(asignacion.cliente_id);
+      const asignacion = asignacionList[0];
+      if (!asignacion?.cliente_id) {
+        console.warn(
+          `[NotificationService] Cliente ID vacío para mesa ${numeroMesa}`,
+        );
+        return;
+      }
 
-      if (token && token.startsWith('ExponentPushToken')) {
+      const token = await NotificationService.obtenerTokenCliente(
+        asignacion.cliente_id,
+      );
+
+      if (token && token.startsWith("ExponentPushToken")) {
         await NotificationService.enviar(
           [token],
-          '❌ Pedido Rechazado',
+          "❌ Pedido Rechazado",
           `Tu pedido de la Mesa ${numeroMesa} fue rechazado. Motivo: ${motivo}`,
-          { pantalla: 'homeCliente' }
+          { pantalla: "homeCliente" },
         );
       }
     } catch (error) {
-      console.error('[NotificationService] Error notificando pedido rechazado al cliente:', error);
+      console.error(
+        "[NotificationService] Error notificando pedido rechazado al cliente:",
+        error,
+      );
     }
   },
 
@@ -465,41 +570,54 @@ export const NotificationService = {
    */
   async notificarPedidoDerivado(
     mesaNumero: number | string,
-    items: { categoria: string; producto_nombre: string; cantidad: number }[]
+    items: { categoria: string; producto_nombre: string; cantidad: number }[],
   ): Promise<void> {
     try {
-      const tieneBebida = items.some(item => item.categoria === 'bebida');
-      const tieneCocina = items.some(item => item.categoria !== 'bebida');
+      const tieneBebida = items.some((item) => item.categoria === "bebida");
+      const tieneCocina = items.some((item) => item.categoria !== "bebida");
 
       if (tieneCocina) {
-        const tokensCocinero = await NotificationService.obtenerTokensPorPerfiles(['cocinero']);
+        const tokensCocinero =
+          await NotificationService.obtenerTokensPorPerfiles(["cocinero"]);
         if (tokensCocinero.length > 0) {
-          const cocinaItems = items.filter(item => item.categoria !== 'bebida');
-          const desc = cocinaItems.map(i => `${i.producto_nombre} (x${i.cantidad})`).join(', ');
+          const cocinaItems = items.filter(
+            (item) => item.categoria !== "bebida",
+          );
+          const desc = cocinaItems
+            .map((i) => `${i.producto_nombre} (x${i.cantidad})`)
+            .join(", ");
           await NotificationService.enviar(
             tokensCocinero,
             `👨‍🍳 Nuevo pedido a Cocina — Mesa ${mesaNumero}`,
             `Preparar: ${desc}`,
-            { pantalla: 'pedidos' }
+            { pantalla: "pedidos" },
           );
         }
       }
 
       if (tieneBebida) {
-        const tokensCantinero = await NotificationService.obtenerTokensPorPerfiles(['cantinero']);
+        const tokensCantinero =
+          await NotificationService.obtenerTokensPorPerfiles(["cantinero"]);
         if (tokensCantinero.length > 0) {
-          const bebidaItems = items.filter(item => item.categoria === 'bebida');
-          const desc = bebidaItems.map(i => `${i.producto_nombre} (x${i.cantidad})`).join(', ');
+          const bebidaItems = items.filter(
+            (item) => item.categoria === "bebida",
+          );
+          const desc = bebidaItems
+            .map((i) => `${i.producto_nombre} (x${i.cantidad})`)
+            .join(", ");
           await NotificationService.enviar(
             tokensCantinero,
             `🍹 Nuevo pedido a Barra — Mesa ${mesaNumero}`,
             `Preparar: ${desc}`,
-            { pantalla: 'pedidos' }
+            { pantalla: "pedidos" },
           );
         }
       }
     } catch (error) {
-      console.error('[NotificationService] Error al notificar pedido derivado:', error);
+      console.error(
+        "[NotificationService] Error al notificar pedido derivado:",
+        error,
+      );
     }
   },
 };
