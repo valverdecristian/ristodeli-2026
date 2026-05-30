@@ -200,10 +200,14 @@ export default function CobrarCuentaScreen() {
             const targetSesionId = asignacion?.sesion_id || sesionId;
 
             if (asignacion?.id) {
-                // Modificado para conservar el fix del compañero (completar estado en vez de borrar)
+                // Modificado para conservar el fix del compañero (completar estado)
+                // Usamos 'asignado' con mesa_asignada: null debido a la check constraint 'lista_espera_estado_check' de la DB
                 const { error: errUpd } = await supabase
                     .from('lista_espera')
-                    .update({ estado: 'completado' })
+                    .update({ 
+                        estado: 'asignado',
+                        mesa_asignada: null
+                    })
                     .eq('id', asignacion.id);
                 if (errUpd) throw errUpd;
             }
