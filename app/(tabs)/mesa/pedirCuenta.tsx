@@ -5,6 +5,7 @@ import { supabase } from '@/src/services/SupabaseClient';
 import { SoundService } from '@/src/services/soundService';
 import { useToast } from '@/src/context/ToastContext';
 import { MesaService } from '@/src/services/mesaService';
+import { NotificationService } from '@/src/services/notificationService';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
@@ -217,6 +218,10 @@ export default function PedirCuentaScreen() {
             if (mesaId) {
                 await MesaService.actualizarEstado(mesaId as string, 'Pidiendo Cuenta');
             }
+
+            // Notificar a mozo, admin y supervisor que se solicitó la cuenta
+            NotificationService.notificarPagoRealizado(nroMesaInt, totalNeto)
+                .catch((err) => console.warn('[pedirCuenta] Fallo notificación solicitar cuenta:', err));
 
             await SoundService.reproducir('exito');
             showToast('success', 'Cuenta Solicitada', 'El Mozo vendrá pronto con el cobro. ¡Gracias!');

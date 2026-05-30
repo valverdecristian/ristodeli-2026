@@ -59,13 +59,6 @@ export default function MenuProductosScreen() {
                         setEstadoComanda('edicion');
 
                         await SoundService.reproducir('error');
-
-                        let motivoDelMozo = "Revisá los motivos de rechazo.";
-                        if (data.estado.includes(':')) {
-                            motivoDelMozo = data.estado.split(':')[1].trim();
-                        }
-
-                        showToast("error", "Pedido Rechazado", motivoDelMozo);
                     }
                 }
             } catch (err) {
